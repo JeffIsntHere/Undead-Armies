@@ -17,11 +17,11 @@ public class Alchemist extends BaseType
     public static final Alchemist alchemist = new Alchemist();
     public final ArrayList<LivingEntity> targets = new ArrayList<>();
     public static final AABB throwingBox = new AABB(-10.0,-10.0,-10.0,10.0,10.0,10.0);
-    public static final int throwingCooldown = Alchemist.alchemist.actionCooldown() * 3;
+    public static final int throwingCooldown = Alchemist.alchemist.actionCooldown() * 10;
     @Override
     public float chance()
     {
-        return 0.1f;
+        return 0.2f;
     }
     @Override
     public int actionCooldown()
@@ -48,12 +48,12 @@ public class Alchemist extends BaseType
         for(LivingEntity livingEntity : this.targets)
         {
             final float currentTargetWeight = 1.0f/livingEntity.getHealth();
-            if(currentTargetWeight > highestTargetWeight)
+            if(currentTargetWeight >= highestTargetWeight)
             {
                 highestTargetWeight = currentTargetWeight;
                 currentTarget = livingEntity;
             }
         }
-        Util.throwPotion(single.pathfinderMob, currentTarget, PotionContents.createItemStack(Items.SPLASH_POTION, Potions.HARMING));
+        Util.throwPotion(single.pathfinderMob, currentTarget, PotionContents.createItemStack(Items.SPLASH_POTION, Potions.HARMING), 0.75f, 1.2f);
     }
 }

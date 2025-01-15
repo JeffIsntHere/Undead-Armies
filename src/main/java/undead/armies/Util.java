@@ -6,10 +6,11 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrownPotion;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 public final class Util
 {
-    public static void throwPotion(final LivingEntity livingEntity, final LivingEntity target, ItemStack itemStack)
+    public static void throwPotion(final LivingEntity livingEntity, final LivingEntity target, ItemStack itemStack, final float velocity, final float accuracy)
     {
         final Level level = livingEntity.level();
         level.playSound(null, livingEntity.getX(), livingEntity.getY(), livingEntity.getZ(), SoundEvents.SPLASH_POTION_THROW, SoundSource.NEUTRAL, 1.0f, 1.0f);
@@ -17,11 +18,11 @@ public final class Util
         {
             ThrownPotion thrownPotion = new ThrownPotion(livingEntity.level(), livingEntity);
             thrownPotion.setItem(itemStack);
-            final double x = target.getX() - livingEntity.getX();
-            final double y = target.getY() - livingEntity.getY();
-            final double z = target.getZ() - livingEntity.getZ();
-            final double distance = Math.sqrt(x*x + y*y);
-            thrownPotion.shoot(x,y + distance * 0.2,z,0.75f, 8.0f);
+            final Vec3 movementDelta = target.getDeltaMovement();
+            final double x = target.getX() + movementDelta.x - livingEntity.getX();
+            final double z = target.getZ() + movementDelta.z - livingEntity.getZ();
+            final double distance = Math.sqrt(x*x + z*z);
+            thrownPotion.shoot(x,distance/velocity * 0.5 ,z,velocity, accuracy);
             level.addFreshEntity(thrownPotion);
         }
     }

@@ -11,6 +11,7 @@ public class Single
     public final PathfinderMob pathfinderMob;
     public final BaseType baseType;
     public int currentTask = Task.nothing;
+    public int taskStorage = 0;
     public Group group = null;
     public Single(final PathfinderMob pathfinderMob)
     {

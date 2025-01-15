@@ -6,7 +6,10 @@ import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
-import undead.armies.util.container.MobSingle;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import undead.armies.behaviour.single.Single;
 
 @Mixin(Zombie.class)
 public class ZombieMixin extends Monster
@@ -16,5 +19,10 @@ public class ZombieMixin extends Monster
         super(pEntityType, pLevel);
     }
     @Unique
-    private MobSingle mobSingle = null;
+    private final Single single = new Single(this);
+    @Inject(method="tick",at=@At("RETURN"))
+    public void additionalTick(CallbackInfo callbackInfo)
+    {
+        single.tick();
+    }
 }
