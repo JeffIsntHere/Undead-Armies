@@ -4,6 +4,7 @@ import net.minecraft.world.entity.PathfinderMob;
 import undead.armies.UndeadArmies;
 import undead.armies.behaviour.group.Task;
 import undead.armies.behaviour.group.Group;
+import undead.armies.behaviour.group.task.BaseTask;
 import undead.armies.behaviour.type.BaseType;
 import undead.armies.behaviour.type.TypeUtil;
 
@@ -11,8 +12,9 @@ public class Single
 {
     public final PathfinderMob pathfinderMob;
     public final BaseType baseType;
+    public BaseTask baseTask = null;
     public int currentTask = Task.nothing;
-    public int taskStorage = 0;
+    public int taskStorage = Task.nothing;
     public Group group = null;
     public Single(final PathfinderMob pathfinderMob)
     {

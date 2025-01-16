@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import undead.armies.behaviour.single.Single;
 
 @Mixin(Zombie.class)
-public class ZombieMixin extends Monster
+public abstract class ZombieMixin extends Monster
 {
     protected ZombieMixin(EntityType<? extends Monster> pEntityType, Level pLevel)
     {
