@@ -20,9 +20,9 @@ public class ZombieMixin extends Monster
     }
     @Unique
     private final Single single = new Single(this);
-    @Inject(method="tick",at=@At("RETURN"))
+    @Inject(method="tick",at=@At("HEAD"))
     public void additionalTick(CallbackInfo callbackInfo)
     {
-        single.tick();
+        this.single.doTick();
     }
 }
