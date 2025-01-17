@@ -1,16 +1,10 @@
 package undead.armies.behaviour.type;
 
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.alchemy.PotionContents;
-import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.phys.AABB;
 import undead.armies.behaviour.single.Single;
-import undead.armies.Util;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Alchemist extends BaseType
 {
@@ -31,7 +25,7 @@ public class Alchemist extends BaseType
     @Override
     public void additionalTick(final Single single)
     {
-        if(single.pathfinderMob.tickCount % Alchemist.throwingCooldown == 0)
+        /*if(single.pathfinderMob.tickCount % Alchemist.throwingCooldown == 0)
         {
             final List<Entity> entitiesInThrowingRange = single.pathfinderMob.level().getEntities(single.pathfinderMob, Alchemist.throwingBox);
             targets.clear();
@@ -55,5 +49,5 @@ public class Alchemist extends BaseType
             }
         }
         Util.throwPotion(single.pathfinderMob, currentTarget, PotionContents.createItemStack(Items.SPLASH_POTION, Potions.HARMING), 0.75f, 1.2f);
-    }
+    */}
 }

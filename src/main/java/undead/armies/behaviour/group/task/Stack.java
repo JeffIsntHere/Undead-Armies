@@ -20,23 +20,23 @@ public class Stack extends BaseTask
     public Stack(final Single single)
     {
         super(single);
+        UndeadArmies.logger.debug("created stack task!");
     }
     @Override
     public void handleTask(final Single single, final LivingEntity target)
     {
-        UndeadArmies.logger.debug("doing task! " + single.currentTask);
-        switch (single.currentTask)
+        switch (single.groupStorage.assignedTask)
         {
             case Stack.stack ->
             {
-                if(single.pathfinderMob.is(super.starter.pathfinderMob) || single.pathfinderMob.isPathFinding())
+                if(single.pathfinderMob.is(super.starter.pathfinderMob))
                 {
                     return;
                 }
                 if(super.starter.pathfinderMob.distanceTo(single.pathfinderMob) <= Stack.minimumDistanceToStack)
                 {
                     super.starter.pathfinderMob.startRiding(single.pathfinderMob);
-                    super.starter.currentTask = Stack.dismount;
+                    super.starter.groupStorage.assignedTask = Stack.dismount;
                     super.starter = single;
                     return;
                 }
@@ -44,7 +44,7 @@ public class Stack extends BaseTask
             }
             case Stack.dismount ->
             {
-                UndeadArmies.logger.debug("task " + single.currentTask + " b");
+                UndeadArmies.logger.debug("task " + single.groupStorage.assignedTask + " b");
                 final BlockPos pathFinderMobBlockPos = single.pathfinderMob.blockPosition();
                 final int pathFinderMobHeight = (int)Math.ceil(single.pathfinderMob.getEyeHeight());
                 final Level level = single.pathfinderMob.level();
@@ -82,7 +82,8 @@ public class Stack extends BaseTask
                                 {
                                     single.pathfinderMob.getNavigation().moveTo(target, 0.2f);
                                 }
-                                single.currentTask = Task.nothing;
+                                single.groupStorage.assignedTask = Task.nothing;
+                                single.groupStorage.task = null;
                             }
                             UndeadArmies.logger.debug("finished task! ");
                         }
