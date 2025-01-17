@@ -22,6 +22,7 @@ public class StackTaskSelector extends BaseTaskSelector
         }
         UndeadArmies.logger.debug("set task!");
         single.groupStorage.assignedTask = Stack.stack;
+        tasks.removeIf(baseTask -> baseTask.starter.pathfinderMob.isDeadOrDying());
         if(tasks.size() == 0)
         {
             tasks.add(new Stack(single));
