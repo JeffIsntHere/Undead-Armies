@@ -1,14 +1,10 @@
 package undead.armies.behaviour.single;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Position;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
 import undead.armies.UndeadArmies;
 import undead.armies.behaviour.group.GroupStorage;
 import undead.armies.behaviour.group.Group;

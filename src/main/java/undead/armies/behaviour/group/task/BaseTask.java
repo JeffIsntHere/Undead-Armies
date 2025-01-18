@@ -6,6 +6,7 @@ import undead.armies.behaviour.single.Single;
 public abstract class BaseTask
 {
     public Single starter;
+    public boolean deleted = false;
     //where this task is stored in Group class.
     public BaseTask(final Single starter)
     {

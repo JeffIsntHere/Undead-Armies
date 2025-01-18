@@ -13,6 +13,7 @@ public class StackTaskSelector extends BaseTaskSelector
 {
     public static final double distanceToTargetPositionAdder = 2.0d;
     public static final StackTaskSelector instance = new StackTaskSelector();
+    public static final ArrayList<Stack> addTaskBack = new ArrayList<>();
     @Override
     public BaseTask getSuitableTask(final ArrayList<BaseTask> tasks, final Single single, final LivingEntity target)
     {
@@ -20,9 +21,17 @@ public class StackTaskSelector extends BaseTaskSelector
         {
             return null;
         }
-        UndeadArmies.logger.debug("set task!");
         single.groupStorage.assignedTask = Stack.stack;
-        tasks.removeIf(baseTask -> baseTask.starter.pathfinderMob.isDeadOrDying());
+        tasks.removeIf(baseTask -> {
+            if(baseTask.starter.pathfinderMob.isDeadOrDying())
+            {
+                baseTask.deleted = true;
+                return true;
+            }
+            return false;
+        });
+        tasks.addAll(StackTaskSelector.addTaskBack);
+        StackTaskSelector.addTaskBack.clear();
         if(tasks.size() == 0)
         {
             tasks.add(new Stack(single));

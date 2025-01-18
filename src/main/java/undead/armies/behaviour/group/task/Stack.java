@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.WaterFluid;
 import undead.armies.UndeadArmies;
 import undead.armies.behaviour.group.Task;
+import undead.armies.behaviour.group.task.selector.StackTaskSelector;
 import undead.armies.behaviour.single.Single;
 
 public class Stack extends BaseTask
@@ -25,6 +26,10 @@ public class Stack extends BaseTask
     @Override
     public void handleTask(final Single single, final LivingEntity target)
     {
+        if(single.groupStorage == null)
+        {
+            return; //to prevent that one edge case where my server somehow crashed because groupStorage was null
+        }
         switch (single.groupStorage.assignedTask)
         {
             case Stack.stack ->
@@ -45,6 +50,13 @@ public class Stack extends BaseTask
             case Stack.dismount ->
             {
                 UndeadArmies.logger.debug("task " + single.groupStorage.assignedTask + " b");
+                if(this.deleted && single.pathfinderMob.getVehicle() == null)
+                {
+                    this.deleted = false;
+                    this.starter = single;
+                    single.groupStorage.assignedTask = Stack.stack;
+                    StackTaskSelector.addTaskBack.add(this);
+                }
                 final BlockPos pathFinderMobBlockPos = single.pathfinderMob.blockPosition();
                 final int pathFinderMobHeight = (int)Math.ceil(single.pathfinderMob.getEyeHeight());
                 final Level level = single.pathfinderMob.level();
