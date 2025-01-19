@@ -8,7 +8,7 @@ public abstract class BaseTask
 {
     public Single starter;
     public boolean deleted = false;
-    protected final int taskSelectorIndex;
+    public final int taskSelectorIndex;
     //where this task is stored in Group class.
     public BaseTask(@NotNull final Single starter, final int taskSelectorIndex)
     {
@@ -23,5 +23,6 @@ public abstract class BaseTask
             this.deleted = false;
         }
     }
+    protected void splitTask(@NotNull Single starter){}
     public abstract void handleTask(@NotNull final Single single, @NotNull final LivingEntity target);
 }

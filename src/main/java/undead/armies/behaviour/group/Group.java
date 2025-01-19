@@ -4,6 +4,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import undead.armies.behaviour.group.task.BaseTask;
 import undead.armies.behaviour.group.task.selector.BaseTaskSelector;
+import undead.armies.behaviour.group.task.selector.MineTaskSelector;
 import undead.armies.behaviour.group.task.selector.StackTaskSelector;
 import undead.armies.behaviour.single.Single;
 
@@ -13,6 +14,7 @@ public class Group
 {
     public static final ArrayList<Group> groups = new ArrayList<>();
     public static final int setTaskAttempts = 5;
+    public static final float tickGroupChance = 0.1f;
     public static Group getGroupThatAttacks(LivingEntity target)
     {
         if(target == null)
@@ -115,12 +117,21 @@ public class Group
         }
         if(single.groupStorage.task != null)
         {
-            single.groupStorage.task.handleTask(single, this.target);
+            if(single.pathfinderMob.getRandom().nextFloat() < Group.tickGroupChance)
+            {
+                final int index = single.groupStorage.task.taskSelectorIndex;
+                this.taskSelectors.get(index).tick(this.taskStorages.get(index), this.target);
+            }
+            if(single.groupStorage.task != null)
+            {
+                single.groupStorage.task.handleTask(single, this.target);
+            }
         }
     }
     public Group(LivingEntity target)
     {
         this.target = target;
-        this.addTaskSelector(StackTaskSelector.instance, 1.0f);
+        //this.addTaskSelector(MineTaskSelector.instance, 0.3f);
+        this.addTaskSelector(StackTaskSelector.instance, 0.7f);
     }
 }

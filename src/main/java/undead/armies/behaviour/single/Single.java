@@ -68,12 +68,21 @@ public class Single
             return;
         }
         this.baseType.additionalTick(this);
-        if(this.groupStorage == null || !this.groupStorage.group.target.is(this.pathfinderMob.getTarget()))
+        if(this.groupStorage == null)
         {
             this.attemptDismount();
             this.groupStorage = Group.getGroupStorageThatAttacks(this.pathfinderMob.getTarget());
         }
-        else
+        else if(this.pathfinderMob.getTarget() == null)
+        {
+            this.pathfinderMob.setTarget(this.groupStorage.group.target);
+        }
+        else if(!this.groupStorage.group.target.is(this.pathfinderMob.getTarget()))
+        {
+            this.attemptDismount();
+            this.groupStorage = Group.getGroupStorageThatAttacks(this.pathfinderMob.getTarget());
+        }
+        if(this.groupStorage != null)
         {
             this.groupStorage.group.doGroupTask(this);
         }
