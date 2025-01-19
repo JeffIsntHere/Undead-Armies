@@ -58,7 +58,11 @@ public class Group
             this.normalizedWeights.add(weight/divisor);
         }
     }
-    public void addTask(BaseTaskSelector baseTaskSelector, float weight)
+    public void addTask(final BaseTask baseTask, final int index)
+    {
+        this.taskStorages.get(index).add(baseTask);
+    }
+    public void addTaskSelector(BaseTaskSelector baseTaskSelector, float weight)
     {
         this.taskSelectors.add(baseTaskSelector);
         this.unNormalizedWeights.add(weight);
@@ -80,7 +84,7 @@ public class Group
                     cumulative += normalizedWeights.get(i);
                     if(cumulative >= randomResult)
                     {
-                        single.groupStorage.task = this.taskSelectors.get(i).getSuitableTask(this.taskStorages.get(i), single, this.target);
+                        single.groupStorage.task = this.taskSelectors.get(i).getSuitableTask(this.taskStorages.get(i), single, this.target, i);
                         return true;
                     }
                 }
@@ -117,6 +121,6 @@ public class Group
     public Group(LivingEntity target)
     {
         this.target = target;
-        this.addTask(StackTaskSelector.instance, 1.0f);
+        this.addTaskSelector(StackTaskSelector.instance, 1.0f);
     }
 }

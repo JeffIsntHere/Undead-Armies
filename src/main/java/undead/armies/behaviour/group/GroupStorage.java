@@ -11,4 +11,9 @@ public class GroupStorage
     {
         this.group = group;
     }
+    public void resetGroupStorage()
+    {
+        this.task = null;
+        this.assignedTask = Task.nothing;
+    }
 }

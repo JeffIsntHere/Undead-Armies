@@ -8,20 +8,16 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.WaterFluid;
 import undead.armies.UndeadArmies;
 import undead.armies.behaviour.group.Task;
-import undead.armies.behaviour.group.task.selector.StackTaskSelector;
 import undead.armies.behaviour.single.Single;
 
 public class Stack extends BaseTask
 {
-    public static final int stack = 1;
-    public static final int dismount = 2;
-    public static final int hitCounterToMakeStackingMobsFall = 3;
-    public static final float hitDamageToMakeStackingMobsFall = 3.0f;
+    public static final int stack = 0;
+    public static final int dismount = 1;
     public static final float minimumDistanceToStack = 3.0f;
-    public Stack(final Single single)
+    public Stack(Single starter, final int taskSelectorIndex)
     {
-        super(single);
-        UndeadArmies.logger.debug("created stack task!");
+        super(starter, taskSelectorIndex);
     }
     @Override
     public void handleTask(final Single single, final LivingEntity target)
@@ -49,13 +45,11 @@ public class Stack extends BaseTask
             }
             case Stack.dismount ->
             {
-                UndeadArmies.logger.debug("task " + single.groupStorage.assignedTask + " b");
                 if(this.deleted && single.pathfinderMob.getVehicle() == null)
                 {
-                    this.deleted = false;
                     this.starter = single;
+                    this.addBackToGroup();
                     single.groupStorage.assignedTask = Stack.stack;
-                    StackTaskSelector.addTaskBack.add(this);
                 }
                 final BlockPos pathFinderMobBlockPos = single.pathfinderMob.blockPosition();
                 final int pathFinderMobHeight = (int)Math.ceil(single.pathfinderMob.getEyeHeight());

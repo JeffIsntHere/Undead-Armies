@@ -1,17 +1,18 @@
 package undead.armies.behaviour.group.task.selector;
 
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import undead.armies.behaviour.group.task.BaseTask;
-import undead.armies.behaviour.group.task.Stack;
+import undead.armies.behaviour.group.task.Mine;
 import undead.armies.behaviour.single.Single;
 
 import java.util.ArrayList;
 
-public class StackTaskSelector extends BaseTaskSelector
+public class MineTaskSelector extends BaseTaskSelector
 {
-    public static final double distanceToTargetPositionAdder = 2.0d;
-    public static final StackTaskSelector instance = new StackTaskSelector();
+    public static final MineTaskSelector instance = new MineTaskSelector();
+    public static final double maxDistanceFromTask = 12.0d;
     @Override
     public BaseTask getSuitableTask(final ArrayList<BaseTask> tasks, final Single single, final LivingEntity target, final int taskSelectorIndex)
     {
@@ -19,7 +20,7 @@ public class StackTaskSelector extends BaseTaskSelector
         {
             return null;
         }
-        single.groupStorage.assignedTask = Stack.stack;
+        single.groupStorage.assignedTask = Mine.mineAdd;
         tasks.removeIf(baseTask ->
         {
             if(baseTask.starter == null)
@@ -33,16 +34,17 @@ public class StackTaskSelector extends BaseTaskSelector
             }
             return false;
         });
-        final Vec3 targetPosition = target.position();
-        final double distanceToTargetPosition = single.pathfinderMob.position().distanceTo(targetPosition) + StackTaskSelector.distanceToTargetPositionAdder;
-        for(BaseTask task : tasks)
+        final Vec3 position = single.pathfinderMob.position();
+        for(BaseTask baseTask : tasks)
         {
-            if(task.starter.pathfinderMob.position().distanceTo(targetPosition) <= distanceToTargetPosition)
+            if(baseTask instanceof Mine mine)
             {
-                return task;
+                if(position.distanceTo(new Vec3(mine.mineTarget.getX(), mine.mineTarget.getY(), mine.mineTarget.getZ())) <= MineTaskSelector.maxDistanceFromTask)
+                {
+                    return baseTask;
+                }
             }
         }
-        tasks.add(new Stack(single, taskSelectorIndex));
-        return tasks.get(tasks.size() - 1);
+        return null;
     }
 }
