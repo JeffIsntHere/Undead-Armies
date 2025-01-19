@@ -61,11 +61,17 @@ public class Stack extends BaseTask
                 if(single.pathfinderMob.getVehicle() == null)
                 {
                     single.groupStorage.assignedTask = Stack.stack;
-                    if(this.deleted)
+                    if(this.starter.pathfinderMob.isDeadOrDying())
                     {
                         this.starter = single;
-                        this.addBackToGroup();
-                        return;
+                        if(this.deleted)
+                        {
+                            this.addBackToGroup();
+                        }
+                    }
+                    else
+                    {
+                        this.splitTask(single);
                     }
                 }
                 final BlockPos pathFinderMobBlockPos = single.pathfinderMob.blockPosition();
@@ -114,7 +120,7 @@ public class Stack extends BaseTask
                                 }
                                 if(!single.pathfinderMob.getPassengers().isEmpty())
                                 {
-                                    this.splitTask(starter);
+                                    this.splitTask(single);
                                 }
                                 else
                                 {

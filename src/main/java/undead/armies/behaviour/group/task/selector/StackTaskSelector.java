@@ -21,6 +21,19 @@ public class StackTaskSelector extends BaseTaskSelector
             return null;
         }
         single.groupStorage.assignedTask = Stack.stack;
+        tasks.removeIf(baseTask ->
+        {
+            if(baseTask.starter == null)
+            {
+                return true;
+            }
+            if(baseTask.starter.pathfinderMob.isDeadOrDying())
+            {
+                baseTask.deleted = true;
+                return true;
+            }
+            return false;
+        });
         final Vec3 targetPosition = target.position();
         final double distanceToTargetPosition = single.pathfinderMob.position().distanceTo(targetPosition);
         for(BaseTask task : tasks)
@@ -34,5 +47,17 @@ public class StackTaskSelector extends BaseTaskSelector
         return tasks.get(tasks.size() - 1);
     }
     @Override
-    public void tick(@NotNull final ArrayList<BaseTask> tasks, @NotNull final LivingEntity target) {}
+    public void tick(@NotNull final ArrayList<BaseTask> tasks, @NotNull final LivingEntity target)
+    {
+        UndeadArmies.logger.debug("ticked!");
+        tasks.removeIf(baseTask -> {
+            if(baseTask.starter.pathfinderMob.getPassengers().isEmpty())
+            {
+                UndeadArmies.logger.debug("removed");
+                baseTask.starter.groupStorage.resetGroupStorage();
+                return true;
+            }
+            return false;
+        });
+    }
 }

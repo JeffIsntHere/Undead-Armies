@@ -33,6 +33,19 @@ public class MineTaskSelector extends BaseTaskSelector
             return null;
         }
         single.groupStorage.assignedTask = Mine.mineAdd;
+        tasks.removeIf(baseTask ->
+        {
+            if(baseTask.starter == null)
+            {
+                return true;
+            }
+            if(baseTask.starter.pathfinderMob.isDeadOrDying())
+            {
+                baseTask.deleted = true;
+                return true;
+            }
+            return false;
+        });
         final Vec3 position = single.pathfinderMob.position();
         for(BaseTask baseTask : tasks)
         {
