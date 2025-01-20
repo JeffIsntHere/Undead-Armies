@@ -4,8 +4,8 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import undead.armies.behaviour.group.task.BaseTask;
 import undead.armies.behaviour.group.task.selector.BaseTaskSelector;
-import undead.armies.behaviour.group.task.selector.MineTaskSelector;
 import undead.armies.behaviour.group.task.selector.StackTaskSelector;
+import undead.armies.behaviour.group.task.selector.TickableTaskSelector;
 import undead.armies.behaviour.single.Single;
 
 import java.util.ArrayList;
@@ -60,10 +60,6 @@ public class Group
             this.normalizedWeights.add(weight/divisor);
         }
     }
-    public void addTask(final BaseTask baseTask, final int index)
-    {
-        this.taskStorages.get(index).add(baseTask);
-    }
     public void addTaskSelector(BaseTaskSelector baseTaskSelector, float weight)
     {
         this.taskSelectors.add(baseTaskSelector);
@@ -98,7 +94,7 @@ public class Group
     {
         if(this.deleted)
         {
-            single.resetSingle();
+            single.reset();
             return;
         }
         if(this.target.isDeadOrDying())
@@ -108,24 +104,39 @@ public class Group
                 Group.groups.remove(single.groupStorage.group);
                 this.deleted = true;
             }
-            single.resetSingle();
+            single.reset();
             return;
         }
         if(single.groupStorage.task == null)
         {
             this.setTask(single);
         }
+        else if(single.groupStorage.task.starter == null || single.groupStorage.task.starter.pathfinderMob.isDeadOrDying())
+        {
+            this.taskStorages.get(single.groupStorage.task.taskIndex).remove(single.groupStorage.task);
+            single.groupStorage.task.deleted = true;
+        }
         if(single.groupStorage.task != null)
         {
-            if(single.pathfinderMob.getRandom().nextFloat() < Group.tickGroupChance)
+            if(single.groupStorage.task.deleted)
             {
-                final int index = single.groupStorage.task.taskSelectorIndex;
-                this.taskSelectors.get(index).tick(this.taskStorages.get(index), this.target);
+                if (single.groupStorage.task.handleDelete(single))
+                {
+                    this.setTask(single);
+                }
+                else
+                {
+                    if (single.groupStorage.task.starter != null && single.groupStorage.task.starter.pathfinderMob.isDeadOrDying())
+                    {
+                        this.taskStorages.get(single.groupStorage.task.taskIndex).add(single.groupStorage.task);
+                        single.groupStorage.task.deleted = false;
+                    }
+                }
             }
-            if(single.groupStorage.task != null)
-            {
-                single.groupStorage.task.handleTask(single, this.target);
-            }
+        }
+        if(single.groupStorage.task != null)
+        {
+            single.groupStorage.task.handleTask(single, this.target);
         }
     }
     public Group(LivingEntity target)

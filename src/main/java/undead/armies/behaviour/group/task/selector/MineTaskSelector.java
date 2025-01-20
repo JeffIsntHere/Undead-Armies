@@ -1,11 +1,10 @@
 package undead.armies.behaviour.group.task.selector;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import undead.armies.UndeadArmies;
+import org.jetbrains.annotations.NotNull;
 import undead.armies.behaviour.group.task.BaseTask;
 import undead.armies.behaviour.group.task.Mine;
 import undead.armies.behaviour.single.Single;
@@ -26,26 +25,14 @@ public class MineTaskSelector extends BaseTaskSelector
         return 1;
     }
     @Override
-    public BaseTask getSuitableTask(final ArrayList<BaseTask> tasks, final Single single, final LivingEntity target, final int taskSelectorIndex)
+    public BaseTask getSuitableTask(@NotNull final ArrayList<BaseTask> tasks, @NotNull final Single single, @NotNull final LivingEntity target, @NotNull final int taskIndex)
     {
         if(!single.pathfinderMob.getNavigation().isStuck() && !single.pathfinderMob.getNavigation().isDone())
         {
             return null;
         }
+        BaseTaskSelector.cleanTasks(tasks);
         single.groupStorage.assignedTask = Mine.mineAdd;
-        tasks.removeIf(baseTask ->
-        {
-            if(baseTask.starter == null)
-            {
-                return true;
-            }
-            if(baseTask.starter.pathfinderMob.isDeadOrDying())
-            {
-                baseTask.deleted = true;
-                return true;
-            }
-            return false;
-        });
         final Vec3 position = single.pathfinderMob.position();
         for(BaseTask baseTask : tasks)
         {
@@ -86,17 +73,18 @@ public class MineTaskSelector extends BaseTaskSelector
             final BlockPos blockPosAtY = blockPos.atY(blockPos.getY() + 1);
             if(!single.pathfinderMob.level().getBlockState(blockPosAtY).isEmpty())
             {
-                tasks.add(new Mine(single, taskSelectorIndex, blockPosAtY));
+                tasks.add(new Mine(single, taskIndex, blockPosAtY));
             }
             else
             {
-                tasks.add(new Mine(single, taskSelectorIndex, blockPos.atY(blockPos.getY() - 1)));
+                tasks.add(new Mine(single, taskIndex, blockPos.atY(blockPos.getY() - 1)));
             }
         }
         else
         {
-            tasks.add(new Mine(single, taskSelectorIndex, blockPos));
+            tasks.add(new Mine(single, taskIndex, blockPos));
         }
         return tasks.get(tasks.size() - 1);
     }
+    private MineTaskSelector(){}
 }

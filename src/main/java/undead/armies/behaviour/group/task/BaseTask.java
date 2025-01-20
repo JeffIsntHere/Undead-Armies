@@ -6,23 +6,20 @@ import undead.armies.behaviour.single.Single;
 
 public abstract class BaseTask
 {
-    public Single starter;
+    public Single starter; //stater.groupStorage may be null!
     public boolean deleted = false;
-    public final int taskSelectorIndex;
-    //where this task is stored in Group class.
-    public BaseTask(@NotNull final Single starter, final int taskSelectorIndex)
+    public final int taskIndex;
+    public abstract void handleTask(@NotNull final Single single, @NotNull final LivingEntity target);
+    //true = give me new task.
+    //false = check me again, if starter isn't null add me back!
+    public boolean handleDelete(@NotNull final Single single)
+    {
+        return true;
+    }
+    public void splitTask(@NotNull final Single starter) {}
+    public BaseTask(@NotNull final Single starter, final int taskIndex)
     {
         this.starter = starter;
-        this.taskSelectorIndex = taskSelectorIndex;
+        this.taskIndex = taskIndex;
     }
-    protected void addBackToGroup()
-    {
-        if(this.starter.groupStorage != null)
-        {
-            this.starter.groupStorage.group.addTask(this, this.taskSelectorIndex);
-            this.deleted = false;
-        }
-    }
-    protected void splitTask(@NotNull Single starter){}
-    public abstract void handleTask(@NotNull final Single single, @NotNull final LivingEntity target);
 }

@@ -6,6 +6,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import undead.armies.UndeadArmies;
 import undead.armies.behaviour.single.Single;
 
@@ -18,32 +19,9 @@ public class Mine extends BaseTask
     public final BlockPos mineTarget;
     public final Vec3 mineTargetVec3;
     public int miningProgress = 0;
-    public boolean taskIsDone = false;
-    public Mine(final Single starter, final int taskSelectorIndex, final BlockPos mineTarget)
-    {
-        super(starter, taskSelectorIndex);
-        this.mineTarget = mineTarget;
-        this.mineTargetVec3 = new Vec3(mineTarget.getX(), mineTarget.getY(), mineTarget.getZ());
-        UndeadArmies.logger.debug("created mine task to break block at " + mineTarget);
-    }
-
     @Override
-    public void handleTask(final Single single, final LivingEntity target)
+    public void handleTask(@NotNull final Single single, @NotNull final LivingEntity target)
     {
-        if(single.groupStorage == null)
-        {
-            return;
-        }
-        if(this.taskIsDone)
-        {
-            single.groupStorage.resetGroupStorage();
-            return;
-        }
-        if(this.deleted)
-        {
-            this.starter = single;
-            this.addBackToGroup();
-        }
         if(single.groupStorage.assignedTask == Mine.mineAdd)
         {
             this.miningProgress++;
@@ -73,8 +51,7 @@ public class Mine extends BaseTask
         if(blockState.isEmpty())
         {
             this.starter = null;
-            this.taskIsDone = true;
-            single.groupStorage.resetGroupStorage();
+            single.groupStorage.reset();
             return;
         }
         if(this.miningProgress * Mine.miningProgressToBlastResistanceRatio > blockState.getBlock().getExplosionResistance())
@@ -82,8 +59,24 @@ public class Mine extends BaseTask
             Block.dropResources(blockState, single.pathfinderMob.level(), this.mineTarget);
             single.pathfinderMob.level().setBlock(this.mineTarget, Blocks.AIR.defaultBlockState(), 3);
             this.starter = null;
-            this.taskIsDone = true;
-            single.groupStorage.resetGroupStorage();
+            single.groupStorage.reset();
         }
+    }
+    @Override
+    public boolean handleDelete(@NotNull Single single)
+    {
+        if(this.starter == null)
+        {
+            return true;
+        }
+        this.starter = single;
+        return false;
+    }
+    public Mine(@NotNull final Single starter, final int taskIndex, @NotNull final BlockPos mineTarget)
+    {
+        super(starter, taskIndex);
+        this.mineTarget = mineTarget;
+        this.mineTargetVec3 = new Vec3(mineTarget.getX(), mineTarget.getY(), mineTarget.getZ());
+        UndeadArmies.logger.debug("created mine task to break block at " + mineTarget);
     }
 }

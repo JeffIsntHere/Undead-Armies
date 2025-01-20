@@ -1,8 +1,9 @@
 package undead.armies.behaviour.group;
 
+import undead.armies.base.Resettable;
 import undead.armies.behaviour.group.task.BaseTask;
 
-public class GroupStorage
+public class GroupStorage implements Resettable
 {
     public final Group group;
     public BaseTask task = null;
@@ -11,7 +12,8 @@ public class GroupStorage
     {
         this.group = group;
     }
-    public void resetGroupStorage()
+    @Override
+    public void reset()
     {
         this.task = null;
         this.assignedTask = Task.nothing;

@@ -6,12 +6,13 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import undead.armies.UndeadArmies;
+import undead.armies.base.Resettable;
 import undead.armies.behaviour.group.GroupStorage;
 import undead.armies.behaviour.group.Group;
 import undead.armies.behaviour.type.BaseType;
 import undead.armies.behaviour.type.TypeUtil;
 
-public class Single
+public class Single implements Resettable
 {
     public final PathfinderMob pathfinderMob;
     public final BaseType baseType;
@@ -52,7 +53,7 @@ public class Single
         }
         this.pathfinderMob.stopRiding();
     }
-    public void resetSingle()
+    public void reset()
     {
         UndeadArmies.logger.debug("reset single!");
         this.groupStorage = null;
@@ -67,8 +68,7 @@ public class Single
         {
             return;
         }
-        this.baseType.additionalTick(this);
-        if(this.groupStorage == null)
+        if(this.groupStorage == null || !this.groupStorage.group.target.is(this.pathfinderMob.getTarget()))
         {
             this.attemptDismount();
             this.groupStorage = Group.getGroupStorageThatAttacks(this.pathfinderMob.getTarget());
@@ -77,15 +77,11 @@ public class Single
         {
             this.pathfinderMob.setTarget(this.groupStorage.group.target);
         }
-        else if(!this.groupStorage.group.target.is(this.pathfinderMob.getTarget()))
-        {
-            this.attemptDismount();
-            this.groupStorage = Group.getGroupStorageThatAttacks(this.pathfinderMob.getTarget());
-        }
         if(this.groupStorage != null)
         {
             this.groupStorage.group.doGroupTask(this);
         }
+        this.baseType.additionalTick(this);
     }
     public Single(final PathfinderMob pathfinderMob)
     {

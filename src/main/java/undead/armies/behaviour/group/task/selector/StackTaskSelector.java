@@ -10,30 +10,18 @@ import undead.armies.behaviour.single.Single;
 
 import java.util.ArrayList;
 
-public class StackTaskSelector extends BaseTaskSelector
+public class StackTaskSelector extends BaseTaskSelector implements TickableTaskSelector
 {
     public static final StackTaskSelector instance = new StackTaskSelector();
     @Override
-    public BaseTask getSuitableTask(final ArrayList<BaseTask> tasks, final Single single, final LivingEntity target, final int taskSelectorIndex)
+    public BaseTask getSuitableTask(@NotNull final ArrayList<BaseTask> tasks, @NotNull final Single single, @NotNull final LivingEntity target, final int taskIndex)
     {
         if(!single.pathfinderMob.getNavigation().isStuck() && !single.pathfinderMob.getNavigation().isDone())
         {
             return null;
         }
+        BaseTaskSelector.cleanTasks(tasks);
         single.groupStorage.assignedTask = Stack.stack;
-        tasks.removeIf(baseTask ->
-        {
-            if(baseTask.starter == null)
-            {
-                return true;
-            }
-            if(baseTask.starter.pathfinderMob.isDeadOrDying())
-            {
-                baseTask.deleted = true;
-                return true;
-            }
-            return false;
-        });
         final Vec3 targetPosition = target.position();
         final double distanceToTargetPosition = single.pathfinderMob.position().distanceTo(targetPosition);
         for(BaseTask task : tasks)
@@ -43,7 +31,7 @@ public class StackTaskSelector extends BaseTaskSelector
                 return task;
             }
         }
-        tasks.add(new Stack(single, taskSelectorIndex));
+        tasks.add(new Stack(single, taskIndex));
         return tasks.get(tasks.size() - 1);
     }
     @Override
@@ -54,10 +42,11 @@ public class StackTaskSelector extends BaseTaskSelector
             if(baseTask.starter.pathfinderMob.getPassengers().isEmpty())
             {
                 UndeadArmies.logger.debug("removed");
-                baseTask.starter.groupStorage.resetGroupStorage();
+                baseTask.starter.groupStorage.reset();
                 return true;
             }
             return false;
         });
     }
+    private StackTaskSelector(){}
 }

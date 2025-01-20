@@ -1,50 +1,44 @@
 package undead.armies.behaviour.group.task;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.WaterFluid;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import undead.armies.UndeadArmies;
+import undead.armies.base.GetSingle;
 import undead.armies.behaviour.single.Single;
 
 public class Stack extends BaseTask
 {
     public static final int stack = 0;
     public static final int dismount = 1;
+    public static final int emptyCounterBeforeDeleteSelf = 2;
     public static final float minimumDistanceToStack = 3.0f;
-    public Stack(final Single starter, final int taskSelectorIndex)
-    {
-        super(starter, taskSelectorIndex);
-    }
+    public int emptyCounter = 0;
     @Override
-    protected void splitTask(final Single single)
+    public void handleTask(@NotNull final Single single, @NotNull final LivingEntity target)
     {
-        if(single.groupStorage == null)
-        {
-            return;
-        }
-        UndeadArmies.logger.debug("splitting task!");
-        single.groupStorage.resetGroupStorage();
-        single.groupStorage.task = new Stack(single, this.taskSelectorIndex);
-        single.groupStorage.task.addBackToGroup();
-        single.groupStorage.assignedTask = Stack.stack;
-    }
-    @Override
-    public void handleTask(final Single single, final LivingEntity target)
-    {
-        if(single.groupStorage == null)
-        {
-            return; //to prevent that one edge case where my server somehow crashed because groupStorage was null
-        }
         switch (single.groupStorage.assignedTask)
         {
             case Stack.stack ->
             {
                 if(single.pathfinderMob.is(super.starter.pathfinderMob))
                 {
+                    if(this.emptyCounter > Stack.emptyCounterBeforeDeleteSelf)
+                    {
+                        super.starter = null;
+                        single.groupStorage.reset();
+                    }
+                    else if(super.starter.pathfinderMob.getPassengers().isEmpty())
+                    {
+                        this.emptyCounter++;
+                    }
                     return;
                 }
                 if(super.starter.pathfinderMob.distanceTo(single.pathfinderMob) <= Stack.minimumDistanceToStack)
@@ -58,22 +52,6 @@ public class Stack extends BaseTask
             }
             case Stack.dismount ->
             {
-                if(single.pathfinderMob.getVehicle() == null)
-                {
-                    single.groupStorage.assignedTask = Stack.stack;
-                    if(this.starter.pathfinderMob.isDeadOrDying())
-                    {
-                        this.starter = single;
-                        if(this.deleted)
-                        {
-                            this.addBackToGroup();
-                        }
-                    }
-                    else
-                    {
-                        this.splitTask(single);
-                    }
-                }
                 final BlockPos pathFinderMobBlockPos = single.pathfinderMob.blockPosition();
                 final int pathFinderMobHeight = (int)Math.ceil(single.pathfinderMob.getEyeHeight());
                 final Level level = single.pathfinderMob.level();
@@ -83,10 +61,10 @@ public class Stack extends BaseTask
                 {
                     for(int z = -2; z < 2; z++)
                     {
-                        for(int y = -1; y < 2; y++)
+                        for(int y = -2; y < 2; y++)
                         {
                             BlockPos blockPos = new BlockPos(pathFinderMobBlockPos.getX() + x, pathFinderMobBlockPos.getY() + y, pathFinderMobBlockPos.getZ() + z);
-                            if(targetPosition.distanceTo(new Vec3(blockPos.getX(), blockPos.getY(), blockPos.getZ())) >= distance)
+                            if(targetPosition.distanceTo(new Vec3(blockPos.getX(), blockPos.getY(), blockPos.getZ())) + 1.0d >= distance)
                             {
                                 continue;
                             }
@@ -110,7 +88,6 @@ public class Stack extends BaseTask
                             }
                             if(success)
                             {
-                                UndeadArmies.logger.debug("dismounted on " + this.taskSelectorIndex);
                                 UndeadArmies.logger.debug("dist " + targetPosition.distanceTo(new Vec3(blockPos.getX(), blockPos.getY(), blockPos.getZ())) + " dist: " + distance);
                                 single.pathfinderMob.stopRiding();
                                 single.pathfinderMob.dismountTo(blockPos.getX() + 0.5d, blockPos.getY() + 1.0d, blockPos.getZ() + 0.5d);
@@ -118,13 +95,13 @@ public class Stack extends BaseTask
                                 {
                                     single.pathfinderMob.getNavigation().moveTo(target, 0.2f);
                                 }
-                                if(!single.pathfinderMob.getPassengers().isEmpty())
+                                if(single.pathfinderMob.getPassengers().isEmpty())
                                 {
-                                    this.splitTask(single);
+                                    single.groupStorage.reset();
                                 }
                                 else
                                 {
-                                    single.groupStorage.resetGroupStorage();
+                                    this.splitTask(single);
                                 }
                             }
                         }
@@ -132,5 +109,41 @@ public class Stack extends BaseTask
                 }
             }
         }
+    }
+    @Override
+    public boolean handleDelete(@NotNull Single single)
+    {
+        if(single.pathfinderMob.getVehicle() == null)
+        {
+            single.groupStorage.assignedTask = Stack.stack;
+            super.starter = single;
+        }
+        return false;
+    }
+    @Override
+    public void splitTask(@NotNull Single single)
+    {
+        single.groupStorage.task = new Stack(single, this.taskIndex);
+        single.groupStorage.assignedTask = Stack.stack;
+        this.changeTaskForPassengers(single.groupStorage.task, single.pathfinderMob);
+    }
+    protected void changeTaskForPassengers(final BaseTask baseTask, final Entity entity)
+    {
+        if(!(entity instanceof PathfinderMob))
+        {
+            return;
+        }
+        if(entity instanceof GetSingle getSingle)
+        {
+            getSingle.getSingle().groupStorage.task = baseTask;
+            for(Entity passenger : entity.getPassengers())
+            {
+                this.changeTaskForPassengers(baseTask, passenger);
+            }
+        }
+    }
+    public Stack(@NotNull final Single starter, final int taskIndex)
+    {
+        super(starter, taskIndex);
     }
 }

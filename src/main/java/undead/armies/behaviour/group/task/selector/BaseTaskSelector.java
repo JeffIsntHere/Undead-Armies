@@ -9,7 +9,20 @@ import java.util.ArrayList;
 
 public abstract class BaseTaskSelector
 {
-    public BaseTask getSuitableTask(@NotNull final ArrayList<BaseTask> tasks, @NotNull final Single single, @NotNull final LivingEntity target, final int taskSelectorIndex)
+    public static void cleanTasks(@NotNull final ArrayList<BaseTask> tasks)
+    {
+        tasks.removeIf(
+                baseTask ->
+                {
+                    if(baseTask.starter == null || baseTask.starter.pathfinderMob.isDeadOrDying())
+                    {
+                        baseTask.deleted = true;
+                        return true;
+                    }
+                    return false;
+                });
+    }
+    public BaseTask getSuitableTask(@NotNull final ArrayList<BaseTask> tasks, @NotNull final Single single, @NotNull final LivingEntity target, final int taskIndex)
     {
         if(tasks.size() > 0)
         {
@@ -17,5 +30,4 @@ public abstract class BaseTaskSelector
         }
         return null;
     }
-    public void tick(@NotNull final ArrayList<BaseTask> tasks, @NotNull final LivingEntity target) {}
 }

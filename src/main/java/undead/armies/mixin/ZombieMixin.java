@@ -9,10 +9,11 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import undead.armies.base.GetSingle;
 import undead.armies.behaviour.single.Single;
 
 @Mixin(Zombie.class)
-public abstract class ZombieMixin extends Monster
+public abstract class ZombieMixin extends Monster implements GetSingle
 {
     protected ZombieMixin(EntityType<? extends Monster> pEntityType, Level pLevel)
     {
@@ -24,5 +25,10 @@ public abstract class ZombieMixin extends Monster
     public void additionalTick(CallbackInfo callbackInfo)
     {
         this.single.doTick();
+    }
+    @Override
+    public Single getSingle()
+    {
+        return this.single;
     }
 }
