@@ -14,7 +14,7 @@ public abstract class BaseTaskSelector
         tasks.removeIf(
                 baseTask ->
                 {
-                    if(baseTask.starter == null || baseTask.starter.pathfinderMob.isDeadOrDying())
+                    if(baseTask.starter == null || baseTask.starter.pathfinderMob.isDeadOrDying() || baseTask.starter.groupStorage == null)
                     {
                         baseTask.deleted = true;
                         return true;

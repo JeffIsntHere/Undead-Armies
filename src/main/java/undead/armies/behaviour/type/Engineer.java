@@ -11,6 +11,6 @@ public class Engineer extends BaseType
     @Override
     public int actionCooldown()
     {
-        return 15;
+        return 10;
     }
 }

@@ -11,7 +11,7 @@ public class Giant extends BaseType
     @Override
     public int actionCooldown()
     {
-        return 45;
+        return 30;
     }
     @Override
     public boolean canHoldItems()

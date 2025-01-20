@@ -11,6 +11,6 @@ public class Normal extends BaseType
     @Override
     public int actionCooldown()
     {
-        return 30;
+        return 20;
     }
 }

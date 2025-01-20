@@ -5,6 +5,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.phys.Vec3;
 import undead.armies.UndeadArmies;
 import undead.armies.base.Resettable;
 import undead.armies.behaviour.group.GroupStorage;
@@ -18,6 +19,8 @@ public class Single implements Resettable
     public final BaseType baseType;
     public GroupStorage groupStorage = null;
     public static final int maxDismountChecks = 10;
+    public Vec3 lastPosition;
+    public Vec3 currentPosition;
     public void attemptDismount()
     {
         if(!this.pathfinderMob.isPassenger())
@@ -57,6 +60,7 @@ public class Single implements Resettable
     {
         UndeadArmies.logger.debug("reset single!");
         this.groupStorage = null;
+        this.lastPosition = pathfinderMob.position();
     }
     public void doTick()
     {
@@ -77,15 +81,19 @@ public class Single implements Resettable
         {
             this.pathfinderMob.setTarget(this.groupStorage.group.target);
         }
+        this.currentPosition = pathfinderMob.position();
         if(this.groupStorage != null)
         {
             this.groupStorage.group.doGroupTask(this);
         }
         this.baseType.additionalTick(this);
+        this.lastPosition = this.currentPosition;
     }
     public Single(final PathfinderMob pathfinderMob)
     {
         this.pathfinderMob = pathfinderMob;
         this.baseType = TypeUtil.instance.getMobType(pathfinderMob.getRandom());
+        this.lastPosition = pathfinderMob.position();
+        this.currentPosition = this.lastPosition;
     }
 }

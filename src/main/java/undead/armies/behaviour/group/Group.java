@@ -4,6 +4,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import undead.armies.behaviour.group.task.BaseTask;
 import undead.armies.behaviour.group.task.selector.BaseTaskSelector;
+import undead.armies.behaviour.group.task.selector.MineTaskSelector;
 import undead.armies.behaviour.group.task.selector.StackTaskSelector;
 import undead.armies.behaviour.group.task.selector.TickableTaskSelector;
 import undead.armies.behaviour.single.Single;
@@ -111,7 +112,7 @@ public class Group
         {
             this.setTask(single);
         }
-        else if(single.groupStorage.task.starter == null || single.groupStorage.task.starter.pathfinderMob.isDeadOrDying())
+        else if(single.groupStorage.task.starter == null || single.groupStorage.task.starter.pathfinderMob.isDeadOrDying() || single.groupStorage.task.starter.groupStorage == null)
         {
             this.taskStorages.get(single.groupStorage.task.taskIndex).remove(single.groupStorage.task);
             single.groupStorage.task.deleted = true;
@@ -142,7 +143,7 @@ public class Group
     public Group(LivingEntity target)
     {
         this.target = target;
-        //this.addTaskSelector(MineTaskSelector.instance, 0.3f);
-        this.addTaskSelector(StackTaskSelector.instance, 0.7f);
+        this.addTaskSelector(StackTaskSelector.instance, 0.6f);
+        this.addTaskSelector(MineTaskSelector.instance, 0.4f);
     }
 }

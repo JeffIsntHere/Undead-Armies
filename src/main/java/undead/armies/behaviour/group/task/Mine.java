@@ -1,7 +1,9 @@
 package undead.armies.behaviour.group.task;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -10,56 +12,47 @@ import org.jetbrains.annotations.NotNull;
 import undead.armies.UndeadArmies;
 import undead.armies.behaviour.single.Single;
 
+import java.util.ArrayList;
+
 public class Mine extends BaseTask
 {
-    public static final int mineAdd = 0;
-    public static final int mineRemove = 1;
-    public static final double maxMiningDistance = 5.0d;
-    public static final float miningProgressToBlastResistanceRatio = 1.51f;
-    public final BlockPos mineTarget;
+    public static final double maxMiningDistance = 3.0d;
+    public static final float blastResistanceToHitPointRatio = 8;
+    protected final ArrayList<BlockPos> mineTargets;
+    protected BlockPos mineTarget;
     public final Vec3 mineTargetVec3;
     public int miningProgress = 0;
     @Override
     public void handleTask(@NotNull final Single single, @NotNull final LivingEntity target)
     {
-        if(single.groupStorage.assignedTask == Mine.mineAdd)
-        {
-            this.miningProgress++;
-        }
-        else
-        {
-            this.miningProgress--;
-        }
         if(single.pathfinderMob.position().distanceTo(this.mineTargetVec3) >= Mine.maxMiningDistance)
         {
             single.pathfinderMob.getNavigation().moveTo(this.mineTargetVec3.x, this.mineTargetVec3.y, this.mineTargetVec3.z, 0.2f);
             return;
         }
-        if(this.miningProgress < 1)
-        {
-            single.groupStorage.assignedTask = Mine.mineAdd;
-            if(this.miningProgress < 0)
-            {
-                this.miningProgress = 0;
-            }
-        }
-        else
-        {
-            single.groupStorage.assignedTask = Mine.mineRemove;
-        }
-        final BlockState blockState = single.pathfinderMob.level().getBlockState(this.mineTarget);
+        this.miningProgress+=1;
+        final Level level = single.pathfinderMob.level();
+        final BlockState blockState = level.getBlockState(this.mineTarget);
+        UndeadArmies.logger.debug("breaking block at " + this.mineTarget + " progress: " + this.miningProgress);
         if(blockState.isEmpty())
         {
-            this.starter = null;
-            single.groupStorage.reset();
+            if(this.mineTargets.isEmpty())
+            {
+                this.starter = null;
+                single.groupStorage.reset();
+                return;
+            }
+            this.mineTarget = this.mineTargets.removeLast();
+            this.miningProgress = 0;
             return;
         }
-        if(this.miningProgress * Mine.miningProgressToBlastResistanceRatio > blockState.getBlock().getExplosionResistance())
+        final float requiredMiningProgress = blockState.getBlock().getExplosionResistance() * Mine.blastResistanceToHitPointRatio;
+        level.playSound(null, this.mineTarget, blockState.getSoundType(level, this.mineTarget, single.pathfinderMob).getHitSound(), SoundSource.BLOCKS, (float)this.miningProgress/requiredMiningProgress * 2.0f + 1.0f, 1.0f);
+        if(this.miningProgress > requiredMiningProgress)
         {
-            Block.dropResources(blockState, single.pathfinderMob.level(), this.mineTarget);
-            single.pathfinderMob.level().setBlock(this.mineTarget, Blocks.AIR.defaultBlockState(), 3);
-            this.starter = null;
-            single.groupStorage.reset();
+            Block.dropResources(blockState, level, this.mineTarget);
+            level.setBlock(this.mineTarget, Blocks.AIR.defaultBlockState(), 3);
+            level.playSound(null, this.mineTarget, blockState.getSoundType(level, this.mineTarget, single.pathfinderMob).getBreakSound(), SoundSource.BLOCKS, 3.0f, 1.0f);
         }
     }
     @Override
@@ -72,11 +65,12 @@ public class Mine extends BaseTask
         this.starter = single;
         return false;
     }
-    public Mine(@NotNull final Single starter, final int taskIndex, @NotNull final BlockPos mineTarget)
+    public Mine(@NotNull final Single starter, final int taskIndex, @NotNull final ArrayList<BlockPos> mineTargets)
     {
         super(starter, taskIndex);
-        this.mineTarget = mineTarget;
-        this.mineTargetVec3 = new Vec3(mineTarget.getX(), mineTarget.getY(), mineTarget.getZ());
-        UndeadArmies.logger.debug("created mine task to break block at " + mineTarget);
+        this.mineTargets = mineTargets;
+        this.mineTarget = this.mineTargets.removeLast();
+        this.mineTargetVec3 = starter.currentPosition;
+        UndeadArmies.logger.debug("created mine task to break block at " + mineTargets);
     }
 }

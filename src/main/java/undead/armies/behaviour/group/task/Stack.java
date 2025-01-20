@@ -1,11 +1,17 @@
 package undead.armies.behaviour.group.task;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.monster.Witch;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.entity.BellBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.WaterFluid;
 import net.minecraft.world.phys.Vec3;
@@ -18,7 +24,7 @@ public class Stack extends BaseTask
 {
     public static final int stack = 0;
     public static final int dismount = 1;
-    public static final int emptyCounterBeforeDeleteSelf = 2;
+    public static final int emptyCounterBeforeDeleteSelf = 1;
     public static final float minimumDistanceToStack = 3.0f;
     public int emptyCounter = 0;
     @Override
@@ -32,8 +38,10 @@ public class Stack extends BaseTask
                 {
                     if(this.emptyCounter > Stack.emptyCounterBeforeDeleteSelf)
                     {
+                        this.emptyCounter = 0;
                         super.starter = null;
                         single.groupStorage.reset();
+                        ((PathfinderMob) single.pathfinderMob).addEffect(new MobEffectInstance(MobEffects.GLOWING, 20));
                     }
                     else if(super.starter.pathfinderMob.getPassengers().isEmpty())
                     {
@@ -135,6 +143,11 @@ public class Stack extends BaseTask
         }
         if(entity instanceof GetSingle getSingle)
         {
+            ((PathfinderMob) entity).addEffect(new MobEffectInstance(MobEffects.GLOWING, 60));
+            if(getSingle.getSingle().groupStorage == null)
+            {
+                return;
+            }
             getSingle.getSingle().groupStorage.task = baseTask;
             for(Entity passenger : entity.getPassengers())
             {
