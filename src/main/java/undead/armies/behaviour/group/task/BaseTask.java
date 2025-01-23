@@ -7,7 +7,7 @@ import undead.armies.behaviour.single.Single;
 
 public abstract class BaseTask
 {
-    public Single starter; //stater.groupStorage may be null!
+    public Single starter; //starter.groupStorage may be null!
     public boolean deleted = false;
     public final TaskSelectorStorage taskSelectorStorage;
     public abstract void handleTask(@NotNull final Single single, @NotNull final LivingEntity target);

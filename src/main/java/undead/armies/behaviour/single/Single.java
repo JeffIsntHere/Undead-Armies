@@ -8,8 +8,8 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.phys.Vec3;
 import undead.armies.UndeadArmies;
 import undead.armies.base.Resettable;
+import undead.armies.behaviour.group.GroupUtil;
 import undead.armies.behaviour.group.GroupStorage;
-import undead.armies.behaviour.group.Group;
 import undead.armies.behaviour.type.BaseType;
 import undead.armies.behaviour.type.TypeUtil;
 
@@ -75,7 +75,7 @@ public class Single implements Resettable
         if(this.groupStorage == null || !this.groupStorage.group.target.is(this.pathfinderMob.getTarget()))
         {
             this.attemptDismount();
-            this.groupStorage = Group.getGroupStorageThatAttacks(this.pathfinderMob.getTarget());
+            this.groupStorage = GroupUtil.instance.getGroupStorageThatAttacks(this.pathfinderMob.getTarget(), this);
         }
         else if(this.pathfinderMob.getTarget() == null)
         {

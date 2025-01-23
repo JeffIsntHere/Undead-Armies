@@ -23,4 +23,6 @@ public abstract class BaseTaskSelector
                 });
     }
     public abstract BaseTask getSuitableTask(@NotNull final TaskSelectorStorage taskSelectorStorage, @NotNull final Single single, @NotNull final LivingEntity target);
+    //the "tick" function is called when the starter of a baseTask is ticked
+    public void tick(@NotNull final TaskSelectorStorage taskSelectorStorage, @NotNull final Single single, @NotNull final LivingEntity target) {}
 }

@@ -2,8 +2,7 @@ package undead.armies.behaviour.group;
 
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
-import undead.armies.behaviour.group.task.selector.MineTaskSelector;
-import undead.armies.behaviour.group.task.selector.StackTaskSelector;
+import undead.armies.behaviour.group.task.BaseTask;
 import undead.armies.behaviour.group.task.selector.TaskSelectorStorage;
 import undead.armies.behaviour.single.Single;
 
@@ -15,37 +14,10 @@ public class Group
 {
     public static final ArrayList<Group> groups = new ArrayList<>();
     public static final int setTaskAttempts = 5;
-    public static final float tickGroupChance = 0.1f;
-    public static Group getGroupThatAttacks(LivingEntity target)
-    {
-        if(target == null)
-        {
-            return null;
-        }
-        for(Group group : Group.groups)
-        {
-            if(group.target.is(target))
-            {
-                return group;
-            }
-        }
-        final int groupsSize = Group.groups.size();
-        Group.groups.add(new Group(target));
-        return Group.groups.get(groupsSize);
-    }
-    public static GroupStorage getGroupStorageThatAttacks(LivingEntity target)
-    {
-        final Group group = Group.getGroupThatAttacks(target);
-        if(group == null)
-        {
-            return null;
-        }
-        return new GroupStorage(group);
-    }
     public final LivingEntity target;
     protected boolean deleted = false;
     protected final ArrayList<TaskSelectorStorage> taskSelectorStorages = new ArrayList<>();
-    public void reprocessTaskTable()
+    protected void reprocessTaskTable()
     {
         float divisor = 0.0f;
         for(TaskSelectorStorage taskSelectorStorage : this.taskSelectorStorages)
@@ -134,10 +106,15 @@ public class Group
                 }
                 else
                 {
-                    if (single.groupStorage.task.starter != null && single.groupStorage.task.starter.pathfinderMob.isDeadOrDying())
+                    final BaseTask baseTask = single.groupStorage.task;
+                    if (baseTask.starter != null && !baseTask.starter.pathfinderMob.isDeadOrDying() && baseTask.starter.groupStorage != null)
                     {
-                        single.groupStorage.task.taskSelectorStorage.taskStorage.add(single.groupStorage.task);
-                        single.groupStorage.task.deleted = false;
+                        baseTask.taskSelectorStorage.taskStorage.add(baseTask);
+                        baseTask.deleted = false;
+                    }
+                    if  (baseTask.starter.pathfinderMob.is(single.pathfinderMob))
+                    {
+                        baseTask.taskSelectorStorage.taskSelector.tick(baseTask.taskSelectorStorage, single, this.target);
                     }
                 }
             }
@@ -150,8 +127,7 @@ public class Group
     public Group(LivingEntity target)
     {
         this.target = target;
-        this.taskSelectorStorages.add(new TaskSelectorStorage(StackTaskSelector.instance, 0.6f));
-        this.taskSelectorStorages.add(new TaskSelectorStorage(MineTaskSelector.instance, 0.4f));
+        GroupUtil.instance.setTaskSelectors(this.taskSelectorStorages);
         this.reprocessTaskTable();
     }
 }
