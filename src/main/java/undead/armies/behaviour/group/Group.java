@@ -124,7 +124,10 @@ public class Group
         {
             if (baseTask.starter != null && baseTask.starter.pathfinderMob.is(single.pathfinderMob))
             {
-                baseTask.taskSelectorStorage.taskSelector.tick(baseTask.taskSelectorStorage, single, this.target);
+                if(baseTask.taskSelectorStorage.taskSelector.tick(baseTask.taskSelectorStorage, single, this.target))
+                {
+                    this.reprocessTaskTable();
+                }
             }
             baseTask.handleTask(single, this.target);
         }
