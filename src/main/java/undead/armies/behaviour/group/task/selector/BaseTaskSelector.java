@@ -22,12 +22,5 @@ public abstract class BaseTaskSelector
                     return false;
                 });
     }
-    public BaseTask getSuitableTask(@NotNull final ArrayList<BaseTask> tasks, @NotNull final Single single, @NotNull final LivingEntity target, final int taskIndex)
-    {
-        if(tasks.size() > 0)
-        {
-            return tasks.get(0);
-        }
-        return null;
-    }
+    public abstract BaseTask getSuitableTask(@NotNull final TaskSelectorStorage taskSelectorStorage, @NotNull final Single single, @NotNull final LivingEntity target);
 }

@@ -15,12 +15,13 @@ public class StackTaskSelector extends BaseTaskSelector
     public static final double distanceToBeConsideredAsNotMoving = 1.3d;
     public static final StackTaskSelector instance = new StackTaskSelector();
     @Override
-    public BaseTask getSuitableTask(@NotNull final ArrayList<BaseTask> tasks, @NotNull final Single single, @NotNull final LivingEntity target, final int taskIndex)
+    public BaseTask getSuitableTask(@NotNull final TaskSelectorStorage taskSelectorStorage, @NotNull final Single single, @NotNull final LivingEntity target)
     {
         if(single.lastPosition.distanceTo(single.currentPosition) >= StackTaskSelector.distanceToBeConsideredAsNotMoving)
         {
             return null;
         }
+        final ArrayList<BaseTask> tasks = taskSelectorStorage.taskStorage;
         BaseTaskSelector.cleanTasks(tasks);
         single.groupStorage.assignedTask = Stack.stack;
         final Vec3 targetPosition = target.position();
@@ -32,7 +33,7 @@ public class StackTaskSelector extends BaseTaskSelector
                 return task;
             }
         }
-        tasks.add(new Stack(single, taskIndex));
+        tasks.add(new Stack(single, taskSelectorStorage));
         return tasks.get(tasks.size() - 1);
     }
     private StackTaskSelector(){}

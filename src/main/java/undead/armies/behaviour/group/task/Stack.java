@@ -4,20 +4,17 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.monster.Witch;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.LiquidBlock;
-import net.minecraft.world.level.block.entity.BellBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.WaterFluid;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import undead.armies.UndeadArmies;
 import undead.armies.base.GetSingle;
+import undead.armies.behaviour.group.task.selector.TaskSelectorStorage;
 import undead.armies.behaviour.single.Single;
 
 public class Stack extends BaseTask
@@ -41,7 +38,6 @@ public class Stack extends BaseTask
                         this.emptyCounter = 0;
                         super.starter = null;
                         single.groupStorage.reset();
-                        ((PathfinderMob) single.pathfinderMob).addEffect(new MobEffectInstance(MobEffects.GLOWING, 20));
                     }
                     else if(super.starter.pathfinderMob.getPassengers().isEmpty())
                     {
@@ -131,7 +127,7 @@ public class Stack extends BaseTask
     @Override
     public void splitTask(@NotNull Single single)
     {
-        single.groupStorage.task = new Stack(single, this.taskIndex);
+        single.groupStorage.task = new Stack(single, this.taskSelectorStorage);
         single.groupStorage.assignedTask = Stack.stack;
         this.changeTaskForPassengers(single.groupStorage.task, single.pathfinderMob);
     }
@@ -155,8 +151,8 @@ public class Stack extends BaseTask
             }
         }
     }
-    public Stack(@NotNull final Single starter, final int taskIndex)
+    public Stack(@NotNull final Single starter, final TaskSelectorStorage taskSelectorStorage)
     {
-        super(starter, taskIndex);
+        super(starter, taskSelectorStorage);
     }
 }

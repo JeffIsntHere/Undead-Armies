@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import undead.armies.UndeadArmies;
+import undead.armies.behaviour.group.task.selector.TaskSelectorStorage;
 import undead.armies.behaviour.single.Single;
 
 import java.util.ArrayList;
@@ -65,9 +66,9 @@ public class Mine extends BaseTask
         this.starter = single;
         return false;
     }
-    public Mine(@NotNull final Single starter, final int taskIndex, @NotNull final ArrayList<BlockPos> mineTargets)
+    public Mine(@NotNull final Single starter, final TaskSelectorStorage taskSelectorStorage, @NotNull final ArrayList<BlockPos> mineTargets)
     {
-        super(starter, taskIndex);
+        super(starter, taskSelectorStorage);
         this.mineTargets = mineTargets;
         this.mineTarget = this.mineTargets.removeLast();
         this.mineTargetVec3 = starter.currentPosition;

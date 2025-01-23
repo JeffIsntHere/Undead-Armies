@@ -65,12 +65,13 @@ public class MineTaskSelector extends BaseTaskSelector
         return output;
     }
     @Override
-    public BaseTask getSuitableTask(@NotNull final ArrayList<BaseTask> tasks, @NotNull final Single single, @NotNull final LivingEntity target, @NotNull final int taskIndex)
+    public BaseTask getSuitableTask(@NotNull final TaskSelectorStorage taskSelectorStorage, @NotNull final Single single, @NotNull final LivingEntity target)
     {
         if(single.lastPosition.distanceTo(single.currentPosition) >= MineTaskSelector.distanceToBeConsideredAsNotMoving)
         {
             return null;
         }
+        final ArrayList<BaseTask> tasks = taskSelectorStorage.taskStorage;
         BaseTaskSelector.cleanTasks(tasks);
         final Vec3 position = single.pathfinderMob.position();
         for(BaseTask baseTask : tasks)
@@ -89,7 +90,7 @@ public class MineTaskSelector extends BaseTaskSelector
         {
             return null;
         }
-        tasks.add(new Mine(single, taskIndex, blockPos));
+        tasks.add(new Mine(single, taskSelectorStorage, blockPos));
         return tasks.get(tasks.size() - 1);
     }
     private MineTaskSelector(){}

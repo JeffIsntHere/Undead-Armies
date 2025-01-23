@@ -1,15 +1,12 @@
 package undead.armies;
 
-import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.projectile.ThrownPotion;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
@@ -30,5 +27,9 @@ public final class Util
             thrownPotion.shoot(x,distance/velocity * 0.5 ,z,velocity, accuracy);
             level.addFreshEntity(thrownPotion);
         }
+    }
+    public static void glow(final Mob mob, final int duration)
+    {
+        mob.addEffect(new MobEffectInstance(MobEffects.GLOWING, duration));
     }
 }
