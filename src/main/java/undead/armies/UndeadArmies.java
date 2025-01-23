@@ -9,4 +9,5 @@ public class UndeadArmies
 {
     public static final String modId = "undead_armies";
     public static final Logger logger = LogUtils.getLogger();
+    //most of the code is in the "behaviour" package.
 }

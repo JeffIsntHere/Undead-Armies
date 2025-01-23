@@ -9,6 +9,8 @@ public abstract class BaseTask
 {
     public Single starter; //starter.groupStorage may be null!
     public boolean deleted = false;
+    //killed = forced delete.
+    public boolean killed = false;
     public final TaskSelectorStorage taskSelectorStorage;
     public abstract void handleTask(@NotNull final Single single, @NotNull final LivingEntity target);
     //true = give me new task.
@@ -18,6 +20,7 @@ public abstract class BaseTask
         return true;
     }
     public void splitTask(@NotNull final Single starter) {}
+    public void combineTask(@NotNull final Single starter) {}
     public BaseTask(@NotNull final Single starter, final TaskSelectorStorage taskSelectorStorage)
     {
         this.starter = starter;

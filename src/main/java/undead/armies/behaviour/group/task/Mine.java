@@ -9,7 +9,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import undead.armies.UndeadArmies;
 import undead.armies.behaviour.group.task.selector.TaskSelectorStorage;
 import undead.armies.behaviour.single.Single;
 
@@ -34,7 +33,6 @@ public class Mine extends BaseTask
         this.miningProgress+=1;
         final Level level = single.pathfinderMob.level();
         final BlockState blockState = level.getBlockState(this.mineTarget);
-        UndeadArmies.logger.debug("breaking block at " + this.mineTarget + " progress: " + this.miningProgress);
         if(blockState.isEmpty())
         {
             if(this.mineTargets.isEmpty())
@@ -72,6 +70,5 @@ public class Mine extends BaseTask
         this.mineTargets = mineTargets;
         this.mineTarget = this.mineTargets.removeLast();
         this.mineTargetVec3 = starter.currentPosition;
-        UndeadArmies.logger.debug("created mine task to break block at " + mineTargets);
     }
 }

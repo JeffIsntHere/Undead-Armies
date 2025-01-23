@@ -24,6 +24,7 @@ public class Stack extends BaseTask
     public static final int emptyCounterBeforeDeleteSelf = 1;
     public static final float minimumDistanceToStack = 3.0f;
     public int emptyCounter = 0;
+
     @Override
     public void handleTask(@NotNull final Single single, @NotNull final LivingEntity target)
     {
@@ -68,7 +69,7 @@ public class Stack extends BaseTask
                         for(int y = -2; y < 2; y++)
                         {
                             BlockPos blockPos = new BlockPos(pathFinderMobBlockPos.getX() + x, pathFinderMobBlockPos.getY() + y, pathFinderMobBlockPos.getZ() + z);
-                            if(targetPosition.distanceTo(new Vec3(blockPos.getX(), blockPos.getY(), blockPos.getZ())) + 1.0d >= distance)
+                            if(targetPosition.distanceTo(new Vec3(blockPos.getX(), blockPos.getY(), blockPos.getZ())) >= distance)
                             {
                                 continue;
                             }
@@ -114,6 +115,7 @@ public class Stack extends BaseTask
             }
         }
     }
+
     @Override
     public boolean handleDelete(@NotNull Single single)
     {
@@ -124,6 +126,7 @@ public class Stack extends BaseTask
         }
         return false;
     }
+
     @Override
     public void splitTask(@NotNull Single single)
     {
@@ -139,7 +142,6 @@ public class Stack extends BaseTask
         }
         if(entity instanceof GetSingle getSingle)
         {
-            ((PathfinderMob) entity).addEffect(new MobEffectInstance(MobEffects.GLOWING, 60));
             if(getSingle.getSingle().groupStorage == null)
             {
                 return;

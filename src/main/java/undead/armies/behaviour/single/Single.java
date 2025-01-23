@@ -6,7 +6,6 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.phys.Vec3;
-import undead.armies.UndeadArmies;
 import undead.armies.base.Resettable;
 import undead.armies.behaviour.group.GroupUtil;
 import undead.armies.behaviour.group.GroupStorage;
@@ -18,7 +17,6 @@ public class Single implements Resettable
     public final PathfinderMob pathfinderMob;
     public final BaseType baseType;
     public GroupStorage groupStorage = null;
-    public static final int maxDismountChecks = 10;
     public Vec3 lastPosition;
     public Vec3 currentPosition;
     public void attemptDismount()
@@ -33,6 +31,7 @@ public class Single implements Resettable
             return;
         }
         final Entity vehicle = this.pathfinderMob.getVehicle();
+        //TODO: find a better was to check if vehicle is flying.
         if(vehicle.fallDistance != 0)
         {
             return;
@@ -58,7 +57,6 @@ public class Single implements Resettable
     }
     public void reset()
     {
-        UndeadArmies.logger.debug("reset single!");
         this.groupStorage = null;
         this.lastPosition = pathfinderMob.position();
     }

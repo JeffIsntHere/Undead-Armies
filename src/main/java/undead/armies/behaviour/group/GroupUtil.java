@@ -15,8 +15,8 @@ public final class GroupUtil
     //mix into this if you want to add your own tasks.
     public void setTaskSelectors(@NotNull final ArrayList<TaskSelectorStorage> taskSelectorStorages)
     {
-        taskSelectorStorages.add(new TaskSelectorStorage(StackTaskSelector.instance, 0.6f));
-        taskSelectorStorages.add(new TaskSelectorStorage(MineTaskSelector.instance, 0.4f));
+        taskSelectorStorages.add(new TaskSelectorStorage(StackTaskSelector.instance, StackTaskSelector.baseWeight));
+        taskSelectorStorages.add(new TaskSelectorStorage(MineTaskSelector.instance, MineTaskSelector.baseWeight));
     }
     //mix into this if you want to use your own Group implementation.
     protected Group createGroup(LivingEntity target, Single requester)

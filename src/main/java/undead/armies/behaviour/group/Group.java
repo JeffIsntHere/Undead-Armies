@@ -98,7 +98,11 @@ public class Group
         }
         if(single.groupStorage.task != null)
         {
-            if(single.groupStorage.task.deleted)
+            if(single.groupStorage.task.killed)
+            {
+                this.setTask(single);
+            }
+            else if(single.groupStorage.task.deleted)
             {
                 if (single.groupStorage.task.handleDelete(single))
                 {
@@ -112,16 +116,17 @@ public class Group
                         baseTask.taskSelectorStorage.taskStorage.add(baseTask);
                         baseTask.deleted = false;
                     }
-                    if  (baseTask.starter.pathfinderMob.is(single.pathfinderMob))
-                    {
-                        baseTask.taskSelectorStorage.taskSelector.tick(baseTask.taskSelectorStorage, single, this.target);
-                    }
                 }
             }
         }
-        if(single.groupStorage.task != null)
+        final BaseTask baseTask = single.groupStorage.task;
+        if(baseTask != null)
         {
-            single.groupStorage.task.handleTask(single, this.target);
+            if (baseTask.starter != null && baseTask.starter.pathfinderMob.is(single.pathfinderMob))
+            {
+                baseTask.taskSelectorStorage.taskSelector.tick(baseTask.taskSelectorStorage, single, this.target);
+            }
+            baseTask.handleTask(single, this.target);
         }
     }
     public Group(LivingEntity target)
