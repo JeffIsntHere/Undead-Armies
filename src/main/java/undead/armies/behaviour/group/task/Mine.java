@@ -52,7 +52,14 @@ public class Mine extends BaseTask
             level.setBlock(this.mineTarget, Blocks.AIR.defaultBlockState(), 3);
             level.playSound(null, this.mineTarget, blockState.getSoundType(level, this.mineTarget, single.pathfinderMob).getBreakSound(), SoundSource.BLOCKS, 3.0f, 1.0f);
         }
-        return false;
+        if(this.starter.pathfinderMob.is(single.pathfinderMob))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
     @Override
     public boolean handleDelete(@NotNull Single single)

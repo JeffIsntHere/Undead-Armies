@@ -7,8 +7,6 @@ import undead.armies.behaviour.group.task.selector.TaskSelectorStorage;
 import undead.armies.behaviour.single.Single;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 public class Group
 {
@@ -28,18 +26,11 @@ public class Group
         {
             taskSelectorStorage.weight = (taskSelectorStorage.rawWeight / divisor);
         }
-        Collections.sort(this.taskSelectorStorages, new Comparator<TaskSelectorStorage>()
-        {
-            @Override
-            public int compare(TaskSelectorStorage left, TaskSelectorStorage right)
-            {
-                return left.weight > right.weight ? -1 : (left.weight < right.weight) ? 1 : 0;
-            }
-        });
+        this.taskSelectorStorages.sort((left, right) -> Float.compare(right.weight, left.weight));
     }
     public boolean setTask(final Single single)
     {
-        int rerollCounter = 0;
+        int reRollCounter = 0;
         final RandomSource randomSource = single.pathfinderMob.getRandom();
         final int sizeOfProcessedTasks = this.taskSelectorStorages.size();
         if(sizeOfProcessedTasks != 0)
@@ -59,11 +50,11 @@ public class Group
                     }
                     else
                     {
-                        if(rerollCounter > Group.setTaskAttempts)
+                        if(reRollCounter > Group.setTaskAttempts)
                         {
                             return false;
                         }
-                        rerollCounter++;
+                        reRollCounter++;
                     }
                 }
             }
@@ -84,9 +75,9 @@ public class Group
             single.reset();
             return;
         }
-        if(single.groupStorage.task == null || single.groupStorage.task.killed)
+        if((single.groupStorage.task == null || single.groupStorage.task.killed) && !this.setTask(single))
         {
-            this.setTask(single);
+            return;
         }
         else if(single.groupStorage.task.starter.pathfinderMob.isDeadOrDying() || single.groupStorage.task.starter.groupStorage == null)
         {
@@ -94,13 +85,9 @@ public class Group
             single.groupStorage.task.deleted = true;
         }
         final BaseTask lastBaseTask = single.groupStorage.task;
-        if(lastBaseTask == null)
+        if(lastBaseTask.deleted)
         {
-            return;
-        }
-        if(single.groupStorage.task.deleted)
-        {
-            if (single.groupStorage.task.handleDelete(single))
+            if (lastBaseTask.handleDelete(single))
             {
                 this.setTask(single);
             }

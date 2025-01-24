@@ -37,6 +37,10 @@ public class Single implements Resettable
         }
         final Entity vehicle = this.pathfinderMob.getVehicle();
         //TODO: find a better was to check if vehicle is flying.
+        if(vehicle == null)
+        {
+            return;
+        }
         if(vehicle.fallDistance != 0)
         {
             return;

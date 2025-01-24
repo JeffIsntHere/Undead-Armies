@@ -1,8 +1,6 @@
 package undead.armies.behaviour.group.task;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
@@ -12,7 +10,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.WaterFluid;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import undead.armies.UndeadArmies;
 import undead.armies.Util;
 import undead.armies.base.GetSingle;
 import undead.armies.behaviour.group.task.selector.TaskSelectorStorage;
@@ -33,10 +30,9 @@ public class Stack extends BaseTask
         {
             case Stack.stack ->
             {
-                single.pathfinderMob.removeAllEffects();
-                Util.glow(single.pathfinderMob, 20);
                 if(single.pathfinderMob.is(super.starter.pathfinderMob))
                 {
+                    Util.glow(single.pathfinderMob, 20);
                     return true;
                 }
                 if(super.starter.pathfinderMob.position().distanceTo(single.currentPosition) <= Stack.minimumDistanceToStack)
@@ -52,7 +48,6 @@ public class Stack extends BaseTask
             }
             case Stack.dismount ->
             {
-                single.pathfinderMob.removeAllEffects();
                 final Vec3 targetPosition = target.position();
                 Vec3 direction = targetPosition.subtract(single.currentPosition);
                 final BlockPos pathFinderMobBlockPos = single.pathfinderMob.blockPosition();
@@ -91,7 +86,6 @@ public class Stack extends BaseTask
                             }
                             if(success)
                             {
-                                UndeadArmies.logger.debug("dist " + targetPosition.distanceTo(new Vec3(blockPos.getX(), blockPos.getY(), blockPos.getZ())) + " dist: " + distance);
                                 single.pathfinderMob.stopRiding();
                                 single.pathfinderMob.dismountTo(blockPos.getX() + 0.5d, blockPos.getY() + 1.0d, blockPos.getZ() + 0.5d);
                                 if(!target.isDeadOrDying())
@@ -106,6 +100,7 @@ public class Stack extends BaseTask
                                 {
                                     this.splitTask(single);
                                 }
+                                return false;
                             }
                         }
                     }

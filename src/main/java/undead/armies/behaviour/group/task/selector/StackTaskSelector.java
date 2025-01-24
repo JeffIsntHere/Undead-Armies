@@ -22,12 +22,12 @@ public class StackTaskSelector extends BaseTaskSelector
     @Override
     public BaseTask getSuitableTask(@NotNull final TaskSelectorStorage taskSelectorStorage, @NotNull final Single single, @NotNull final LivingEntity target)
     {
+        taskSelectorStorage.cleanTaskStorage();
         if(BaseTaskSelector.isMoving(single))
         {
             return null;
         }
         final ArrayList<BaseTask> tasks = taskSelectorStorage.taskStorage;
-        taskSelectorStorage.cleanTaskStorage();
         single.groupStorage.assignedTask = Stack.stack;
         final Vec3 targetPosition = target.position();
         final double distanceToTargetPosition = single.pathfinderMob.position().distanceTo(targetPosition) + distanceAdder;
@@ -39,6 +39,7 @@ public class StackTaskSelector extends BaseTaskSelector
             }
         }
         tasks.add(new Stack(single, taskSelectorStorage));
+        UndeadArmies.logger.debug("made a task! now size is:" + tasks.size());
         return tasks.get(tasks.size() - 1);
     }
 
@@ -51,15 +52,10 @@ public class StackTaskSelector extends BaseTaskSelector
         int numberOfEntries = 0;
         float calculatedWeight = StackTaskSelector.baseWeight;
         BaseTask lastTask = null;
-        UndeadArmies.logger.debug("ticked!: " + taskSelectorStorage.taskStorage.size());
         for(BaseTask task : taskSelectorStorage.taskStorage)
         {
             sumOfDifferences += targetHeight - task.starter.currentPosition.y;
             numberOfEntries++;
-            if(lastTask != null)
-            {
-                UndeadArmies.logger.debug("result: " + (Math.abs(lastTask.starter.currentPosition.y - task.starter.currentPosition.y) <= 1.0d) + " " + (lastTask.starter.currentPosition.distanceTo(task.starter.currentPosition) <= StackTaskSelector.maxDistanceForMerging));
-            }
             if(lastTask != null && Math.abs(lastTask.starter.currentPosition.y - task.starter.currentPosition.y) <= 1.0d && lastTask.starter.currentPosition.distanceTo(task.starter.currentPosition) <= StackTaskSelector.maxDistanceForMerging)
             {
                 if(lastTask.starter.currentPosition.distanceTo(targetPosition) > task.starter.currentPosition.distanceTo(targetPosition))

@@ -15,6 +15,7 @@ public class MineTaskSelector extends BaseTaskSelector
     public static final MineTaskSelector instance = new MineTaskSelector();
     public static final float baseWeight = 0.5f;
     public static final double maxDistanceFromTask = 12.0d;
+    public static final double expectedDistanceToPlayer = 3.0d;
 
     protected static int getPositiveOrNegativeOne(final double d)
     {
@@ -69,13 +70,13 @@ public class MineTaskSelector extends BaseTaskSelector
     @Override
     public BaseTask getSuitableTask(@NotNull final TaskSelectorStorage taskSelectorStorage, @NotNull final Single single, @NotNull final LivingEntity target)
     {
+        taskSelectorStorage.cleanTaskStorage();
         if(BaseTaskSelector.isMoving(single))
         {
             return null;
         }
-        final ArrayList<BaseTask> tasks = taskSelectorStorage.taskStorage;
-        taskSelectorStorage.cleanTaskStorage();
         final Vec3 position = single.pathfinderMob.position();
+        final ArrayList<BaseTask> tasks = taskSelectorStorage.taskStorage;
         for(BaseTask baseTask : tasks)
         {
             if(baseTask instanceof Mine mine)
@@ -93,12 +94,18 @@ public class MineTaskSelector extends BaseTaskSelector
             return null;
         }
         tasks.add(new Mine(single, taskSelectorStorage, blockPos));
-        return tasks.get(tasks.size() - 1);
+        return tasks.getLast();
     }
 
     @Override
     public boolean tick(@NotNull TaskSelectorStorage taskSelectorStorage, @NotNull Single single, @NotNull LivingEntity target)
     {
+        final Vec3 targetPosition = target.position();
+        taskSelectorStorage.taskStorage.removeIf(baseTask -> {
+            final Vec3 directionToBaseTask = ((Mine) baseTask).mineTargetVec3.subtract(baseTask.starter.currentPosition);
+            final Vec3 directionToTarget = targetPosition.subtract(baseTask.starter.currentPosition);
+            return directionToTarget.dot(directionToBaseTask) > 0;
+        });
         double sumOfDifferences = 0;
         double targetHeight = target.position().y;
         int numberOfEntries = 0;
@@ -108,7 +115,7 @@ public class MineTaskSelector extends BaseTaskSelector
             sumOfDifferences += targetHeight - task.starter.currentPosition.y;
             numberOfEntries++;
         }
-        sumOfDifferences = sumOfDifferences/((double)numberOfEntries)/StackTaskSelector.expectedDistanceToPlayer;
+        sumOfDifferences = sumOfDifferences/((double)numberOfEntries)/MineTaskSelector.expectedDistanceToPlayer;
         //positive = majority is below the player. Therefore, it is good to mine
         //negative = majority is above the player. Therefore, it is bad to mine.
         final float commonFloat = 0.2f + ((float)sumOfDifferences)/10.0f;
@@ -127,7 +134,7 @@ public class MineTaskSelector extends BaseTaskSelector
         if(sumOfDifferences > 1.0f)
         {
             calculatedWeight-=commonFloat;
-            Math.max(calculatedWeight, 0.1f);
+            calculatedWeight = Math.max(calculatedWeight, 0.1f);
             final int taskStorageSize = taskSelectorStorage.taskStorage.size();
             int amountToBeDeleted = (int) Math.floor(MineTaskSelector.baseWeight - calculatedWeight) * taskStorageSize + 1;
             if(amountToBeDeleted > taskStorageSize)
