@@ -7,7 +7,6 @@ import java.util.ArrayList;
 public class TaskSelectorStorage
 {
     public final BaseTaskSelector taskSelector;
-    public final ArrayList<BaseTask> taskStorage = new ArrayList<>();
     public float rawWeight;
     public float weight = 0.0f;
     public TaskSelectorStorage(final BaseTaskSelector taskSelector, final float rawWeight)

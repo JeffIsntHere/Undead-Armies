@@ -3,6 +3,7 @@ package undead.armies.behaviour.group.task.selector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import undead.armies.UndeadArmies;
 import undead.armies.behaviour.group.task.BaseTask;
 import undead.armies.behaviour.group.task.Stack;
 import undead.armies.behaviour.single.Single;
@@ -14,6 +15,8 @@ public class StackTaskSelector extends BaseTaskSelector
     public static final double distanceAdder = 1.5d;
     public static final float baseWeight = 0.5f;
     public static final double expectedDistanceToPlayer = 5.0d;
+    public static final double maxDistanceForMerging = 3.0d;
+
     public static final StackTaskSelector instance = new StackTaskSelector();
 
     @Override
@@ -43,17 +46,49 @@ public class StackTaskSelector extends BaseTaskSelector
     public boolean tick(@NotNull TaskSelectorStorage taskSelectorStorage, @NotNull Single single, @NotNull LivingEntity target)
     {
         double sumOfDifferences = 0;
-        double targetHeight = target.position().y;
+        final Vec3 targetPosition = target.position();
+        double targetHeight = targetPosition.y;
         int numberOfEntries = 0;
         float calculatedWeight = StackTaskSelector.baseWeight;
+        final ArrayList<BaseTask> remove = new ArrayList<>();
+        BaseTask lastTask = null;
+        UndeadArmies.logger.debug("ticked!: " + taskSelectorStorage.taskStorage.size());
         for(BaseTask task : taskSelectorStorage.taskStorage)
         {
-            if(task.starter != null && task.starter.currentPosition != null)
+            if(task.starter != null)
             {
+                if(task.starter.currentPosition == null)
+                {
+                    continue;
+                }
                 sumOfDifferences += targetHeight - task.starter.currentPosition.y;
                 numberOfEntries++;
+                if(lastTask != null)
+                {
+                    UndeadArmies.logger.debug("result: " + (Math.abs(lastTask.starter.currentPosition.y - task.starter.currentPosition.y) <= 1.0d) + " " + (lastTask.starter.currentPosition.distanceTo(task.starter.currentPosition) <= StackTaskSelector.maxDistanceForMerging));
+                }
+                if(lastTask != null && Math.abs(lastTask.starter.currentPosition.y - task.starter.currentPosition.y) <= 1.0d && lastTask.starter.currentPosition.distanceTo(task.starter.currentPosition) <= StackTaskSelector.maxDistanceForMerging)
+                {
+                    if(lastTask.starter.currentPosition.distanceTo(targetPosition) > task.starter.currentPosition.distanceTo(targetPosition))
+                    {
+                        task.mergeTask(lastTask.starter);
+                        lastTask = task;
+                    }
+                    else
+                    {
+                        lastTask.mergeTask(task.starter);
+                    }
+                }
+                else
+                {
+                    lastTask = task;
+                }
+                continue;
             }
+            task.deleted = true;
+            remove.add(task);
         }
+        //taskSelectorStorage.taskStorage.removeAll(remove);
         sumOfDifferences = sumOfDifferences/((double)numberOfEntries)/StackTaskSelector.expectedDistanceToPlayer;
         //positive = majority is below the player. Therefore, it is good to stack.
         //negative = majority is above the player. Therefore, it is less good to stack.
@@ -70,7 +105,7 @@ public class StackTaskSelector extends BaseTaskSelector
         {
             calculatedWeight-=0.15f;
         }
-        if(sumOfDifferences < 1.0f)
+        if(sumOfDifferences < -1.0f)
         {
             calculatedWeight-=commonFloat;
             Math.max(calculatedWeight, 0.1f);

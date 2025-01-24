@@ -20,7 +20,7 @@ public abstract class BaseTask
         return true;
     }
     public void splitTask(@NotNull final Single starter) {}
-    public void combineTask(@NotNull final Single starter) {}
+    public void mergeTask(@NotNull final Single starter) {}
     public BaseTask(@NotNull final Single starter, final TaskSelectorStorage taskSelectorStorage)
     {
         this.starter = starter;

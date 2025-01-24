@@ -119,7 +119,7 @@ public class MineTaskSelector extends BaseTaskSelector
         {
             calculatedWeight+=0.15f;
         }
-        if(sumOfDifferences < 1.0f)
+        if(sumOfDifferences < -1.0f)
         {
             calculatedWeight+=commonFloat;
         }

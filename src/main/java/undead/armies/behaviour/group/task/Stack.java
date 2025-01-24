@@ -13,17 +13,18 @@ import net.minecraft.world.level.material.WaterFluid;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import undead.armies.UndeadArmies;
+import undead.armies.Util;
 import undead.armies.base.GetSingle;
 import undead.armies.behaviour.group.task.selector.TaskSelectorStorage;
 import undead.armies.behaviour.single.Single;
+
+import java.util.List;
 
 public class Stack extends BaseTask
 {
     public static final int stack = 0;
     public static final int dismount = 1;
-    public static final int emptyCounterBeforeDeleteSelf = 1;
     public static final float minimumDistanceToStack = 3.0f;
-    public int emptyCounter = 0;
 
     @Override
     public void handleTask(@NotNull final Single single, @NotNull final LivingEntity target)
@@ -32,21 +33,13 @@ public class Stack extends BaseTask
         {
             case Stack.stack ->
             {
+                single.pathfinderMob.removeAllEffects();
+                Util.glow(single.pathfinderMob, 20);
                 if(single.pathfinderMob.is(super.starter.pathfinderMob))
                 {
-                    if(this.emptyCounter > Stack.emptyCounterBeforeDeleteSelf)
-                    {
-                        this.emptyCounter = 0;
-                        super.starter = null;
-                        single.groupStorage.reset();
-                    }
-                    else if(super.starter.pathfinderMob.getPassengers().isEmpty())
-                    {
-                        this.emptyCounter++;
-                    }
                     return;
                 }
-                if(super.starter.pathfinderMob.distanceTo(single.pathfinderMob) <= Stack.minimumDistanceToStack)
+                if(super.starter.pathfinderMob.position().distanceTo(single.currentPosition) <= Stack.minimumDistanceToStack)
                 {
                     super.starter.pathfinderMob.startRiding(single.pathfinderMob);
                     super.starter.groupStorage.assignedTask = Stack.dismount;
@@ -57,11 +50,14 @@ public class Stack extends BaseTask
             }
             case Stack.dismount ->
             {
+                single.pathfinderMob.removeAllEffects();
+                final Vec3 targetPosition = target.position();
+                Vec3 direction = targetPosition.subtract(single.currentPosition);
                 final BlockPos pathFinderMobBlockPos = single.pathfinderMob.blockPosition();
                 final int pathFinderMobHeight = (int)Math.ceil(single.pathfinderMob.getEyeHeight());
                 final Level level = single.pathfinderMob.level();
-                final Vec3 targetPosition = target.position();
                 final double distance = targetPosition.distanceTo(single.pathfinderMob.position());
+
                 for(int x = -2; x < 2; x++)
                 {
                     for(int z = -2; z < 2; z++)
@@ -69,7 +65,7 @@ public class Stack extends BaseTask
                         for(int y = -2; y < 2; y++)
                         {
                             BlockPos blockPos = new BlockPos(pathFinderMobBlockPos.getX() + x, pathFinderMobBlockPos.getY() + y, pathFinderMobBlockPos.getZ() + z);
-                            if(targetPosition.distanceTo(new Vec3(blockPos.getX(), blockPos.getY(), blockPos.getZ())) >= distance)
+                            if(targetPosition.distanceTo(new Vec3(blockPos.getX(), blockPos.getY(), blockPos.getZ())) + 1.0d >= distance)
                             {
                                 continue;
                             }
@@ -127,13 +123,6 @@ public class Stack extends BaseTask
         return false;
     }
 
-    @Override
-    public void splitTask(@NotNull Single single)
-    {
-        single.groupStorage.task = new Stack(single, this.taskSelectorStorage);
-        single.groupStorage.assignedTask = Stack.stack;
-        this.changeTaskForPassengers(single.groupStorage.task, single.pathfinderMob);
-    }
     protected void changeTaskForPassengers(final BaseTask baseTask, final Entity entity)
     {
         if(!(entity instanceof PathfinderMob))
@@ -152,6 +141,33 @@ public class Stack extends BaseTask
                 this.changeTaskForPassengers(baseTask, passenger);
             }
         }
+    }
+
+    @Override
+    public void splitTask(@NotNull Single single)
+    {
+        single.groupStorage.task = new Stack(single, this.taskSelectorStorage);
+        single.groupStorage.assignedTask = Stack.stack;
+        this.changeTaskForPassengers(single.groupStorage.task, single.pathfinderMob);
+    }
+
+    @Override
+    public void mergeTask(@NotNull Single single)
+    {
+        this.changeTaskForPassengers(single.groupStorage.task, this.starter.pathfinderMob);
+        Entity theFinalPassenger = starter.pathfinderMob;
+        while(true)
+        {
+            List<Entity> nextPassengers = theFinalPassenger.getPassengers();
+            if(nextPassengers.isEmpty())
+            {
+                break;
+            }
+            theFinalPassenger = nextPassengers.get(0);
+            Util.glow((PathfinderMob) theFinalPassenger, 60);
+        }
+        single.pathfinderMob.startRiding(theFinalPassenger);
+        single.groupStorage.assignedTask = Stack.dismount;
     }
     public Stack(@NotNull final Single starter, final TaskSelectorStorage taskSelectorStorage)
     {
