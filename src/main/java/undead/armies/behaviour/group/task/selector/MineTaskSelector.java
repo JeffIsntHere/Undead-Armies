@@ -74,7 +74,7 @@ public class MineTaskSelector extends BaseTaskSelector
             return null;
         }
         final ArrayList<BaseTask> tasks = taskSelectorStorage.taskStorage;
-        BaseTaskSelector.cleanTasks(tasks);
+        taskSelectorStorage.cleanTaskStorage();
         final Vec3 position = single.pathfinderMob.position();
         for(BaseTask baseTask : tasks)
         {
@@ -105,11 +105,8 @@ public class MineTaskSelector extends BaseTaskSelector
         float calculatedWeight = StackTaskSelector.baseWeight;
         for(BaseTask task : taskSelectorStorage.taskStorage)
         {
-            if(task.starter != null && task.starter.currentPosition != null)
-            {
-                sumOfDifferences += targetHeight - task.starter.currentPosition.y;
-                numberOfEntries++;
-            }
+            sumOfDifferences += targetHeight - task.starter.currentPosition.y;
+            numberOfEntries++;
         }
         sumOfDifferences = sumOfDifferences/((double)numberOfEntries)/StackTaskSelector.expectedDistanceToPlayer;
         //positive = majority is below the player. Therefore, it is good to mine

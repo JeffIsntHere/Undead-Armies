@@ -5,24 +5,9 @@ import org.jetbrains.annotations.NotNull;
 import undead.armies.behaviour.group.task.BaseTask;
 import undead.armies.behaviour.single.Single;
 
-import java.util.ArrayList;
-
 public abstract class BaseTaskSelector
 {
     public static float distanceToBeConsideredAsMoving = 0.7f;
-    public static void cleanTasks(@NotNull final ArrayList<BaseTask> tasks)
-    {
-        tasks.removeIf(
-                baseTask ->
-                {
-                    if(baseTask.starter == null || baseTask.starter.pathfinderMob.isDeadOrDying() || baseTask.starter.groupStorage == null)
-                    {
-                        baseTask.deleted = true;
-                        return true;
-                    }
-                    return false;
-                });
-    }
     public static boolean isMoving(@NotNull final Single single)
     {
         return single.lastPosition.distanceTo(single.currentPosition) >= BaseTaskSelector.distanceToBeConsideredAsMoving;

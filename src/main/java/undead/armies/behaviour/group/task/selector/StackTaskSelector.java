@@ -27,7 +27,7 @@ public class StackTaskSelector extends BaseTaskSelector
             return null;
         }
         final ArrayList<BaseTask> tasks = taskSelectorStorage.taskStorage;
-        BaseTaskSelector.cleanTasks(tasks);
+        taskSelectorStorage.cleanTaskStorage();
         single.groupStorage.assignedTask = Stack.stack;
         final Vec3 targetPosition = target.position();
         final double distanceToTargetPosition = single.pathfinderMob.position().distanceTo(targetPosition) + distanceAdder;
@@ -50,45 +50,33 @@ public class StackTaskSelector extends BaseTaskSelector
         double targetHeight = targetPosition.y;
         int numberOfEntries = 0;
         float calculatedWeight = StackTaskSelector.baseWeight;
-        final ArrayList<BaseTask> remove = new ArrayList<>();
         BaseTask lastTask = null;
         UndeadArmies.logger.debug("ticked!: " + taskSelectorStorage.taskStorage.size());
         for(BaseTask task : taskSelectorStorage.taskStorage)
         {
-            if(task.starter != null)
+            sumOfDifferences += targetHeight - task.starter.currentPosition.y;
+            numberOfEntries++;
+            if(lastTask != null)
             {
-                if(task.starter.currentPosition == null)
+                UndeadArmies.logger.debug("result: " + (Math.abs(lastTask.starter.currentPosition.y - task.starter.currentPosition.y) <= 1.0d) + " " + (lastTask.starter.currentPosition.distanceTo(task.starter.currentPosition) <= StackTaskSelector.maxDistanceForMerging));
+            }
+            if(lastTask != null && Math.abs(lastTask.starter.currentPosition.y - task.starter.currentPosition.y) <= 1.0d && lastTask.starter.currentPosition.distanceTo(task.starter.currentPosition) <= StackTaskSelector.maxDistanceForMerging)
+            {
+                if(lastTask.starter.currentPosition.distanceTo(targetPosition) > task.starter.currentPosition.distanceTo(targetPosition))
                 {
-                    continue;
-                }
-                sumOfDifferences += targetHeight - task.starter.currentPosition.y;
-                numberOfEntries++;
-                if(lastTask != null)
-                {
-                    UndeadArmies.logger.debug("result: " + (Math.abs(lastTask.starter.currentPosition.y - task.starter.currentPosition.y) <= 1.0d) + " " + (lastTask.starter.currentPosition.distanceTo(task.starter.currentPosition) <= StackTaskSelector.maxDistanceForMerging));
-                }
-                if(lastTask != null && Math.abs(lastTask.starter.currentPosition.y - task.starter.currentPosition.y) <= 1.0d && lastTask.starter.currentPosition.distanceTo(task.starter.currentPosition) <= StackTaskSelector.maxDistanceForMerging)
-                {
-                    if(lastTask.starter.currentPosition.distanceTo(targetPosition) > task.starter.currentPosition.distanceTo(targetPosition))
-                    {
-                        task.mergeTask(lastTask.starter);
-                        lastTask = task;
-                    }
-                    else
-                    {
-                        lastTask.mergeTask(task.starter);
-                    }
+                    task.mergeTask(lastTask.starter);
+                    lastTask = task;
                 }
                 else
                 {
-                    lastTask = task;
+                    lastTask.mergeTask(task.starter);
                 }
-                continue;
             }
-            task.deleted = true;
-            remove.add(task);
+            else
+            {
+                lastTask = task;
+            }
         }
-        //taskSelectorStorage.taskStorage.removeAll(remove);
         sumOfDifferences = sumOfDifferences/((double)numberOfEntries)/StackTaskSelector.expectedDistanceToPlayer;
         //positive = majority is below the player. Therefore, it is good to stack.
         //negative = majority is above the player. Therefore, it is less good to stack.

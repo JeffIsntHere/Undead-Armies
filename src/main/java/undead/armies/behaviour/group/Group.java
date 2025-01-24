@@ -79,57 +79,45 @@ public class Group
         }
         if(this.target.isDeadOrDying())
         {
-            if(!this.deleted)
-            {
-                Group.groups.remove(single.groupStorage.group);
-                this.deleted = true;
-            }
+            Group.groups.remove(single.groupStorage.group);
+            this.deleted = true;
             single.reset();
             return;
         }
-        if(single.groupStorage.task == null)
+        if(single.groupStorage.task == null || single.groupStorage.task.killed)
         {
             this.setTask(single);
         }
-        else if(single.groupStorage.task.starter == null || single.groupStorage.task.starter.pathfinderMob.isDeadOrDying() || single.groupStorage.task.starter.groupStorage == null)
+        else if(single.groupStorage.task.starter.pathfinderMob.isDeadOrDying() || single.groupStorage.task.starter.groupStorage == null)
         {
             single.groupStorage.task.taskSelectorStorage.taskStorage.remove(single.groupStorage.task);
             single.groupStorage.task.deleted = true;
         }
-        if(single.groupStorage.task != null)
+        final BaseTask lastBaseTask = single.groupStorage.task;
+        if(lastBaseTask == null)
         {
-            if(single.groupStorage.task.killed)
+            return;
+        }
+        if(single.groupStorage.task.deleted)
+        {
+            if (single.groupStorage.task.handleDelete(single))
             {
                 this.setTask(single);
             }
-            else if(single.groupStorage.task.deleted)
+            else
             {
-                if (single.groupStorage.task.handleDelete(single))
+                final BaseTask baseTask = single.groupStorage.task;
+                if (!baseTask.starter.pathfinderMob.isDeadOrDying() && baseTask.starter.groupStorage != null)
                 {
-                    this.setTask(single);
-                }
-                else
-                {
-                    final BaseTask baseTask = single.groupStorage.task;
-                    if (baseTask.starter != null && !baseTask.starter.pathfinderMob.isDeadOrDying() && baseTask.starter.groupStorage != null)
-                    {
-                        baseTask.taskSelectorStorage.taskStorage.add(baseTask);
-                        baseTask.deleted = false;
-                    }
+                    baseTask.taskSelectorStorage.taskStorage.add(baseTask);
+                    baseTask.deleted = false;
                 }
             }
         }
         final BaseTask baseTask = single.groupStorage.task;
-        if(baseTask != null)
+        if(baseTask != null && baseTask.handleTask(single, this.target) && baseTask.taskSelectorStorage.taskSelector.tick(baseTask.taskSelectorStorage, single, this.target))
         {
-            if (baseTask.starter != null && baseTask.starter.pathfinderMob.is(single.pathfinderMob))
-            {
-                if(baseTask.taskSelectorStorage.taskSelector.tick(baseTask.taskSelectorStorage, single, this.target))
-                {
-                    this.reprocessTaskTable();
-                }
-            }
-            baseTask.handleTask(single, this.target);
+            this.reprocessTaskTable();
         }
     }
     public Group(LivingEntity target)

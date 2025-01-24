@@ -27,7 +27,7 @@ public class Stack extends BaseTask
     public static final float minimumDistanceToStack = 3.0f;
 
     @Override
-    public void handleTask(@NotNull final Single single, @NotNull final LivingEntity target)
+    public boolean handleTask(@NotNull final Single single, @NotNull final LivingEntity target)
     {
         switch (single.groupStorage.assignedTask)
         {
@@ -37,16 +37,18 @@ public class Stack extends BaseTask
                 Util.glow(single.pathfinderMob, 20);
                 if(single.pathfinderMob.is(super.starter.pathfinderMob))
                 {
-                    return;
+                    return true;
                 }
                 if(super.starter.pathfinderMob.position().distanceTo(single.currentPosition) <= Stack.minimumDistanceToStack)
                 {
                     super.starter.pathfinderMob.startRiding(single.pathfinderMob);
                     super.starter.groupStorage.assignedTask = Stack.dismount;
                     super.starter = single;
-                    return;
                 }
-                single.pathfinderMob.getNavigation().moveTo(super.starter.pathfinderMob, 0.2f);
+                else
+                {
+                    single.pathfinderMob.getNavigation().moveTo(super.starter.pathfinderMob, 0.2f);
+                }
             }
             case Stack.dismount ->
             {
@@ -110,6 +112,7 @@ public class Stack extends BaseTask
                 }
             }
         }
+        return false;
     }
 
     @Override

@@ -23,12 +23,12 @@ public class Mine extends BaseTask
     public final Vec3 mineTargetVec3;
     public int miningProgress = 0;
     @Override
-    public void handleTask(@NotNull final Single single, @NotNull final LivingEntity target)
+    public boolean handleTask(@NotNull final Single single, @NotNull final LivingEntity target)
     {
         if(single.pathfinderMob.position().distanceTo(this.mineTargetVec3) >= Mine.maxMiningDistance)
         {
             single.pathfinderMob.getNavigation().moveTo(this.mineTargetVec3.x, this.mineTargetVec3.y, this.mineTargetVec3.z, 0.2f);
-            return;
+            return false;
         }
         this.miningProgress+=1;
         final Level level = single.pathfinderMob.level();
@@ -37,13 +37,12 @@ public class Mine extends BaseTask
         {
             if(this.mineTargets.isEmpty())
             {
-                this.starter = null;
-                single.groupStorage.reset();
-                return;
+                this.killed = true;
+                return false;
             }
             this.mineTarget = this.mineTargets.removeLast();
             this.miningProgress = 0;
-            return;
+            return false;
         }
         final float requiredMiningProgress = blockState.getBlock().getExplosionResistance() * Mine.blastResistanceToHitPointRatio;
         level.playSound(null, this.mineTarget, blockState.getSoundType(level, this.mineTarget, single.pathfinderMob).getHitSound(), SoundSource.BLOCKS, (float)this.miningProgress/requiredMiningProgress * 2.0f + 1.0f, 1.0f);
@@ -53,11 +52,12 @@ public class Mine extends BaseTask
             level.setBlock(this.mineTarget, Blocks.AIR.defaultBlockState(), 3);
             level.playSound(null, this.mineTarget, blockState.getSoundType(level, this.mineTarget, single.pathfinderMob).getBreakSound(), SoundSource.BLOCKS, 3.0f, 1.0f);
         }
+        return false;
     }
     @Override
     public boolean handleDelete(@NotNull Single single)
     {
-        if(this.starter == null)
+        if(this.killed)
         {
             return true;
         }

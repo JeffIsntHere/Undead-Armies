@@ -6,6 +6,7 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import undead.armies.base.Resettable;
 import undead.armies.behaviour.group.GroupUtil;
 import undead.armies.behaviour.group.GroupStorage;
@@ -14,10 +15,14 @@ import undead.armies.behaviour.type.TypeUtil;
 
 public class Single implements Resettable
 {
+    @NotNull
     public final PathfinderMob pathfinderMob;
+    @NotNull
     public final BaseType baseType;
     public GroupStorage groupStorage = null;
+    @NotNull
     public Vec3 lastPosition;
+    @NotNull
     public Vec3 currentPosition;
     public void attemptDismount()
     {
@@ -59,6 +64,7 @@ public class Single implements Resettable
     {
         this.groupStorage = null;
         this.lastPosition = pathfinderMob.position();
+        this.currentPosition = this.lastPosition;
     }
     public void doTick()
     {
