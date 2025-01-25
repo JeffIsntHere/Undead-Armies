@@ -1,4 +1,4 @@
-package undead.armies.behaviour.group;
+package undead.armies.behaviour;
 
 public final class Task
 {

@@ -34,7 +34,7 @@ public class Stack extends BaseTask
             {
                 if(super.starter.pathfinderMob.is(single.pathfinderMob))
                 {
-                    Util.holdItem(single.pathfinderMob, Util.redWool);
+                    //Util.holdItem(single.pathfinderMob, Util.redWool);
                     return true;
                 }
                 if(super.starter.pathfinderMob.position().distanceTo(single.currentPosition) <= Stack.minimumDistanceToStack)
@@ -172,8 +172,8 @@ public class Stack extends BaseTask
         super.taskSelectorStorage.taskStorage.add(new Stack(single, super.taskSelectorStorage));
         single.groupStorage.task = super.taskSelectorStorage.taskStorage.getLast();
         this.setPassengersTaskTo(single.pathfinderMob, single.groupStorage.task);
-        Util.glow(single.pathfinderMob, 40);
-        Util.holdItem(single.pathfinderMob, Util.greenWool);
+        //Util.glow(single.pathfinderMob, 40);
+        //Util.holdItem(single.pathfinderMob, Util.greenWool);
     }
 
     @Override
@@ -199,7 +199,7 @@ public class Stack extends BaseTask
             theFinalPassenger = nextPassengers.get(0);
         }
         single.pathfinderMob.startRiding(theFinalPassenger);
-        Util.glow(single.pathfinderMob, 40);
+        //Util.glow(single.pathfinderMob, 40);
     }
     public Stack(@NotNull final Single starter, final TaskSelectorStorage taskSelectorStorage)
     {

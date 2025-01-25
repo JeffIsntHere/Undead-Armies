@@ -1,6 +1,7 @@
 package undead.armies.behaviour.group;
 
 import undead.armies.base.Resettable;
+import undead.armies.behaviour.Task;
 import undead.armies.behaviour.group.task.BaseTask;
 
 public class GroupStorage implements Resettable
