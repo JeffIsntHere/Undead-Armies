@@ -45,29 +45,32 @@ public class StackTaskSelector extends BaseTaskSelector
     @Override
     public boolean tick(@NotNull TaskSelectorStorage taskSelectorStorage, @NotNull Single single, @NotNull LivingEntity target)
     {
+        taskSelectorStorage.cleanTaskStorage();
         double sumOfDifferences = 0;
         final Vec3 targetPosition = target.position();
         double targetHeight = targetPosition.y;
         int numberOfEntries = 0;
         float calculatedWeight = StackTaskSelector.baseWeight;
         BaseTask lastTask = null;
-        final ArrayList<BaseTask> remove = new ArrayList<>();
+        UndeadArmies.logger.debug("ticking! " + taskSelectorStorage.taskStorage.size());
         for(BaseTask task : taskSelectorStorage.taskStorage)
         {
             sumOfDifferences += targetHeight - task.starter.currentPosition.y;
             numberOfEntries++;
+            if(lastTask != null)
+            {
+                UndeadArmies.logger.debug("merge truth table: " + (lastTask != null) + " : " + Math.abs(lastTask.starter.currentPosition.y - task.starter.currentPosition.y) + " : " + (lastTask.starter.currentPosition.distanceTo(task.starter.currentPosition) <= StackTaskSelector.maxDistanceForMerging));
+            }
             if(lastTask != null && Math.abs(lastTask.starter.currentPosition.y - task.starter.currentPosition.y) <= 1.0d && lastTask.starter.currentPosition.distanceTo(task.starter.currentPosition) <= StackTaskSelector.maxDistanceForMerging)
             {
                 if(lastTask.starter.currentPosition.distanceTo(targetPosition) > task.starter.currentPosition.distanceTo(targetPosition))
                 {
-                    task.mergeTask(lastTask.starter);
-                    remove.add(lastTask);
+                    task.mergeTask(lastTask);
                     lastTask = task;
                 }
                 else
                 {
-                    lastTask.mergeTask(task.starter);
-                    remove.add(task);
+                    lastTask.mergeTask(task);
                 }
             }
             else
@@ -75,7 +78,6 @@ public class StackTaskSelector extends BaseTaskSelector
                 lastTask = task;
             }
         }
-        taskSelectorStorage.taskStorage.removeAll(remove);
         sumOfDifferences = sumOfDifferences/((double)numberOfEntries)/StackTaskSelector.expectedDistanceToPlayer;
         //positive = majority is below the player. Therefore, it is good to stack.
         //negative = majority is above the player. Therefore, it is less good to stack.

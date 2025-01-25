@@ -103,8 +103,8 @@ public class MineTaskSelector extends BaseTaskSelector
     {
         final Vec3 targetPosition = target.position();
         taskSelectorStorage.taskStorage.removeIf(baseTask -> {
-            final Vec3 directionToBaseTask = ((Mine) baseTask).mineTargetVec3.subtract(baseTask.starter.currentPosition);
-            final Vec3 directionToTarget = targetPosition.subtract(baseTask.starter.currentPosition);
+            final Vec3 directionToBaseTask = ((Mine) baseTask).mineTargetVec3.subtract(baseTask.starter.currentPosition).normalize();
+            final Vec3 directionToTarget = targetPosition.subtract(baseTask.starter.currentPosition).normalize();
             if(directionToTarget.dot(directionToBaseTask) < 0)
             {
                 //UndeadArmies.logger.debug("abandoning breaking task!");

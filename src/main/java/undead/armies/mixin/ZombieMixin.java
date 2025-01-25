@@ -24,7 +24,7 @@ public abstract class ZombieMixin extends Monster implements GetSingle
     @Inject(method="tick",at=@At("HEAD"))
     public void additionalTick(CallbackInfo callbackInfo)
     {
-        this.single.doTick();
+        this.single.tick();
     }
     @Override
     public Single getSingle()

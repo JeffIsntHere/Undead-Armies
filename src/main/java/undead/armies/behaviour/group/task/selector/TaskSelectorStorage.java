@@ -13,7 +13,7 @@ public class TaskSelectorStorage
     public void cleanTaskStorage()
     {
         taskStorage.removeIf(baseTask -> {
-            if(baseTask.killed || baseTask.starter.pathfinderMob.isDeadOrDying())
+            if(baseTask.killed || baseTask.starter.pathfinderMob.isDeadOrDying() || baseTask.deleted)
             {
                 baseTask.deleted = true;
                 return true;

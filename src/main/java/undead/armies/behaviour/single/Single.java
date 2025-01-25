@@ -7,6 +7,8 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import undead.armies.UndeadArmies;
+import undead.armies.Util;
 import undead.armies.base.Resettable;
 import undead.armies.behaviour.group.GroupUtil;
 import undead.armies.behaviour.group.GroupStorage;
@@ -36,16 +38,7 @@ public class Single implements Resettable
             return;
         }
         final Entity vehicle = this.pathfinderMob.getVehicle();
-        //TODO: find a better was to check if vehicle is flying.
         if(vehicle == null)
-        {
-            return;
-        }
-        if(vehicle.fallDistance != 0)
-        {
-            return;
-        }
-        if(vehicle.getVehicle() != null)
         {
             return;
         }
@@ -62,6 +55,8 @@ public class Single implements Resettable
         {
             return;
         }
+        //final int maxFallDistance = this.pathfinderMob.getMaxFallDistance();
+
         this.pathfinderMob.stopRiding();
     }
     public void reset()
@@ -72,11 +67,17 @@ public class Single implements Resettable
     }
     public void doTick()
     {
-        if(this.pathfinderMob.level().isClientSide)
+        this.currentPosition = pathfinderMob.position();
+        if(this.groupStorage != null)
         {
-            return;
+            this.groupStorage.group.doGroupTask(this);
         }
-        if(this.pathfinderMob.tickCount % this.baseType.actionCooldown() != 0)
+        this.baseType.additionalTick(this);
+        this.lastPosition = this.currentPosition;
+    }
+    public void tick()
+    {
+        if(this.pathfinderMob.level().isClientSide || this.pathfinderMob.tickCount % this.baseType.actionCooldown() != 0)
         {
             return;
         }
@@ -89,13 +90,7 @@ public class Single implements Resettable
         {
             this.pathfinderMob.setTarget(this.groupStorage.group.target);
         }
-        this.currentPosition = pathfinderMob.position();
-        if(this.groupStorage != null)
-        {
-            this.groupStorage.group.doGroupTask(this);
-        }
-        this.baseType.additionalTick(this);
-        this.lastPosition = this.currentPosition;
+        this.doTick();
     }
     public Single(final PathfinderMob pathfinderMob)
     {

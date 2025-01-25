@@ -2,6 +2,7 @@ package undead.armies.behaviour.group;
 
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
+import undead.armies.UndeadArmies;
 import undead.armies.behaviour.group.task.BaseTask;
 import undead.armies.behaviour.group.task.selector.TaskSelectorStorage;
 import undead.armies.behaviour.single.Single;

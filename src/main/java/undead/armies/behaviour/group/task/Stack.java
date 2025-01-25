@@ -3,10 +3,10 @@ package undead.armies.behaviour.group.task;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.WaterFluid;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import undead.armies.UndeadArmies;
@@ -15,7 +15,6 @@ import undead.armies.base.GetSingle;
 import undead.armies.behaviour.group.task.selector.TaskSelectorStorage;
 import undead.armies.behaviour.single.Single;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,18 +27,26 @@ public class Stack extends BaseTask
     @Override
     public boolean handleTask(@NotNull final Single single, @NotNull final LivingEntity target)
     {
+        if(!single.pathfinderMob.isPassenger() && single.groupStorage.assignedTask == Stack.dismount)
+        {
+            single.groupStorage.assignedTask = Stack.stack;
+            this.splitTask(single);
+            return false;
+        }
+        Util.clearHeldItem(single.pathfinderMob);
         switch (single.groupStorage.assignedTask)
         {
             case Stack.stack ->
             {
-                if(single.pathfinderMob.is(super.starter.pathfinderMob))
+                if(super.starter.pathfinderMob.is(single.pathfinderMob))
                 {
+                    Util.holdItem(single.pathfinderMob, Util.redWool);
                     return true;
                 }
                 if(super.starter.pathfinderMob.position().distanceTo(single.currentPosition) <= Stack.minimumDistanceToStack)
                 {
                     super.starter.pathfinderMob.startRiding(single.pathfinderMob);
-                    super.starter.groupStorage.assignedTask = Stack.dismount;
+                    single.groupStorage.assignedTask = Stack.dismount;
                     super.starter = single;
                 }
                 else
@@ -123,6 +130,7 @@ public class Stack extends BaseTask
                 }
                 else
                 {
+                    single.groupStorage.assignedTask = Stack.stack;
                     this.splitTask(single);
                 }
             }
@@ -141,41 +149,45 @@ public class Stack extends BaseTask
         return false;
     }
 
-    protected void changeTaskForPassengers(final BaseTask newTask, final Entity passenger)
+    protected void setPassengersTaskTo(@NotNull final Entity passenger, @NotNull final BaseTask newTask)
     {
-        Entity currentPassenger = passenger;
-        do
+        Entity vehicle = passenger;
+        while(vehicle.isPassenger())
         {
-            if (currentPassenger instanceof GetSingle getSingle && getSingle.getSingle().groupStorage != null)
+            vehicle = vehicle.getVehicle();
+            if (vehicle instanceof GetSingle getSingle && getSingle.getSingle().groupStorage != null)
             {
                 getSingle.getSingle().groupStorage.task = newTask;
+                getSingle.getSingle().groupStorage.assignedTask = Stack.dismount;
             }
-            final List<Entity> passengers = currentPassenger.getPassengers();
-            if(currentPassenger.getPassengers().isEmpty())
-            {
-                currentPassenger = null;
-            }
-            else
-            {
-                currentPassenger = passengers.get(0);
-            }
-        }while(currentPassenger != null);
+        }
     }
 
     @Override
     public void splitTask(@NotNull Single single)
     {
-        single.groupStorage.task = new Stack(single, this.taskSelectorStorage);
-        single.groupStorage.assignedTask = Stack.stack;
-        this.changeTaskForPassengers(single.groupStorage.task, single.pathfinderMob);
+        if(super.starter == single)
+        {
+            return;
+        }
+        super.taskSelectorStorage.taskStorage.add(new Stack(single, super.taskSelectorStorage));
+        single.groupStorage.task = super.taskSelectorStorage.taskStorage.getLast();
+        this.setPassengersTaskTo(single.pathfinderMob, single.groupStorage.task);
     }
 
     @Override
-    public void mergeTask(@NotNull Single single)
+    public void mergeTask(@NotNull BaseTask baseTask)
     {
-        single.groupStorage.task.killed = true;
-        this.changeTaskForPassengers(this.starter.groupStorage.task, single.pathfinderMob);
-        Entity theFinalPassenger = starter.pathfinderMob;
+        if(this == baseTask)
+        {
+            return;
+        }
+        baseTask.killed = true;
+        final Single single = baseTask.starter;
+        single.groupStorage.task = this;
+        single.groupStorage.assignedTask = Stack.dismount;
+        this.setPassengersTaskTo(single.pathfinderMob, this);
+        Entity theFinalPassenger = super.starter.pathfinderMob;
         while(true)
         {
             List<Entity> nextPassengers = theFinalPassenger.getPassengers();
@@ -186,7 +198,6 @@ public class Stack extends BaseTask
             theFinalPassenger = nextPassengers.get(0);
         }
         single.pathfinderMob.startRiding(theFinalPassenger);
-        single.groupStorage.assignedTask = Stack.dismount;
     }
     public Stack(@NotNull final Single starter, final TaskSelectorStorage taskSelectorStorage)
     {
