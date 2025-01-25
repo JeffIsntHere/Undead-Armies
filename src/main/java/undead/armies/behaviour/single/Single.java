@@ -7,7 +7,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import undead.armies.UndeadArmies;
 import undead.armies.Util;
 import undead.armies.base.Resettable;
 import undead.armies.behaviour.group.GroupUtil;
@@ -81,6 +80,7 @@ public class Single implements Resettable
         {
             return;
         }
+        Util.clearHeldItem(this.pathfinderMob);
         if(this.groupStorage == null || !this.groupStorage.group.target.is(this.pathfinderMob.getTarget()))
         {
             this.attemptDismount();

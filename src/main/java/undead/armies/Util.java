@@ -32,6 +32,7 @@ public final class Util
     }
     public static final ItemStack air = new ItemStack(Items.AIR);
     public static final ItemStack redWool = new ItemStack(Items.RED_WOOL);
+    public static final ItemStack greenWool = new ItemStack(Items.GREEN_WOOL);
     public static void glow(final Mob mob, final int duration)
     {
         mob.addEffect(new MobEffectInstance(MobEffects.GLOWING, duration));
