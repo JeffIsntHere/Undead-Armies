@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import undead.armies.UndeadArmies;
 import undead.armies.behaviour.group.task.BaseTask;
 import undead.armies.behaviour.group.task.Mine;
 import undead.armies.behaviour.single.Single;
@@ -104,8 +105,9 @@ public class MineTaskSelector extends BaseTaskSelector
         taskSelectorStorage.taskStorage.removeIf(baseTask -> {
             final Vec3 directionToBaseTask = ((Mine) baseTask).mineTargetVec3.subtract(baseTask.starter.currentPosition);
             final Vec3 directionToTarget = targetPosition.subtract(baseTask.starter.currentPosition);
-            if(directionToTarget.dot(directionToBaseTask) > 0)
+            if(directionToTarget.dot(directionToBaseTask) < 0)
             {
+                //UndeadArmies.logger.debug("abandoning breaking task!");
                 baseTask.killed = true;
                 return true;
             }

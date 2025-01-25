@@ -2,9 +2,7 @@ package undead.armies.behaviour.group.task.selector;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
-import org.checkerframework.checker.units.qual.A;
 import org.jetbrains.annotations.NotNull;
-import undead.armies.UndeadArmies;
 import undead.armies.behaviour.group.task.BaseTask;
 import undead.armies.behaviour.group.task.Stack;
 import undead.armies.behaviour.single.Single;
@@ -16,7 +14,7 @@ public class StackTaskSelector extends BaseTaskSelector
     public static final double distanceAdder = 1.5d;
     public static final float baseWeight = 0.5f;
     public static final double expectedDistanceToPlayer = 5.0d;
-    public static final double maxDistanceForMerging = 3.0d;
+    public static final double maxDistanceForMerging = 5.0d;
 
     public static final StackTaskSelector instance = new StackTaskSelector();
 
@@ -40,7 +38,6 @@ public class StackTaskSelector extends BaseTaskSelector
             }
         }
         tasks.add(new Stack(single, taskSelectorStorage));
-        UndeadArmies.logger.debug("made a task! now size is:" + tasks.size());
         return tasks.get(tasks.size() - 1);
     }
 
@@ -97,7 +94,7 @@ public class StackTaskSelector extends BaseTaskSelector
         if(sumOfDifferences < -1.0f)
         {
             calculatedWeight-=commonFloat;
-            Math.max(calculatedWeight, 0.1f);
+            calculatedWeight = Math.max(calculatedWeight, 0.1f);
             final int taskStorageSize = taskSelectorStorage.taskStorage.size();
             int amountToBeDeleted = (int) Math.floor(StackTaskSelector.baseWeight - calculatedWeight) * taskStorageSize + 1;
             if(amountToBeDeleted > taskStorageSize)

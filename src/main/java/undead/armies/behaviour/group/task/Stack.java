@@ -3,19 +3,18 @@ package undead.armies.behaviour.group.task;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.WaterFluid;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import undead.armies.UndeadArmies;
-import undead.armies.Util;
 import undead.armies.base.GetSingle;
 import undead.armies.behaviour.group.task.selector.TaskSelectorStorage;
 import undead.armies.behaviour.single.Single;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Stack extends BaseTask
@@ -49,61 +48,80 @@ public class Stack extends BaseTask
             case Stack.dismount ->
             {
                 final Vec3 targetPosition = target.position();
-                Vec3 direction = targetPosition.subtract(single.currentPosition);
                 final BlockPos pathFinderMobBlockPos = single.pathfinderMob.blockPosition();
-                final int pathFinderMobHeight = (int)Math.ceil(single.pathfinderMob.getEyeHeight());
+                final ArrayList<BlockPos> validPositions = new ArrayList<>();
                 final Level level = single.pathfinderMob.level();
-                final double distance = targetPosition.distanceTo(single.pathfinderMob.position());
-
-                for(int x = -2; x < 2; x++)
+                for (int x = -2; x < 2; x++)
                 {
-                    for(int z = -2; z < 2; z++)
+                    for (int z = -2; z < 2; z++)
                     {
-                        for(int y = -2; y < 2; y++)
+                        final BlockPos middle = new BlockPos(pathFinderMobBlockPos.getX() + x, pathFinderMobBlockPos.getY(), pathFinderMobBlockPos.getZ() + z);
+                        final BlockPos aboveMiddle = middle.above();
+                        final BlockPos top = aboveMiddle.above();
+                        final BlockState middleBlockState = level.getBlockState(aboveMiddle);
+                        if (middleBlockState.isEmpty())
                         {
-                            BlockPos blockPos = new BlockPos(pathFinderMobBlockPos.getX() + x, pathFinderMobBlockPos.getY() + y, pathFinderMobBlockPos.getZ() + z);
-                            if(targetPosition.distanceTo(new Vec3(blockPos.getX(), blockPos.getY(), blockPos.getZ())) + 1.0d >= distance)
+                            final BlockPos belowMiddle = middle.below();
+                            if(level.getBlockState(aboveMiddle).isEmpty())
                             {
-                                continue;
-                            }
-                            {
-                                final BlockState blockState = level.getBlockState(blockPos);
-                                if (blockState.isEmpty() || blockState.getBlock() instanceof LiquidBlock)
+                                if(level.getBlockState(belowMiddle).isEmpty())
                                 {
-                                    continue;
+                                    final BlockPos bottom = belowMiddle.below();
+                                    final BlockState bottomBlockState = level.getBlockState(bottom);
+                                    if(!bottomBlockState.isEmpty() && !(bottomBlockState.getBlock() instanceof LiquidBlock))
+                                    {
+                                        validPositions.add(bottom);
+                                    }
                                 }
-                            }
-                            boolean success = true;
-                            for(int i = 0; i < pathFinderMobHeight; i++)
-                            {
-                                final BlockPos blockPosAtY = blockPos.atY(blockPos.getY() + i + 1);
-                                if(level.getBlockState(blockPosAtY).isEmpty() || (level.getBlockState(blockPosAtY).getBlock() instanceof LiquidBlock liquidBlock && liquidBlock.fluid instanceof WaterFluid))
+                                else if(!(level.getBlockState(belowMiddle).getBlock() instanceof LiquidBlock))
                                 {
-                                    continue;
+                                    validPositions.add(belowMiddle);
                                 }
-                                success = false;
-                                break;
-                            }
-                            if(success)
-                            {
-                                single.pathfinderMob.stopRiding();
-                                single.pathfinderMob.dismountTo(blockPos.getX() + 0.5d, blockPos.getY() + 1.0d, blockPos.getZ() + 0.5d);
-                                if(!target.isDeadOrDying())
+                                final BlockState topBlockState = level.getBlockState(top);
+                                if(!topBlockState.isEmpty() && !(topBlockState.getBlock() instanceof LiquidBlock) && level.getBlockState(top.above()).isEmpty() && level.getBlockState(top.above(2)).isEmpty())
                                 {
-                                    single.pathfinderMob.getNavigation().moveTo(target, 0.2f);
+                                    validPositions.add(top);
                                 }
-                                if(single.pathfinderMob.getPassengers().isEmpty())
-                                {
-                                    single.groupStorage.reset();
-                                }
-                                else
-                                {
-                                    this.splitTask(single);
-                                }
-                                return false;
                             }
                         }
+                        else if(!(middleBlockState.getBlock() instanceof LiquidBlock) && level.getBlockState(aboveMiddle).isEmpty() && level.getBlockState(top).isEmpty())
+                        {
+                            validPositions.add(middle);
+                        }
                     }
+                }
+                if(validPositions.isEmpty())
+                {
+                    return false;
+                }
+                BlockPos closest = validPositions.removeFirst();
+                double closestDistance = targetPosition.distanceTo(new Vec3(closest.getX(), closest.getY(), closest.getZ()));
+                for(BlockPos blockPos : validPositions)
+                {
+                    final double currentDistance = targetPosition.distanceTo(new Vec3(blockPos.getX(), blockPos.getY(), blockPos.getZ()));
+                    if(currentDistance < closestDistance)
+                    {
+                        closest = blockPos;
+                        closestDistance = currentDistance;
+                    }
+                }
+                if(closestDistance > single.pathfinderMob.distanceTo(target))
+                {
+                    return false;
+                }
+                single.pathfinderMob.stopRiding();
+                single.pathfinderMob.dismountTo(closest.getX() + 0.5d, closest.getY() + 1.0d, closest.getZ() + 0.5d);
+                if(!target.isDeadOrDying())
+                {
+                    single.pathfinderMob.getNavigation().moveTo(target, 0.2f);
+                }
+                if(single.pathfinderMob.getPassengers().isEmpty())
+                {
+                    single.groupStorage.reset();
+                }
+                else
+                {
+                    this.splitTask(single);
                 }
             }
         }
@@ -121,24 +139,25 @@ public class Stack extends BaseTask
         return false;
     }
 
-    protected void changeTaskForPassengers(final BaseTask baseTask, final Entity entity)
+    protected void changeTaskForPassengers(final BaseTask newTask, final Entity passenger)
     {
-        if(!(entity instanceof PathfinderMob))
+        Entity currentPassenger = passenger;
+        do
         {
-            return;
-        }
-        if(entity instanceof GetSingle getSingle)
-        {
-            if(getSingle.getSingle().groupStorage == null)
+            if (currentPassenger instanceof GetSingle getSingle && getSingle.getSingle().groupStorage != null)
             {
-                return;
+                getSingle.getSingle().groupStorage.task = newTask;
             }
-            getSingle.getSingle().groupStorage.task = baseTask;
-            for(Entity passenger : entity.getPassengers())
+            final List<Entity> passengers = currentPassenger.getPassengers();
+            if(currentPassenger.getPassengers().isEmpty())
             {
-                this.changeTaskForPassengers(baseTask, passenger);
+                currentPassenger = null;
             }
-        }
+            else
+            {
+                currentPassenger = passengers.get(0);
+            }
+        }while(currentPassenger != null);
     }
 
     @Override
@@ -152,8 +171,7 @@ public class Stack extends BaseTask
     @Override
     public void mergeTask(@NotNull Single single)
     {
-        UndeadArmies.logger.debug("merge stacking! ");
-        this.changeTaskForPassengers(single.groupStorage.task, this.starter.pathfinderMob);
+        this.changeTaskForPassengers(this.starter.groupStorage.task, this.starter.pathfinderMob);
         Entity theFinalPassenger = starter.pathfinderMob;
         while(true)
         {
@@ -163,7 +181,6 @@ public class Stack extends BaseTask
                 break;
             }
             theFinalPassenger = nextPassengers.get(0);
-            Util.glow((PathfinderMob) theFinalPassenger, 60);
         }
         single.pathfinderMob.startRiding(theFinalPassenger);
         single.groupStorage.assignedTask = Stack.dismount;

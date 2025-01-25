@@ -28,7 +28,7 @@ public class Mine extends BaseTask
         if(single.pathfinderMob.position().distanceTo(this.mineTargetVec3) >= Mine.maxMiningDistance)
         {
             single.pathfinderMob.getNavigation().moveTo(this.mineTargetVec3.x, this.mineTargetVec3.y, this.mineTargetVec3.z, 0.2f);
-            return false;
+            return this.starter.pathfinderMob.is(single.pathfinderMob);
         }
         this.miningProgress+=1;
         final Level level = single.pathfinderMob.level();
@@ -38,11 +38,11 @@ public class Mine extends BaseTask
             if(this.mineTargets.isEmpty())
             {
                 this.killed = true;
-                return false;
+                return this.starter.pathfinderMob.is(single.pathfinderMob);
             }
             this.mineTarget = this.mineTargets.removeLast();
             this.miningProgress = 0;
-            return false;
+            return this.starter.pathfinderMob.is(single.pathfinderMob);
         }
         final float requiredMiningProgress = blockState.getBlock().getExplosionResistance() * Mine.blastResistanceToHitPointRatio;
         level.playSound(null, this.mineTarget, blockState.getSoundType(level, this.mineTarget, single.pathfinderMob).getHitSound(), SoundSource.BLOCKS, (float)this.miningProgress/requiredMiningProgress * 2.0f + 1.0f, 1.0f);
@@ -52,14 +52,7 @@ public class Mine extends BaseTask
             level.setBlock(this.mineTarget, Blocks.AIR.defaultBlockState(), 3);
             level.playSound(null, this.mineTarget, blockState.getSoundType(level, this.mineTarget, single.pathfinderMob).getBreakSound(), SoundSource.BLOCKS, 3.0f, 1.0f);
         }
-        if(this.starter.pathfinderMob.is(single.pathfinderMob))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return this.starter.pathfinderMob.is(single.pathfinderMob);
     }
     @Override
     public boolean handleDelete(@NotNull Single single)
