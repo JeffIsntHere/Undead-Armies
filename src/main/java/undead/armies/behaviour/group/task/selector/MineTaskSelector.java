@@ -104,7 +104,12 @@ public class MineTaskSelector extends BaseTaskSelector
         taskSelectorStorage.taskStorage.removeIf(baseTask -> {
             final Vec3 directionToBaseTask = ((Mine) baseTask).mineTargetVec3.subtract(baseTask.starter.currentPosition);
             final Vec3 directionToTarget = targetPosition.subtract(baseTask.starter.currentPosition);
-            return directionToTarget.dot(directionToBaseTask) > 0;
+            if(directionToTarget.dot(directionToBaseTask) > 0)
+            {
+                baseTask.killed = true;
+                return true;
+            }
+            return false;
         });
         double sumOfDifferences = 0;
         double targetHeight = target.position().y;
