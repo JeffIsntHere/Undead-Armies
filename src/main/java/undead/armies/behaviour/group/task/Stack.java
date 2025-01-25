@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.WaterFluid;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import undead.armies.UndeadArmies;
 import undead.armies.Util;
 import undead.armies.base.GetSingle;
 import undead.armies.behaviour.group.task.selector.TaskSelectorStorage;
@@ -32,7 +33,6 @@ public class Stack extends BaseTask
             {
                 if(single.pathfinderMob.is(super.starter.pathfinderMob))
                 {
-                    Util.glow(single.pathfinderMob, 20);
                     return true;
                 }
                 if(super.starter.pathfinderMob.position().distanceTo(single.currentPosition) <= Stack.minimumDistanceToStack)
@@ -152,6 +152,7 @@ public class Stack extends BaseTask
     @Override
     public void mergeTask(@NotNull Single single)
     {
+        UndeadArmies.logger.debug("merge stacking! ");
         this.changeTaskForPassengers(single.groupStorage.task, this.starter.pathfinderMob);
         Entity theFinalPassenger = starter.pathfinderMob;
         while(true)

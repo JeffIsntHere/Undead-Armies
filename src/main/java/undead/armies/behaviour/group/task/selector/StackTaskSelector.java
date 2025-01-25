@@ -2,6 +2,7 @@ package undead.armies.behaviour.group.task.selector;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
+import org.checkerframework.checker.units.qual.A;
 import org.jetbrains.annotations.NotNull;
 import undead.armies.UndeadArmies;
 import undead.armies.behaviour.group.task.BaseTask;
@@ -52,6 +53,7 @@ public class StackTaskSelector extends BaseTaskSelector
         int numberOfEntries = 0;
         float calculatedWeight = StackTaskSelector.baseWeight;
         BaseTask lastTask = null;
+        final ArrayList<BaseTask> remove = new ArrayList<>();
         for(BaseTask task : taskSelectorStorage.taskStorage)
         {
             sumOfDifferences += targetHeight - task.starter.currentPosition.y;
@@ -61,11 +63,13 @@ public class StackTaskSelector extends BaseTaskSelector
                 if(lastTask.starter.currentPosition.distanceTo(targetPosition) > task.starter.currentPosition.distanceTo(targetPosition))
                 {
                     task.mergeTask(lastTask.starter);
+                    remove.add(lastTask);
                     lastTask = task;
                 }
                 else
                 {
                     lastTask.mergeTask(task.starter);
+                    remove.add(task);
                 }
             }
             else
@@ -73,6 +77,7 @@ public class StackTaskSelector extends BaseTaskSelector
                 lastTask = task;
             }
         }
+        taskSelectorStorage.taskStorage.removeAll(remove);
         sumOfDifferences = sumOfDifferences/((double)numberOfEntries)/StackTaskSelector.expectedDistanceToPlayer;
         //positive = majority is below the player. Therefore, it is good to stack.
         //negative = majority is above the player. Therefore, it is less good to stack.
