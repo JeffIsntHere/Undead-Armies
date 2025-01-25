@@ -9,6 +9,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.WaterFluid;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import undead.armies.UndeadArmies;
+import undead.armies.Util;
 import undead.armies.base.GetSingle;
 import undead.armies.behaviour.group.task.selector.TaskSelectorStorage;
 import undead.armies.behaviour.single.Single;
@@ -171,7 +173,8 @@ public class Stack extends BaseTask
     @Override
     public void mergeTask(@NotNull Single single)
     {
-        this.changeTaskForPassengers(this.starter.groupStorage.task, this.starter.pathfinderMob);
+        single.groupStorage.task.killed = true;
+        this.changeTaskForPassengers(this.starter.groupStorage.task, single.pathfinderMob);
         Entity theFinalPassenger = starter.pathfinderMob;
         while(true)
         {
