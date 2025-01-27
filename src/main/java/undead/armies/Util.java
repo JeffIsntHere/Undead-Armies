@@ -22,9 +22,9 @@ public final class Util
     public static boolean isMoving(@NotNull final Single single)
     {
         final MobEffectInstance slowDown = single.pathfinderMob.getEffect(MobEffects.MOVEMENT_SLOWDOWN);
-        final int slowDownAmplifier = (slowDown == null) ? 1 : slowDown.getAmplifier();
+        final int slowDownAmplifier = (slowDown == null) ? 0 : slowDown.getAmplifier();
         final MobEffectInstance speedUp = single.pathfinderMob.getEffect(MobEffects.MOVEMENT_SPEED);
-        final int speedUpAmplifier = (speedUp == null) ? 1 : speedUp.getAmplifier();
+        final int speedUpAmplifier = (speedUp == null) ? 0 : speedUp.getAmplifier();
         return single.lastPosition.distanceTo(single.currentPosition) >= Util.distanceToBeConsideredAsMoving * 1.0d/(1.0d + Util.movementSlowDownConstant * slowDownAmplifier) * (1 + Util.movementSpeedUpConstant * speedUpAmplifier);
     }
     public static void throwPotion(final LivingEntity livingEntity, final LivingEntity target, ItemStack itemStack, final float velocity, final float accuracy)
