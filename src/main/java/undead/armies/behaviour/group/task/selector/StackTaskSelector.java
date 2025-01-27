@@ -4,6 +4,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import undead.armies.UndeadArmies;
+import undead.armies.Util;
 import undead.armies.behaviour.group.task.BaseTask;
 import undead.armies.behaviour.group.task.Stack;
 import undead.armies.behaviour.single.Single;
@@ -23,7 +24,7 @@ public class StackTaskSelector extends BaseTaskSelector
     public BaseTask getSuitableTask(@NotNull final TaskSelectorStorage taskSelectorStorage, @NotNull final Single single, @NotNull final LivingEntity target)
     {
         taskSelectorStorage.cleanTaskStorage();
-        if(BaseTaskSelector.isMoving(single))
+        if(Util.isMoving(single))
         {
             return null;
         }

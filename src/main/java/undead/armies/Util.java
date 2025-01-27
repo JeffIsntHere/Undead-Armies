@@ -11,9 +11,22 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
+import undead.armies.behaviour.single.Single;
 
 public final class Util
 {
+    public static final float distanceToBeConsideredAsMoving = 0.7f;
+    public static final double movementSlowDownConstant = 0.15d; //or 15% according to minecraft wiki.
+    public static final double movementSpeedUpConstant = 0.20d; //or 20% according to minecraft wiki.
+    public static boolean isMoving(@NotNull final Single single)
+    {
+        final MobEffectInstance slowDown = single.pathfinderMob.getEffect(MobEffects.MOVEMENT_SLOWDOWN);
+        final int slowDownAmplifier = (slowDown == null) ? 1 : slowDown.getAmplifier();
+        final MobEffectInstance speedUp = single.pathfinderMob.getEffect(MobEffects.MOVEMENT_SPEED);
+        final int speedUpAmplifier = (speedUp == null) ? 1 : speedUp.getAmplifier();
+        return single.lastPosition.distanceTo(single.currentPosition) >= Util.distanceToBeConsideredAsMoving * 1.0d/(1.0d + Util.movementSlowDownConstant * slowDownAmplifier) * (1 + Util.movementSpeedUpConstant * speedUpAmplifier);
+    }
     public static void throwPotion(final LivingEntity livingEntity, final LivingEntity target, ItemStack itemStack, final float velocity, final float accuracy)
     {
         final Level level = livingEntity.level();

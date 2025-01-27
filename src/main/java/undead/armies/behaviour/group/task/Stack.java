@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import undead.armies.UndeadArmies;
 import undead.armies.Util;
 import undead.armies.base.GetSingle;
+import undead.armies.behaviour.ClosestBlockPos;
 import undead.armies.behaviour.group.task.selector.TaskSelectorStorage;
 import undead.armies.behaviour.single.Single;
 
@@ -57,7 +58,7 @@ public class Stack extends BaseTask
                 }
                 final Vec3 targetPosition = target.position();
                 final BlockPos pathFinderMobBlockPos = single.pathfinderMob.blockPosition();
-                final ArrayList<BlockPos> validPositions = new ArrayList<>();
+                final ClosestBlockPos closestBlockPos = new ClosestBlockPos(targetPosition);
                 final Level level = single.pathfinderMob.level();
                 for (int x = -2; x < 2; x++)
                 {
@@ -78,47 +79,32 @@ public class Stack extends BaseTask
                                     final BlockState bottomBlockState = level.getBlockState(bottom);
                                     if(!bottomBlockState.isEmpty() && !(bottomBlockState.getBlock() instanceof LiquidBlock))
                                     {
-                                        validPositions.add(bottom);
+                                        closestBlockPos.add(bottom);
                                     }
                                 }
                                 else if(!(level.getBlockState(belowMiddle).getBlock() instanceof LiquidBlock))
                                 {
-                                    validPositions.add(belowMiddle);
+                                    closestBlockPos.add(belowMiddle);
                                 }
                                 final BlockState topBlockState = level.getBlockState(top);
                                 if(!topBlockState.isEmpty() && !(topBlockState.getBlock() instanceof LiquidBlock) && level.getBlockState(top.above()).isEmpty() && level.getBlockState(top.above(2)).isEmpty())
                                 {
-                                    validPositions.add(top);
+                                    closestBlockPos.add(top);
                                 }
                             }
                         }
                         else if(!(middleBlockState.getBlock() instanceof LiquidBlock) && level.getBlockState(aboveMiddle).isEmpty() && level.getBlockState(top).isEmpty())
                         {
-                            validPositions.add(middle);
+                            closestBlockPos.add(middle);
                         }
                     }
                 }
-                if(validPositions.isEmpty())
-                {
-                    return false;
-                }
-                BlockPos closest = validPositions.removeFirst();
-                double closestDistance = targetPosition.distanceTo(new Vec3(closest.getX(), closest.getY(), closest.getZ()));
-                for(BlockPos blockPos : validPositions)
-                {
-                    final double currentDistance = targetPosition.distanceTo(new Vec3(blockPos.getX(), blockPos.getY(), blockPos.getZ()));
-                    if(currentDistance < closestDistance)
-                    {
-                        closest = blockPos;
-                        closestDistance = currentDistance;
-                    }
-                }
-                if(closestDistance > single.pathfinderMob.distanceTo(target))
+                if(closestBlockPos.closest == null || closestBlockPos.distance > single.pathfinderMob.distanceTo(target))
                 {
                     return false;
                 }
                 single.pathfinderMob.stopRiding();
-                single.pathfinderMob.dismountTo(closest.getX() + 0.5d, closest.getY() + 1.0d, closest.getZ() + 0.5d);
+                single.pathfinderMob.dismountTo(closestBlockPos.closest.getX() + 0.5d, closestBlockPos.closest.getY() + 1.0d, closestBlockPos.closest.getZ() + 0.5d);
                 if(!target.isDeadOrDying())
                 {
                     single.pathfinderMob.getNavigation().moveTo(target, 0.2f);

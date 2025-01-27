@@ -9,7 +9,11 @@ public final class TaskUtil
     @NotNull
     public Pair<Integer, BaseTask> getTask()
     {
-        return Pair.of(1, new SprintTask());
+        final BaseTask firstTask = new SprintTask();
+        firstTask.nextTask = new GrabTask();
+        firstTask.nextTask.nextTask = new JumpTask();
+        firstTask.nextTask.nextTask.nextTask = firstTask;
+        return Pair.of(3, firstTask);
     }
     private TaskUtil(){};
 }
