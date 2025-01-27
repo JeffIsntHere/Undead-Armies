@@ -61,7 +61,7 @@ public class JumpTask extends BaseTask
     @Override
     public boolean handleTask(@NotNull Single single)
     {
-        if(triggerAfter > single.pathfinderMob.tickCount || single.pathfinderMob.getTarget() == null || single.pathfinderMob.isPathFinding())
+        if(triggerAfter > single.pathfinderMob.tickCount || single.pathfinderMob.getTarget() == null || single.pathfinderMob.isPathFinding() || single.pathfinderMob.isPassenger())
         {
             return false;
         }

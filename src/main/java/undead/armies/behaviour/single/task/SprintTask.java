@@ -32,7 +32,7 @@ public class SprintTask extends BaseTask
                 return false;
             }
             final double distance = single.currentPosition.distanceTo(single.pathfinderMob.getTarget().position());
-            if(distance > SprintTask.sprintDistance && distance < SprintTask.alwaysSprintWhenDistanceIsThisFar)
+            if(distance > SprintTask.sprintDistance && distance < SprintTask.alwaysSprintWhenDistanceIsThisFar && !single.pathfinderMob.isPassenger())
             {
                 return false;
             }
