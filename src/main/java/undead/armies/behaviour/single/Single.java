@@ -71,27 +71,30 @@ public class Single implements Resettable
     }
     public void doTick()
     {
-        this.currentPosition = pathfinderMob.position();
         if(this.groupStorage != null)
         {
             this.groupStorage.group.doGroupTask(this);
         }
-        final int upperBound = this.currentTaskLength;
-        for(int i = 0; i < upperBound; i++)
-        {
-            if(this.currentTask.handleTask(this))
-            {
-                break;
-            }
-            this.currentTask = this.currentTask.nextTask;
-        }
         this.baseType.additionalTick(this);
-        this.lastPosition = this.currentPosition;
     }
     public void tick()
     {
-        if(this.pathfinderMob.level().isClientSide || this.pathfinderMob.tickCount % this.baseType.actionCooldown() != 0)
+        if(this.pathfinderMob.level().isClientSide)
         {
+            return;
+        }
+        this.currentPosition = pathfinderMob.position();
+        if(this.pathfinderMob.tickCount % this.baseType.actionCooldown() != 0)
+        {
+            final int upperBound = this.currentTaskLength;
+            for(int i = 0; i < upperBound; i++)
+            {
+                if(this.currentTask.handleTask(this))
+                {
+                    break;
+                }
+                this.currentTask = this.currentTask.nextTask;
+            }
             return;
         }
         //Util.clearHeldItem(this.pathfinderMob);
@@ -105,6 +108,7 @@ public class Single implements Resettable
             this.pathfinderMob.setTarget(this.groupStorage.group.target);
         }
         this.doTick();
+        this.lastPosition = this.currentPosition;
     }
     public Single(final PathfinderMob pathfinderMob)
     {
