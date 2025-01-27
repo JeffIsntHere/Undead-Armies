@@ -2,6 +2,7 @@ package undead.armies.behaviour.single.task;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -66,7 +67,8 @@ public class JumpTask extends BaseTask
             return false;
         }
         triggerAfter = single.pathfinderMob.tickCount + 60;
-        final Vec3 targetPosition = single.pathfinderMob.getTarget().position();
+        final LivingEntity target = single.pathfinderMob.getTarget();
+        final Vec3 targetPosition = target.position();
         final double distance = single.currentPosition.distanceTo(targetPosition);
         final ClosestBlockPos closestBlockPos = new ClosestBlockPos(targetPosition);
         final BlockPos startingPoint = single.pathfinderMob.blockPosition();
@@ -99,6 +101,7 @@ public class JumpTask extends BaseTask
         }
         if(closestBlockPos.closest != null && closestBlockPos.distance < distance)
         {
+            single.pathfinderMob.lookAt(target, 180.0f, 180.0f);
             final Vec3 direction = new Vec3(closestBlockPos.closest.getX() + 0.5d, closestBlockPos.closest.getY() + 3.0d, closestBlockPos.closest.getZ() + 0.5d).subtract(single.currentPosition).scale(0.25d);
             single.pathfinderMob.setDeltaMovement(single.pathfinderMob.getDeltaMovement().add(direction));
         }
