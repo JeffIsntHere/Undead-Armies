@@ -42,7 +42,7 @@ public class Single implements Resettable
             return;
         }
         final Entity vehicle = this.pathfinderMob.getVehicle();
-        if(vehicle == null)
+        if(vehicle == null || !vehicle.onGround())
         {
             return;
         }
@@ -59,8 +59,6 @@ public class Single implements Resettable
         {
             return;
         }
-        //final int maxFallDistance = this.pathfinderMob.getMaxFallDistance();
-
         this.pathfinderMob.stopRiding();
     }
     public void reset()

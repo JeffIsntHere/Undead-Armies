@@ -62,10 +62,11 @@ public class JumpTask extends BaseTask
     @Override
     public boolean handleTask(@NotNull Single single)
     {
-        if(triggerAfter > single.pathfinderMob.tickCount || single.pathfinderMob.getTarget() == null || single.pathfinderMob.isPathFinding() || single.pathfinderMob.isPassenger())
+        if(triggerAfter > single.pathfinderMob.tickCount || single.pathfinderMob.getTarget() == null || single.pathfinderMob.isPathFinding() || single.pathfinderMob.isPassenger() || !single.pathfinderMob.onGround())
         {
             return false;
         }
+        UndeadArmies.logger.debug("ticked!");
         triggerAfter = single.pathfinderMob.tickCount + 60;
         final LivingEntity target = single.pathfinderMob.getTarget();
         final Vec3 targetPosition = target.position();
@@ -79,31 +80,43 @@ public class JumpTask extends BaseTask
             final BlockState middleBlockState = level.getBlockState(middle);
             if(middleBlockState.isEmpty())
             {
+                //??0??
                 final BlockPos belowMiddle = middle.below();
                 final BlockState belowMiddleBlockState = level.getBlockState(belowMiddle);
                 if(belowMiddleBlockState.isEmpty())
                 {
+                    //??00?
                     final BlockPos bottom = belowMiddle.below();
-                    if(blockIsGood(bottom, level))
+                    final BlockState bottomBlockState = level.getBlockState(bottom);
+                    if(bottomBlockState.isEmpty())
+                    {
+                        final BlockPos belowBottom = bottom.below();
+                        if(blockIsGood(bottom.below(), level))
+                        {
+                            closestBlockPos.add(belowBottom);
+                        }
+                    }
+                    else if(blockIsNotLava(bottomBlockState))
                     {
                         closestBlockPos.add(bottom);
                     }
                 }
                 else if(blockIsNotLava(belowMiddleBlockState) && level.getBlockState(middle.above()).isEmpty())
                 {
+                    //?001?
                     closestBlockPos.add(belowMiddle);
                 }
             }
             else if(blockIsNotLava(middleBlockState) && level.getBlockState(middle.above()).isEmpty() && level.getBlockState(middle.above(2)).isEmpty())
             {
+                //001??
                 closestBlockPos.add(middle);
             }
         }
         if(closestBlockPos.closest != null && closestBlockPos.distance < distance)
         {
             single.pathfinderMob.lookAt(target, 180.0f, 180.0f);
-            final Vec3 direction = new Vec3(closestBlockPos.closest.getX() + 0.5d, closestBlockPos.closest.getY() + 3.0d, closestBlockPos.closest.getZ() + 0.5d).subtract(single.currentPosition).scale(0.25d);
-            single.pathfinderMob.setDeltaMovement(single.pathfinderMob.getDeltaMovement().add(direction));
+            single.pathfinderMob.setDeltaMovement(single.pathfinderMob.getDeltaMovement().add(Util.getThrowDirection(single.currentPosition, new Vec3(closestBlockPos.closest.getX() + 0.5d, closestBlockPos.closest.getY() + 2.0d, closestBlockPos.closest.getZ() + 0.5d), 10, 1.2d, 1.8d)));
         }
         return true;
     }

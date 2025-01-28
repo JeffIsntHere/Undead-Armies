@@ -27,6 +27,14 @@ public final class Util
         final int speedUpAmplifier = (speedUp == null) ? 0 : speedUp.getAmplifier();
         return single.lastPosition.distanceTo(single.currentPosition) >= Util.distanceToBeConsideredAsMoving * 1.0d/(1.0d + Util.movementSlowDownConstant * slowDownAmplifier) * (1 + Util.movementSpeedUpConstant * speedUpAmplifier);
     }
+    public static Vec3 getThrowDirection(final Vec3 start, final Vec3 end, final int airTime, final double horizontalScale, final double scale)
+    {
+        final Vec3 direction = end.subtract(start);
+        final double xVelocity = (direction.x / (double)airTime + 0.005 * (double)airTime) * horizontalScale;
+        final double yVelocity = direction.y / (double)airTime + 0.01 * (double)airTime;
+        final double zVelocity = (direction.z / (double)airTime + 0.005 * (double)airTime) * horizontalScale;
+        return new Vec3(xVelocity, yVelocity, zVelocity).scale(scale);
+    }
     public static void throwPotion(final LivingEntity livingEntity, final LivingEntity target, ItemStack itemStack, final float velocity, final float accuracy)
     {
         final Level level = livingEntity.level();
