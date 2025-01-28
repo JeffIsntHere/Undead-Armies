@@ -4,6 +4,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.arguments.item.ItemInput;
 import net.minecraft.commands.arguments.item.ItemParser;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -14,13 +15,11 @@ public class Loot
 {
     @NotNull
     public final ItemStack item;
-    public final double chance;
-    public final int lowerBound;
-    public final int possibleExtra;
-    public Loot(final ItemParser itemParser, final String item, final double chance, final int lowerBound, final int maximumCount)
+    public final double quota;
+    public final int minimum;
+    public Loot(final ItemParser itemParser, final String item, final double quota, final int minimum)
     {
-        this.lowerBound = lowerBound;
-        this.possibleExtra = (lowerBound > maximumCount) ? 0 : maximumCount - lowerBound;
+        this.minimum = minimum;
         if(item != null)
         {
             final ItemInput itemInput;
@@ -45,11 +44,18 @@ public class Loot
         {
             this.item = ItemStack.EMPTY;
         }
-        this.chance = chance;
+        this.quota = quota;
     }
-    public void dropAtLocation(final Level level, final Vec3 location)
+    public void dropAtLocation(final Level level, final Vec3 location, final double power)
     {
-        final ItemEntity itemEntity = new ItemEntity(level, location.x, location.y, location.z, this.item.copyWithCount(this.lowerBound + (int) (level.getRandom().nextFloat() * this.possibleExtra)));
-        level.addFreshEntity(itemEntity);
+        final RandomSource randomSource = level.getRandom();
+        int amount = this.minimum;
+        double quota = this.quota * power;
+        while(quota > 0.01)
+        {
+            quota -= Math.max(randomSource.nextDouble(), 0.01d);
+            amount++;
+        }
+        level.addFreshEntity(new ItemEntity(level, location.x, location.y, location.z, this.item.copyWithCount(amount)));
     }
 }

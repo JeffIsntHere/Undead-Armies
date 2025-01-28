@@ -14,18 +14,16 @@ public class LootParser extends Parser
     public ArrayList<Loot> loots = new ArrayList<>();
     protected ItemParser itemParser = null;
     protected String item = null;
-    protected double chance = 1.0d;
-    protected int lowerBound = 0;
-    protected int upperBound = 1;
+    protected double quota = 0.0d;
+    protected int minimum = 0;
     @Override
     protected void process()
     {
         if(super.workingParentCount == 0)
         {
             this.item = null;
-            this.chance = 1.0d;
-            this.lowerBound = 0;
-            this.upperBound = 1;
+            this.quota = 1.0d;
+            this.minimum = 0;
             super.spinUntilOpen();
             super.workingParentCount++;
         }
@@ -36,7 +34,7 @@ public class LootParser extends Parser
             {
                 if(this.item != null)
                 {
-                    this.loots.add(new Loot(this.itemParser, this.item, this.chance, this.lowerBound, this.upperBound));
+                    this.loots.add(new Loot(this.itemParser, this.item, this.quota, this.minimum));
                 }
                 super.workingParentCount--;
             }
@@ -44,37 +42,26 @@ public class LootParser extends Parser
             {
                 this.item = super.parseValueToKey();
             }
-            else if(key == 'c')
+            else if(key == 'q')
             {
                 try
                 {
-                    this.chance = Double.valueOf(super.parseValueToKey());
+                    this.quota = Double.valueOf(super.parseValueToKey());
                 }
                 catch(NumberFormatException e)
                 {
-                    this.chance = 1.0d;
+                    this.quota = 1.0d;
                 }
             }
-            else if(key == 'l')
+            else if(key == 'm')
             {
                 try
                 {
-                    this.lowerBound = Integer.valueOf(super.parseValueToKey());
+                    this.minimum = Integer.valueOf(super.parseValueToKey());
                 }
                 catch(NumberFormatException e)
                 {
-                    this.lowerBound = 0;
-                }
-            }
-            else if(key == 'u')
-            {
-                try
-                {
-                    this.upperBound = Integer.valueOf(super.parseValueToKey());
-                }
-                catch(NumberFormatException e)
-                {
-                    this.upperBound = 1;
+                    this.minimum = 0;
                 }
             }
         }

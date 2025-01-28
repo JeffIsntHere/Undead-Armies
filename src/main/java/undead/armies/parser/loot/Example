@@ -1,8 +1,7 @@
 {
     item:{}
-    chance:{}
-    lowerBound:{}
-    upperBound:{}
+    quota:{}
+    minimum:{}
 }
 {
 }
