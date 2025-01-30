@@ -1,7 +1,6 @@
 package undead.armies.parser;
 
 import undead.armies.UndeadArmies;
-import undead.armies.parser.loot.LootParser;
 
 import java.io.*;
 

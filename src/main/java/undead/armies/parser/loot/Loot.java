@@ -10,6 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import undead.armies.UndeadArmies;
 
 public class Loot
 {
@@ -31,8 +32,8 @@ public class Loot
             }
             catch (CommandSyntaxException e)
             {
+                e.printStackTrace();
                 itemStackFromString = ItemStack.EMPTY;
-                throw new RuntimeException(e);
             }
             if(itemStackFromString == null)
             {

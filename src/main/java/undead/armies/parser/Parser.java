@@ -5,6 +5,10 @@ import undead.armies.UndeadArmies;
 import java.io.*;
 import java.util.ArrayList;
 
+/*
+This parser was made for speed
+ */
+
 //base class for all classes in this the "parser" folder.
 public abstract class Parser
 {
@@ -283,7 +287,7 @@ public abstract class Parser
                 tempCharacterArrayList.add(tempChar);
                 this.workingParentCount++;
             }
-            if(tempChar == '}')
+            else if(tempChar == '}')
             {
                 if(this.workingParentCount == stopWhenParentIs)
                 {

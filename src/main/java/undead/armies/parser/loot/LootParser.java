@@ -2,6 +2,7 @@ package undead.armies.parser.loot;
 
 import net.minecraft.commands.arguments.item.ItemParser;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
+import undead.armies.UndeadArmies;
 import undead.armies.parser.File;
 import undead.armies.parser.Parser;
 
@@ -32,6 +33,7 @@ public class LootParser extends Parser
             final char key = super.spinUntilNotWhitespace();
             if(key == '}' || !super.spinUntilOpenOrClose())
             {
+                UndeadArmies.logger.debug("adding loot!");
                 if(this.item != null)
                 {
                     this.loots.add(new Loot(this.itemParser, this.item, this.quota, this.minimum));
@@ -79,6 +81,7 @@ public class LootParser extends Parser
         super.parseFromInput(reader);
         File.closeReader(reader);
         this.itemParser = null;
+        //this.loots.removeIf(loot -> loot.item.isEmpty());
         return true;
     }
     private LootParser(){}
