@@ -2,10 +2,12 @@ package undead.armies.parser.loot;
 
 import net.minecraft.commands.arguments.item.ItemParser;
 import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
+import undead.armies.UndeadArmies;
 import undead.armies.parser.File;
 import undead.armies.parser.Parser;
 
@@ -19,15 +21,17 @@ public class LootParser extends Parser
     protected ItemParser itemParser = null;
     protected String item = null;
     protected double quota = 0.0d;
-    protected int minimum = 0;
+    protected double reducer = 1.0d;
+    protected double minimumPower = 0;
     @Override
     protected void process()
     {
         if(super.parentCount == 0)
         {
             this.item = null;
-            this.quota = 1.0d;
-            this.minimum = 0;
+            this.quota = 0.0d;
+            this.reducer = 1.0d;
+            this.minimumPower = 0;
             super.spinUntilOpen();
             super.parentCount++;
         }
@@ -38,7 +42,7 @@ public class LootParser extends Parser
             {
                 if(this.item != null)
                 {
-                    this.loots.add(new Loot(this.itemParser, this.item, this.quota, this.minimum));
+                    this.loots.add(new Loot(this.itemParser, this.item, this.quota, this.reducer, this.minimumPower));
                 }
                 super.parentCount--;
             }
@@ -57,15 +61,26 @@ public class LootParser extends Parser
                     this.quota = 1.0d;
                 }
             }
+            else if(key == 'r')
+            {
+                try
+                {
+                    this.reducer = Double.valueOf(super.parseValueToKey());
+                }
+                catch(NumberFormatException e)
+                {
+                    this.reducer = 1.0d;
+                }
+            }
             else if(key == 'm')
             {
                 try
                 {
-                    this.minimum = Integer.valueOf(super.parseValueToKey());
+                    this.minimumPower = Double.valueOf(super.parseValueToKey());
                 }
                 catch(NumberFormatException e)
                 {
-                    this.minimum = 0;
+                    this.minimumPower = 0;
                 }
             }
         }
@@ -92,7 +107,11 @@ public class LootParser extends Parser
     {
         final Level level = pathfinderMob.level();
         final Vec3 position = pathfinderMob.position();
-        final double power = 1.0;
+        //power =
+        //(attack damage + 3) * (hp + armor point^2) * sqrt(movement speed on land + movement speed on sea)
+        final double power = ((float) pathfinderMob.getAttributeValue(Attributes.ATTACK_DAMAGE) + 3.0f) * (pathfinderMob.getMaxHealth() + Math.pow((float) pathfinderMob.getAttributeValue(Attributes.ARMOR_TOUGHNESS), 2.0f)
+                * Math.sqrt((float) pathfinderMob.getAttributeValue(Attributes.MOVEMENT_SPEED) + (float) pathfinderMob.getAttributeValue(Attributes.MOVEMENT_EFFICIENCY))) / 160.0f;
+        UndeadArmies.logger.debug("power: " + power);
         for(Loot loot : this.loots)
         {
             loot.dropAtLocation(level, position, power);

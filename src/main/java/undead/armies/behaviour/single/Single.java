@@ -76,6 +76,7 @@ public class Single implements Resettable
         }
         this.baseType.additionalTick(this);
     }
+    protected boolean droppedLoot = false;
     public void tick()
     {
         if(this.pathfinderMob.level().isClientSide)
@@ -84,7 +85,11 @@ public class Single implements Resettable
         }
         if(this.pathfinderMob.isDeadOrDying())
         {
-            LootParser.instance.dropForPathfinderMob(this.pathfinderMob);
+            if(!this.droppedLoot)
+            {
+                LootParser.instance.dropForPathfinderMob(this.pathfinderMob);
+            }
+            this.droppedLoot = true;
             return;
         }
         this.currentPosition = pathfinderMob.position();

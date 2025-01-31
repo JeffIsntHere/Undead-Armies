@@ -41,7 +41,8 @@ public class Registry
                     UndeadArmies.logger.info(">Item data: " + loot.item.getComponents());
                 }
                 UndeadArmies.logger.info(">Quota: " + loot.quota);
-                UndeadArmies.logger.info(">Minimum: " + loot.minimum);
+                UndeadArmies.logger.info(">Reducer: " + loot.reducer);
+                UndeadArmies.logger.info(">MinimumPower: " + loot.minimumPower);
                 UndeadArmies.logger.info("");
             }
         }
@@ -56,7 +57,8 @@ public class Registry
                     serverPlayer.sendSystemMessage(Component.literal("§7>Item data: §f" + loot.item.getComponents()));
                 }
                 serverPlayer.sendSystemMessage(Component.literal("§7>Quota: §f" + loot.quota));
-                serverPlayer.sendSystemMessage(Component.literal("§7>Minimum: §f" + loot.minimum));
+                serverPlayer.sendSystemMessage(Component.literal("§7>Reducer: §f" + loot.reducer));
+                serverPlayer.sendSystemMessage(Component.literal("§7>MinimumPower: §f" + loot.minimumPower));
                 serverPlayer.sendSystemMessage(Component.literal(""));
             }
         }

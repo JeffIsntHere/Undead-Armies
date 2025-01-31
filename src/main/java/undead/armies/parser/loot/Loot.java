@@ -10,21 +10,21 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import undead.armies.UndeadArmies;
 
 public class Loot
 {
     @NotNull
     public final ItemStack item;
     public final double quota;
-    public final int minimum;
-    public Loot(final ItemParser itemParser, final String item, final double quota, final int minimum)
+    public final double reducer;
+    public final double minimumPower;
+    public Loot(final ItemParser itemParser, final String item, final double quota, final double reducer, final double minimumPower)
     {
-        this.minimum = minimum;
+        this.reducer = reducer;
+        this.minimumPower = minimumPower;
         if(item != null)
         {
-            final ItemInput itemInput;
-            ItemStack itemStackFromString = null;
+            ItemStack itemStackFromString;
             try
             {
                 final ItemParser.ItemResult itemResult = itemParser.parse(new StringReader(item));
@@ -49,14 +49,31 @@ public class Loot
     }
     public void dropAtLocation(final Level level, final Vec3 location, final double power)
     {
-        final RandomSource randomSource = level.getRandom();
-        int amount = this.minimum;
-        double quota = this.quota * power;
-        while(quota > 0.01)
+        //quota = chance * 1/required power
+        if(power < this.minimumPower)
         {
-            quota -= Math.max(randomSource.nextDouble(), 0.01d);
+            return;
+        }
+        final RandomSource randomSource = level.getRandom();
+        int amount = -1;
+        double quota = this.quota * power;
+        do
+        {
+            double nextDouble = randomSource.nextDouble() + this.reducer;
+            quota -= nextDouble;
             amount++;
         }
-        level.addFreshEntity(new ItemEntity(level, location.x, location.y, location.z, this.item.copyWithCount(amount)));
+        while(quota > 0);
+        final int stackSize = this.item.getMaxStackSize();
+        int loopCount = amount / stackSize;
+        for(int i = 0; i < loopCount; i++)
+        {
+            level.addFreshEntity(new ItemEntity(level, location.x, location.y, location.z, this.item.copyWithCount(stackSize)));
+        }
+        loopCount = amount - loopCount * stackSize;
+        if(loopCount > 0)
+        {
+            level.addFreshEntity(new ItemEntity(level, location.x, location.y, location.z, this.item.copyWithCount(loopCount)));
+        }
     }
 }
