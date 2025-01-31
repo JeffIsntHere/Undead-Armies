@@ -1,8 +1,11 @@
 package undead.armies.parser.loot;
 
 import net.minecraft.commands.arguments.item.ItemParser;
+import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
-import undead.armies.UndeadArmies;
+import org.jetbrains.annotations.NotNull;
 import undead.armies.parser.File;
 import undead.armies.parser.Parser;
 
@@ -20,25 +23,24 @@ public class LootParser extends Parser
     @Override
     protected void process()
     {
-        if(super.workingParentCount == 0)
+        if(super.parentCount == 0)
         {
             this.item = null;
             this.quota = 1.0d;
             this.minimum = 0;
             super.spinUntilOpen();
-            super.workingParentCount++;
+            super.parentCount++;
         }
-        else if(super.workingParentCount == 1)
+        else if(super.parentCount == 1)
         {
             final char key = super.spinUntilNotWhitespace();
             if(key == '}' || !super.spinUntilOpenOrClose())
             {
-                UndeadArmies.logger.debug("adding loot!");
                 if(this.item != null)
                 {
                     this.loots.add(new Loot(this.itemParser, this.item, this.quota, this.minimum));
                 }
-                super.workingParentCount--;
+                super.parentCount--;
             }
             else if(key == 'i')
             {
@@ -68,21 +70,33 @@ public class LootParser extends Parser
             }
         }
     }
-    public boolean reload()
+    public long reload()
     {
         if(ServerLifecycleHooks.getCurrentServer() == null)
         {
-            return false;
+            return -1;
         }
         loots.clear();
         this.itemParser = new ItemParser(ServerLifecycleHooks.getCurrentServer().registryAccess());
         final File file = new File();
         final Reader reader = file.getFileReader("loot");
+        long parseStart = System.nanoTime();
         super.parseFromInput(reader);
+        long parsingTime = System.nanoTime() - parseStart;
         File.closeReader(reader);
         this.itemParser = null;
-        //this.loots.removeIf(loot -> loot.item.isEmpty());
-        return true;
+        this.loots.removeIf(loot -> loot.item.isEmpty());
+        return parsingTime;
+    }
+    public void dropForPathfinderMob(@NotNull final PathfinderMob pathfinderMob)
+    {
+        final Level level = pathfinderMob.level();
+        final Vec3 position = pathfinderMob.position();
+        final double power = 1.0;
+        for(Loot loot : this.loots)
+        {
+            loot.dropAtLocation(level, position, power);
+        }
     }
     private LootParser(){}
 }

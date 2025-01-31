@@ -15,6 +15,7 @@ import undead.armies.behaviour.single.task.BaseTask;
 import undead.armies.behaviour.single.task.TaskUtil;
 import undead.armies.behaviour.type.BaseType;
 import undead.armies.behaviour.type.TypeUtil;
+import undead.armies.parser.loot.LootParser;
 
 public class Single implements Resettable
 {
@@ -79,6 +80,11 @@ public class Single implements Resettable
     {
         if(this.pathfinderMob.level().isClientSide)
         {
+            return;
+        }
+        if(this.pathfinderMob.isDeadOrDying())
+        {
+            LootParser.instance.dropForPathfinderMob(this.pathfinderMob);
             return;
         }
         this.currentPosition = pathfinderMob.position();

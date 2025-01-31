@@ -36,9 +36,12 @@ public class UndeadArmies
     @SubscribeEvent
     public void serverStartedEvent(ServerStartedEvent serverStartedEvent)
     {
-        if(!LootParser.instance.reload())
+        final long timeInNanoSeconds = LootParser.instance.reload();
+        if(timeInNanoSeconds == -1)
         {
             serverStartedEvent.getServer().sendSystemMessage(Component.literal("failed to load loot!"));
         }
+        serverStartedEvent.getServer().sendSystemMessage(Component.literal("successfully reloaded! took " + ((double)timeInNanoSeconds/1000000.0d) + "ms"));
+        serverStartedEvent.getServer().sendSystemMessage(Component.literal("loaded: " + LootParser.instance.loots.size() + " items."));
     }
 }

@@ -6,7 +6,6 @@ import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.commands.EffectCommands;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -19,11 +18,13 @@ public class Registry
 {
     public static int reloadLoot(CommandContext<CommandSourceStack> commandContext)
     {
-        if(!LootParser.instance.reload())
+        final long timeInNanoSeconds = LootParser.instance.reload();
+        if(timeInNanoSeconds == -1)
         {
             commandContext.getSource().sendFailure(Component.literal("this command only works when the server has started!"));
         }
-        commandContext.getSource().sendSuccess(() -> Component.translatable("successfully reloaded!"), true);
+        commandContext.getSource().sendSuccess(() -> Component.translatable("successfully reloaded! took " + ((double)timeInNanoSeconds/1000000.0d) + "ms"), true);
+        commandContext.getSource().sendSuccess(() -> Component.translatable("loaded: " + LootParser.instance.loots.size() + " items."), true);
         return 1;
     }
     public static int dumpLoot(CommandContext<CommandSourceStack> commandContext, boolean dumpData)

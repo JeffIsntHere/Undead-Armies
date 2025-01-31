@@ -1,7 +1,5 @@
 package undead.armies.parser;
 
-import undead.armies.UndeadArmies;
-
 import java.io.*;
 import java.util.ArrayList;
 
@@ -12,61 +10,24 @@ This parser was made for speed
 //base class for all classes in this the "parser" folder.
 public abstract class Parser
 {
-    public static final int bufferSize = 4096;
-    protected int workingParentCount = 0;
-    protected int workingIndex = 0;
-    //workingIndex-- is not supported!
-    protected int workingAmountOfCharToRead = 0;
-    protected final char[] workingReaderArray = new char[Parser.bufferSize];
-    //returns number of characters read.
-    //if returns negative, there was an error and the return will not be accurate on errors.
-    abstract protected void process();
+    protected int parentCount = 0;
+    protected BufferedReaderWrapper bufferedReaderWrapper = null;
+    protected abstract void process();
     protected final void parseFromInput(Reader reader)
     {
-        this.workingParentCount = 0;
-        final BufferedReader bufferedReader = new BufferedReader(reader, Parser.bufferSize);
-        while(true)
+        this.parentCount = 0;
+        this.bufferedReaderWrapper = new BufferedReaderWrapper(reader);
+        while(this.bufferedReaderWrapper.hasNext())
         {
-            try
-            {
-                boolean terminate = false;
-                this.workingAmountOfCharToRead = bufferedReader.read(this.workingReaderArray, 0, Parser.bufferSize);
-                if(this.workingAmountOfCharToRead == -1)
-                {
-                    // Main.logger.debug("Attempting to find EOF.");
-                    terminate = true;
-                    for(int i = 0; i < Parser.bufferSize; i++)
-                    {
-                        if(this.workingReaderArray[i] == -1)
-                        {
-                            //Main.logger.debug("Found at index " + String.valueOf(i));
-                            this.workingAmountOfCharToRead = i;
-                            break;
-                        }
-                    }
-                }
-                for(this.workingIndex = 0; this.workingIndex < this.workingAmountOfCharToRead;)
-                {
-                    this.process();
-                }
-                if(terminate)
-                {
-                    break;
-                }
-            }
-            catch(IOException e)
-            {
-                UndeadArmies.logger.error(e.getMessage(),e.getCause());
-                break;
-            }
+            this.process();
         }
     }
     protected final String getKeyUntilOpen()
     {
         final ArrayList<Character> tempCharacterArrayList = new ArrayList<>();
-        for(;this.workingIndex < this.workingAmountOfCharToRead; this.workingIndex++)
+        while(this.bufferedReaderWrapper.next())
         {
-            final char tempChar = this.workingReaderArray[this.workingIndex];
+            final char tempChar = this.bufferedReaderWrapper.character;
             if(Character.isWhitespace(tempChar))
             {
                 continue;
@@ -79,7 +40,6 @@ public abstract class Parser
                 {
                     builder.append(ch);
                 }
-                this.workingIndex++;
                 return builder.toString();
             }
             else
@@ -91,66 +51,57 @@ public abstract class Parser
     }
     protected final char spinUntilNotWhitespace()
     {
-        for(;this.workingIndex < this.workingAmountOfCharToRead; this.workingIndex++)
+        while(this.bufferedReaderWrapper.next())
         {
-            final char tempChar = this.workingReaderArray[this.workingIndex];
-            if (!Character.isWhitespace(tempChar))
+            if (!Character.isWhitespace(this.bufferedReaderWrapper.character))
             {
-                this.workingIndex++;
-                return tempChar;
+                return this.bufferedReaderWrapper.character;
             }
         }
         return ' ';
     }
     protected final void spinUntilOpen()
     {
-        for(;this.workingIndex < this.workingAmountOfCharToRead; this.workingIndex++)
+        while(this.bufferedReaderWrapper.next())
         {
-            final char tempChar = this.workingReaderArray[this.workingIndex];
-            if(Character.isWhitespace(tempChar))
+            if(Character.isWhitespace(this.bufferedReaderWrapper.character))
             {
                 continue;
             }
-            if(tempChar == '{')
+            if(this.bufferedReaderWrapper.character == '{')
             {
-                this.workingIndex++;
                 return;
             }
         }
     }
     protected final void spinUntilClose()
     {
-        for(;this.workingIndex < this.workingAmountOfCharToRead; this.workingIndex++)
+        while(this.bufferedReaderWrapper.next())
         {
-            final char tempChar = this.workingReaderArray[this.workingIndex];
-            if(Character.isWhitespace(tempChar))
+            if(Character.isWhitespace(this.bufferedReaderWrapper.character))
             {
                 continue;
             }
-            if(tempChar == '}')
+            if(this.bufferedReaderWrapper.character == '}')
             {
-                this.workingIndex++;
                 return;
             }
         }
     }
     protected final boolean spinUntilEntryOrOpen()
     {
-        for(;this.workingIndex < this.workingAmountOfCharToRead; this.workingIndex++)
+        while(this.bufferedReaderWrapper.next())
         {
-            final char tempChar = this.workingReaderArray[this.workingIndex];
-            if(Character.isWhitespace(tempChar))
+            if(Character.isWhitespace(this.bufferedReaderWrapper.character))
             {
                 continue;
             }
-            if(tempChar == '.')
+            if(this.bufferedReaderWrapper.character == '.')
             {
-                this.workingIndex++;
                 return true;
             }
-            else if(tempChar == '{')
+            else if(this.bufferedReaderWrapper.character == '{')
             {
-                this.workingIndex++;
                 return false;
             }
         }
@@ -158,21 +109,18 @@ public abstract class Parser
     }
     protected final boolean spinUntilEntryOrClose()
     {
-        for(;this.workingIndex < this.workingAmountOfCharToRead; this.workingIndex++)
+        while(this.bufferedReaderWrapper.next())
         {
-            final char tempChar = this.workingReaderArray[this.workingIndex];
-            if(Character.isWhitespace(tempChar))
+            if(Character.isWhitespace(this.bufferedReaderWrapper.character))
             {
                 continue;
             }
-            if(tempChar == '.')
+            if(this.bufferedReaderWrapper.character == '.')
             {
-                this.workingIndex++;
                 return true;
             }
-            else if(tempChar == '}')
+            else if(this.bufferedReaderWrapper.character == '}')
             {
-                this.workingIndex++;
                 return false;
             }
         }
@@ -180,26 +128,22 @@ public abstract class Parser
     }
     protected final byte spinUntilEntryOrOpenAndClose()
     {
-        for(;this.workingIndex < this.workingAmountOfCharToRead; this.workingIndex++)
+        while(this.bufferedReaderWrapper.next())
         {
-            final char tempChar = this.workingReaderArray[this.workingIndex];
-            if(Character.isWhitespace(tempChar))
+            if(Character.isWhitespace(this.bufferedReaderWrapper.character))
             {
                 continue;
             }
-            if(tempChar == '.')
+            if(this.bufferedReaderWrapper.character == '.')
             {
-                this.workingIndex++;
                 return 0;
             }
-            else if(tempChar == '{')
+            else if(this.bufferedReaderWrapper.character == '{')
             {
-                this.workingIndex++;
                 return -2;
             }
-            else if(tempChar == '}')
+            else if(this.bufferedReaderWrapper.character == '}')
             {
-                this.workingIndex++;
                 return -3;
             }
         }
@@ -207,21 +151,18 @@ public abstract class Parser
     }
     protected final boolean spinUntilCharOrOpen(final char filter)
     {
-        for(;this.workingIndex < this.workingAmountOfCharToRead; this.workingIndex++)
+        while(this.bufferedReaderWrapper.next())
         {
-            final char tempChar = this.workingReaderArray[this.workingIndex];
-            if(Character.isWhitespace(tempChar))
+            if(Character.isWhitespace(this.bufferedReaderWrapper.character))
             {
                 continue;
             }
-            if(tempChar == filter)
+            if(this.bufferedReaderWrapper.character == filter)
             {
-                this.workingIndex++;
                 return true;
             }
-            else if(tempChar == '{')
+            else if(this.bufferedReaderWrapper.character == '{')
             {
-                this.workingIndex++;
                 return false;
             }
         }
@@ -229,21 +170,18 @@ public abstract class Parser
     }
     protected final boolean spinUntilCharOrClose(final char filter)
     {
-        for(;this.workingIndex < this.workingAmountOfCharToRead; this.workingIndex++)
+        while(this.bufferedReaderWrapper.next())
         {
-            final char tempChar = this.workingReaderArray[this.workingIndex];
-            if(Character.isWhitespace(tempChar))
+            if(Character.isWhitespace(this.bufferedReaderWrapper.character))
             {
                 continue;
             }
-            if(tempChar == filter)
+            if(this.bufferedReaderWrapper.character == filter)
             {
-                this.workingIndex++;
                 return true;
             }
-            else if(tempChar == '}')
+            else if(this.bufferedReaderWrapper.character == '}')
             {
-                this.workingIndex++;
                 return false;
             }
         }
@@ -251,21 +189,18 @@ public abstract class Parser
     }
     protected final boolean spinUntilOpenOrClose()
     {
-        for(;this.workingIndex < this.workingAmountOfCharToRead; this.workingIndex++)
+        while(this.bufferedReaderWrapper.next())
         {
-            final char tempChar = this.workingReaderArray[this.workingIndex];
-            if(Character.isWhitespace(tempChar))
+            if(Character.isWhitespace(this.bufferedReaderWrapper.character))
             {
                 continue;
             }
-            if(tempChar == '{')
+            if(this.bufferedReaderWrapper.character == '{')
             {
-                this.workingIndex++;
                 return true;
             }
-            if(tempChar == '}')
+            if(this.bufferedReaderWrapper.character == '}')
             {
-                this.workingIndex++;
                 return false;
             }
         }
@@ -274,35 +209,33 @@ public abstract class Parser
     protected final String parseValueToKey()
     {
         final ArrayList<Character> tempCharacterArrayList = new ArrayList<>();
-        final int stopWhenParentIs = this.workingParentCount;
-        for(;this.workingIndex < this.workingAmountOfCharToRead; this.workingIndex++)
+        final int stopWhenParentIs = this.parentCount;
+        while(this.bufferedReaderWrapper.next())
         {
-            final char tempChar = this.workingReaderArray[this.workingIndex];
-            if(Character.isWhitespace(tempChar))
+            if(Character.isWhitespace(this.bufferedReaderWrapper.character))
             {
                 continue;
             }
-            if(tempChar == '{')
+            if(this.bufferedReaderWrapper.character == '{')
             {
-                tempCharacterArrayList.add(tempChar);
-                this.workingParentCount++;
+                tempCharacterArrayList.add(this.bufferedReaderWrapper.character);
+                this.parentCount++;
             }
-            else if(tempChar == '}')
+            else if(this.bufferedReaderWrapper.character == '}')
             {
-                if(this.workingParentCount == stopWhenParentIs)
+                if(this.parentCount == stopWhenParentIs)
                 {
-                    this.workingIndex++;
                     break;
                 }
                 else
                 {
-                    this.workingParentCount--;
-                    tempCharacterArrayList.add(tempChar);
+                    this.parentCount--;
+                    tempCharacterArrayList.add(this.bufferedReaderWrapper.character);
                 }
             }
             else
             {
-                tempCharacterArrayList.add(tempChar);
+                tempCharacterArrayList.add(this.bufferedReaderWrapper.character);
             }
         }
         final StringBuilder builder = new StringBuilder(tempCharacterArrayList.size());
@@ -315,36 +248,34 @@ public abstract class Parser
     protected final String parseValueToKey(final char firstChar)
     {
         final ArrayList<Character> tempCharacterArrayList = new ArrayList<>();
-        final int stopWhenParentIs = this.workingParentCount;
+        final int stopWhenParentIs = this.parentCount;
         tempCharacterArrayList.add(firstChar);
-        for(;this.workingIndex < this.workingAmountOfCharToRead; this.workingIndex++)
+        while(this.bufferedReaderWrapper.next())
         {
-            final char tempChar = this.workingReaderArray[this.workingIndex];
-            if(Character.isWhitespace(tempChar))
+            if(Character.isWhitespace(this.bufferedReaderWrapper.character))
             {
                 continue;
             }
-            if(tempChar == '{')
+            if(this.bufferedReaderWrapper.character == '{')
             {
-                tempCharacterArrayList.add(tempChar);
-                this.workingParentCount++;
+                tempCharacterArrayList.add(this.bufferedReaderWrapper.character);
+                this.parentCount++;
             }
-            if(tempChar == '}')
+            if(this.bufferedReaderWrapper.character == '}')
             {
-                if(this.workingParentCount == stopWhenParentIs)
+                if(this.parentCount == stopWhenParentIs)
                 {
-                    this.workingIndex++;
                     break;
                 }
                 else
                 {
-                    this.workingParentCount--;
-                    tempCharacterArrayList.add(tempChar);
+                    this.parentCount--;
+                    tempCharacterArrayList.add(this.bufferedReaderWrapper.character);
                 }
             }
             else
             {
-                tempCharacterArrayList.add(tempChar);
+                tempCharacterArrayList.add(this.bufferedReaderWrapper.character);
             }
         }
         final StringBuilder builder = new StringBuilder(tempCharacterArrayList.size());
@@ -377,22 +308,22 @@ public abstract class Parser
     protected final void spinUntilCloseForNextOpen()
     {
         this.spinUntilOpen();
-        this.workingParentCount++;
+        this.parentCount++;
         this.spinUntilCloseForCurrentOpen();
     }
     protected final void spinUntilCloseForCurrentOpen()
     {
         final char tempChar = this.spinUntilNotWhitespace();
-        final int stopWhenParentIs = this.workingParentCount - 1;
-        while(stopWhenParentIs != this.workingParentCount)
+        final int stopWhenParentIs = this.parentCount - 1;
+        while(stopWhenParentIs != this.parentCount)
         {
             if(this.spinUntilOpenOrClose())
             {
-                this.workingParentCount++;
+                this.parentCount++;
             }
             else
             {
-                this.workingParentCount--;
+                this.parentCount--;
             }
         }
     }
