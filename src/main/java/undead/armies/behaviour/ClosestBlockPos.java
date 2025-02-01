@@ -13,7 +13,7 @@ public class ClosestBlockPos
     {
         this.position = position;
     }
-    public void add(final BlockPos blockPos)
+    public void add(@NotNull final BlockPos blockPos)
     {
         final double blockPosDistance = this.position.distanceTo(new Vec3(blockPos.getX(), blockPos.getY(), blockPos.getZ()));
         if(blockPosDistance > this.distance)

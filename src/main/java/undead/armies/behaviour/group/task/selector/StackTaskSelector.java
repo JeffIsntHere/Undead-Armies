@@ -53,15 +53,10 @@ public class StackTaskSelector extends BaseTaskSelector
         int numberOfEntries = 0;
         float calculatedWeight = StackTaskSelector.baseWeight;
         BaseTask lastTask = null;
-        UndeadArmies.logger.debug("ticking! " + taskSelectorStorage.taskStorage.size());
         for(BaseTask task : taskSelectorStorage.taskStorage)
         {
             sumOfDifferences += targetHeight - task.starter.currentPosition.y;
             numberOfEntries++;
-            if(lastTask != null)
-            {
-                UndeadArmies.logger.debug("merge truth table: " + (lastTask != null) + " : " + Math.abs(lastTask.starter.currentPosition.y - task.starter.currentPosition.y) + " : " + (lastTask.starter.currentPosition.distanceTo(task.starter.currentPosition) <= StackTaskSelector.maxDistanceForMerging));
-            }
             if(lastTask != null && Math.abs(lastTask.starter.currentPosition.y - task.starter.currentPosition.y) <= 1.0d && lastTask.starter.currentPosition.distanceTo(task.starter.currentPosition) <= StackTaskSelector.maxDistanceForMerging)
             {
                 if(lastTask.starter.currentPosition.distanceTo(targetPosition) > task.starter.currentPosition.distanceTo(targetPosition))

@@ -5,14 +5,18 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import undead.armies.parser.loot.Loot;
 import undead.armies.parser.loot.LootParser;
+
+import java.util.Collection;
 
 public class Registry
 {
@@ -25,6 +29,37 @@ public class Registry
         }
         commandContext.getSource().sendSuccess(() -> Component.translatable("successfully reloaded! took " + ((double)timeInNanoSeconds/1000000.0d) + "ms"), true);
         commandContext.getSource().sendSuccess(() -> Component.translatable("loaded: " + LootParser.instance.loots.size() + " items."), true);
+        return 1;
+    }
+    public static int getPower(CommandContext<CommandSourceStack> commandContext, Collection<? extends Entity> entities)
+    {
+        final Entity sender = commandContext.getSource().getEntity();
+        if(sender == null)
+        {
+            UndeadArmies.logger.info("");
+            for(Entity entity : entities)
+            {
+                if(entity instanceof LivingEntity livingEntity)
+                {
+                    UndeadArmies.logger.info("Entity: " + livingEntity);
+                    UndeadArmies.logger.info(">Power: " + Util.getPower(livingEntity));
+                    UndeadArmies.logger.info("");
+                }
+            }
+        }
+        else
+        {
+            sender.sendSystemMessage(Component.literal(""));
+            for(Entity entity : entities)
+            {
+                if(entity instanceof LivingEntity livingEntity)
+                {
+                    sender.sendSystemMessage(Component.literal("§7Entity: §f" + livingEntity));
+                    sender.sendSystemMessage(Component.literal("§7>Power: §f" + Util.getPower(livingEntity)));
+                    sender.sendSystemMessage(Component.literal(""));
+                }
+            }
+        }
         return 1;
     }
     public static int dumpLoot(CommandContext<CommandSourceStack> commandContext, boolean dumpData)
@@ -46,20 +81,20 @@ public class Registry
                 UndeadArmies.logger.info("");
             }
         }
-        else if(entity instanceof ServerPlayer serverPlayer)
+        else
         {
-            serverPlayer.sendSystemMessage(Component.literal(""));
+            entity.sendSystemMessage(Component.literal(""));
             for(Loot loot : LootParser.instance.loots)
             {
-                serverPlayer.sendSystemMessage(Component.literal("§7Item type: §f" + loot.item.getItem()));
+                entity.sendSystemMessage(Component.literal("§7Item type: §f" + loot.item.getItem()));
                 if(dumpData)
                 {
-                    serverPlayer.sendSystemMessage(Component.literal("§7>Item data: §f" + loot.item.getComponents()));
+                    entity.sendSystemMessage(Component.literal("§7>Item data: §f" + loot.item.getComponents()));
                 }
-                serverPlayer.sendSystemMessage(Component.literal("§7>Quota: §f" + loot.quota));
-                serverPlayer.sendSystemMessage(Component.literal("§7>Reducer: §f" + loot.reducer));
-                serverPlayer.sendSystemMessage(Component.literal("§7>MinimumPower: §f" + loot.minimumPower));
-                serverPlayer.sendSystemMessage(Component.literal(""));
+                entity.sendSystemMessage(Component.literal("§7>Quota: §f" + loot.quota));
+                entity.sendSystemMessage(Component.literal("§7>Reducer: §f" + loot.reducer));
+                entity.sendSystemMessage(Component.literal("§7>MinimumPower: §f" + loot.minimumPower));
+                entity.sendSystemMessage(Component.literal(""));
             }
         }
         return 1;
@@ -91,6 +126,11 @@ public class Registry
                         .then(Commands.argument("dumpData", BoolArgumentType.bool())
                                 .executes(commandContext -> Registry.dumpLoot(commandContext, BoolArgumentType.getBool(commandContext, "dumpData")))))
                 .then(Commands.literal("dropAllLoot").executes(Registry::dropAllLoot))
+                .then(Commands.literal("getPower")
+                        .then(Commands.argument("targets", EntityArgument.entities())
+                                .executes(commandContext -> Registry.getPower(commandContext, EntityArgument.getEntities(commandContext, "targets")))
+                        )
+                )
         );
     }
 }

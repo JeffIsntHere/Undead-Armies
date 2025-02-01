@@ -6,6 +6,8 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeMap;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.projectile.ThrownPotion;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -27,13 +29,10 @@ public final class Util
         final int speedUpAmplifier = (speedUp == null) ? 0 : speedUp.getAmplifier();
         return single.lastPosition.distanceTo(single.currentPosition) >= Util.distanceToBeConsideredAsMoving * 1.0d/(1.0d + Util.movementSlowDownConstant * slowDownAmplifier) * (1 + Util.movementSpeedUpConstant * speedUpAmplifier);
     }
-    public static Vec3 getThrowDirection(final Vec3 start, final Vec3 end, final int airTime, final double horizontalScale, final double scale)
+    public static Vec3 getThrowVelocity(final Vec3 start, final Vec3 end, final float divisor, final float y)
     {
         final Vec3 direction = end.subtract(start);
-        final double xVelocity = (direction.x / (double)airTime + 0.005 * (double)airTime) * horizontalScale;
-        final double yVelocity = direction.y / (double)airTime + 0.01 * (double)airTime;
-        final double zVelocity = (direction.z / (double)airTime + 0.005 * (double)airTime) * horizontalScale;
-        return new Vec3(xVelocity, yVelocity, zVelocity).scale(scale);
+        return new Vec3(direction.x / divisor, y, direction.z / divisor);
     }
     public static void throwPotion(final LivingEntity livingEntity, final LivingEntity target, ItemStack itemStack, final float velocity, final float accuracy)
     {
@@ -65,5 +64,18 @@ public final class Util
     public static void holdItem(final Mob mob, final ItemStack itemStack)
     {
         mob.setItemInHand(InteractionHand.MAIN_HAND, itemStack);
+    }
+    public static double getPower(final LivingEntity livingEntity)
+    {
+        try
+        {
+            final double power = ((float) livingEntity.getAttributeValue(Attributes.ATTACK_DAMAGE) + 3.0f) * (livingEntity.getMaxHealth() + Math.pow((float) livingEntity.getAttributeValue(Attributes.ARMOR_TOUGHNESS), 2.0f)
+                    * Math.sqrt((float) livingEntity.getAttributeValue(Attributes.MOVEMENT_SPEED) + (float) livingEntity.getAttributeValue(Attributes.MOVEMENT_EFFICIENCY))) / 120.0f;
+            return power;
+        }
+        catch(IllegalArgumentException illegalArgumentException)
+        {
+            return 0;
+        }
     }
 }

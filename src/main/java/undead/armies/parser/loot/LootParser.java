@@ -8,6 +8,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
 import undead.armies.UndeadArmies;
+import undead.armies.Util;
 import undead.armies.parser.File;
 import undead.armies.parser.Parser;
 
@@ -109,9 +110,7 @@ public class LootParser extends Parser
         final Vec3 position = pathfinderMob.position();
         //power =
         //(attack damage + 3) * (hp + armor point^2) * sqrt(movement speed on land + movement speed on sea)
-        final double power = ((float) pathfinderMob.getAttributeValue(Attributes.ATTACK_DAMAGE) + 3.0f) * (pathfinderMob.getMaxHealth() + Math.pow((float) pathfinderMob.getAttributeValue(Attributes.ARMOR_TOUGHNESS), 2.0f)
-                * Math.sqrt((float) pathfinderMob.getAttributeValue(Attributes.MOVEMENT_SPEED) + (float) pathfinderMob.getAttributeValue(Attributes.MOVEMENT_EFFICIENCY))) / 160.0f;
-        UndeadArmies.logger.debug("power: " + power);
+        final double power = Util.getPower(pathfinderMob);
         for(Loot loot : this.loots)
         {
             loot.dropAtLocation(level, position, power);

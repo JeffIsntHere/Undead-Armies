@@ -3,7 +3,6 @@ package undead.armies.behaviour.single.task;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -11,11 +10,15 @@ import net.minecraft.world.level.material.LavaFluid;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import undead.armies.UndeadArmies;
+import undead.armies.Util;
 import undead.armies.behaviour.ClosestBlockPos;
 import undead.armies.behaviour.single.Single;
 
+import java.util.ArrayDeque;
+
 public class JumpTask extends BaseTask
 {
+    public static int maxMemorySize = 10;
     public static final Vec3i[] locationTable = new Vec3i[]{
             new Vec3i(2,0,0),
             new Vec3i(2,0,1),
@@ -59,6 +62,18 @@ public class JumpTask extends BaseTask
         return !blockState.isEmpty() && blockIsNotLava(blockState);
     }
     protected int triggerAfter = 0;
+    protected final ArrayDeque<BlockPos> blockPosMemory = new ArrayDeque<>();
+    protected void addToClosestBlockPosIfNotLastBlockPos(final ClosestBlockPos closestBlockPos, final BlockPos blockPos)
+    {
+        for(BlockPos lastBlockPos : this.blockPosMemory)
+        {
+            if(lastBlockPos.equals(blockPos))
+            {
+                return;
+            }
+        }
+        closestBlockPos.add(blockPos);
+    }
     @Override
     public boolean handleTask(@NotNull Single single)
     {
@@ -66,8 +81,7 @@ public class JumpTask extends BaseTask
         {
             return false;
         }
-        UndeadArmies.logger.debug("ticked!");
-        triggerAfter = single.pathfinderMob.tickCount + 60;
+        triggerAfter = single.pathfinderMob.tickCount + 20;
         final LivingEntity target = single.pathfinderMob.getTarget();
         final Vec3 targetPosition = target.position();
         final double distance = single.currentPosition.distanceTo(targetPosition);
@@ -93,33 +107,40 @@ public class JumpTask extends BaseTask
                         final BlockPos belowBottom = bottom.below();
                         if(blockIsGood(bottom.below(), level))
                         {
-                            closestBlockPos.add(belowBottom);
+                            this.addToClosestBlockPosIfNotLastBlockPos(closestBlockPos, belowBottom);
                         }
                     }
                     else if(blockIsNotLava(bottomBlockState))
                     {
-                        closestBlockPos.add(bottom);
+                        this.addToClosestBlockPosIfNotLastBlockPos(closestBlockPos, bottom);
                     }
                 }
                 else if(blockIsNotLava(belowMiddleBlockState) && level.getBlockState(middle.above()).isEmpty())
                 {
                     //?001?
-                    closestBlockPos.add(belowMiddle);
+                    this.addToClosestBlockPosIfNotLastBlockPos(closestBlockPos, belowMiddle);
                 }
             }
             else if(blockIsNotLava(middleBlockState) && level.getBlockState(middle.above()).isEmpty() && level.getBlockState(middle.above(2)).isEmpty())
             {
                 //001??
-                closestBlockPos.add(middle);
+                this.addToClosestBlockPosIfNotLastBlockPos(closestBlockPos, middle);
             }
         }
-        if(closestBlockPos.closest != null && closestBlockPos.distance < distance)
+        final int blockPosMemorySize = blockPosMemory.size();
+        if(closestBlockPos.closest != null)
         {
+            blockPosMemory.add(startingPoint.below());
             single.pathfinderMob.lookAt(target, 180.0f, 180.0f);
-            final Vec3 direction = new Vec3(closestBlockPos.closest.getX() + 0.5d, closestBlockPos.closest.getY() + 1.0d, closestBlockPos.closest.getZ() + 0.5d).subtract(single.currentPosition);
-            final Vec3 velocity = new Vec3(direction.x / 5.0f, 0.5f ,direction.z / 5.0f);
-            final Vec3 newDeltaMovement = single.pathfinderMob.getDeltaMovement().add(velocity);
-            single.pathfinderMob.setDeltaMovement(newDeltaMovement);
+            single.pathfinderMob.setDeltaMovement(single.pathfinderMob.getDeltaMovement().add(Util.getThrowVelocity(single.currentPosition, new Vec3(closestBlockPos.closest.getX() + 0.5d, closestBlockPos.closest.getY() + 1.0d, closestBlockPos.closest.getZ() + 0.5d), 5.0f, 0.5f)));
+        }
+        else if(blockPosMemorySize > 0)
+        {
+            blockPosMemory.removeFirst();
+        }
+        if(blockPosMemorySize > JumpTask.maxMemorySize)
+        {
+            blockPosMemory.removeFirst();
         }
         return true;
     }
