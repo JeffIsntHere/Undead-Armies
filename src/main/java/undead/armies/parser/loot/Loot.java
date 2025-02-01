@@ -55,15 +55,21 @@ public class Loot
             return;
         }
         final RandomSource randomSource = level.getRandom();
-        int amount = -1;
+        int amount = 0;
         double quota = this.quota * power;
-        do
+        while(true)
         {
-            double nextDouble = randomSource.nextDouble() + this.reducer;
-            quota -= nextDouble;
-            amount++;
+            final double nextDouble = randomSource.nextDouble();
+            if(quota < nextDouble)
+            {
+                break;
+            }
+            else
+            {
+                quota -= (nextDouble + this.reducer);
+                amount++;
+            }
         }
-        while(quota > 0);
         final int stackSize = this.item.getMaxStackSize();
         int loopCount = amount / stackSize;
         for(int i = 0; i < loopCount; i++)

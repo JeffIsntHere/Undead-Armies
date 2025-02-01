@@ -3,6 +3,7 @@ package undead.armies.behaviour.single.task;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -10,7 +11,6 @@ import net.minecraft.world.level.material.LavaFluid;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import undead.armies.UndeadArmies;
-import undead.armies.Util;
 import undead.armies.behaviour.ClosestBlockPos;
 import undead.armies.behaviour.single.Single;
 
@@ -116,7 +116,10 @@ public class JumpTask extends BaseTask
         if(closestBlockPos.closest != null && closestBlockPos.distance < distance)
         {
             single.pathfinderMob.lookAt(target, 180.0f, 180.0f);
-            single.pathfinderMob.setDeltaMovement(single.pathfinderMob.getDeltaMovement().add(Util.getThrowDirection(single.currentPosition, new Vec3(closestBlockPos.closest.getX() + 0.5d, closestBlockPos.closest.getY() + 2.0d, closestBlockPos.closest.getZ() + 0.5d), 10, 1.2d, 1.8d)));
+            final Vec3 direction = new Vec3(closestBlockPos.closest.getX() + 0.5d, closestBlockPos.closest.getY() + 1.0d, closestBlockPos.closest.getZ() + 0.5d).subtract(single.currentPosition);
+            final Vec3 velocity = new Vec3(direction.x / 5.0f, 0.5f ,direction.z / 5.0f);
+            final Vec3 newDeltaMovement = single.pathfinderMob.getDeltaMovement().add(velocity);
+            single.pathfinderMob.setDeltaMovement(newDeltaMovement);
         }
         return true;
     }

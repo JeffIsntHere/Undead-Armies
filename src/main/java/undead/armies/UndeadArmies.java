@@ -1,10 +1,6 @@
 package undead.armies;
 
-import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.context.CommandContext;
 import com.mojang.logging.LogUtils;
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -13,7 +9,6 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import org.slf4j.Logger;
-import undead.armies.parser.loot.Loot;
 import undead.armies.parser.loot.LootParser;
 
 @Mod(UndeadArmies.modId)
