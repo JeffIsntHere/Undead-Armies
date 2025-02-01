@@ -11,13 +11,14 @@ This parser was made for speed
 public abstract class Parser
 {
     protected int parentCount = 0;
+    protected boolean terminate = false;
     protected BufferedReaderWrapper bufferedReaderWrapper = null;
     protected abstract void process();
     protected final void parseFromInput(Reader reader)
     {
         this.parentCount = 0;
         this.bufferedReaderWrapper = new BufferedReaderWrapper(reader);
-        while(this.bufferedReaderWrapper.hasNext())
+        while(!terminate && this.bufferedReaderWrapper.hasNext())
         {
             this.process();
         }
@@ -33,6 +34,33 @@ public abstract class Parser
                 continue;
             }
             if(tempChar == '{')
+            {
+                //source : https://stackoverflow.com/a/6324852
+                StringBuilder builder = new StringBuilder(tempCharacterArrayList.size());
+                for(Character ch: tempCharacterArrayList)
+                {
+                    builder.append(ch);
+                }
+                return builder.toString();
+            }
+            else
+            {
+                tempCharacterArrayList.add(tempChar);
+            }
+        }
+        return new String();
+    }
+    protected final String getKeyUntilOpenOrClose()
+    {
+        final ArrayList<Character> tempCharacterArrayList = new ArrayList<>();
+        while(this.bufferedReaderWrapper.next())
+        {
+            final char tempChar = this.bufferedReaderWrapper.character;
+            if(Character.isWhitespace(tempChar))
+            {
+                continue;
+            }
+            if(tempChar == '{' || tempChar == '}')
             {
                 //source : https://stackoverflow.com/a/6324852
                 StringBuilder builder = new StringBuilder(tempCharacterArrayList.size());

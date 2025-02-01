@@ -1,0 +1,23 @@
+stacking
+{
+    enable{true}
+}
+mining
+{
+    enable{true}
+}
+sprinting
+{
+    enable{true}
+    cooldown{460}
+}
+grab
+{
+    enable{true}
+    distance{2.0}
+}
+jumping
+{
+    enable{true}
+    cooldown{20}
+}

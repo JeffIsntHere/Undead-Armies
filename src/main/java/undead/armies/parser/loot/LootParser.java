@@ -2,12 +2,10 @@ package undead.armies.parser.loot;
 
 import net.minecraft.commands.arguments.item.ItemParser;
 import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
-import undead.armies.UndeadArmies;
 import undead.armies.Util;
 import undead.armies.parser.File;
 import undead.armies.parser.Parser;
@@ -18,6 +16,7 @@ import java.util.ArrayList;
 public class LootParser extends Parser
 {
     public static final LootParser instance = new LootParser();
+    private LootParser(){}
     public ArrayList<Loot> loots = new ArrayList<>();
     protected ItemParser itemParser = null;
     protected String item = null;
@@ -116,5 +115,4 @@ public class LootParser extends Parser
             loot.dropAtLocation(level, position, power);
         }
     }
-    private LootParser(){}
 }
