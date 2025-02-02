@@ -9,6 +9,8 @@ import undead.armies.Util;
 import undead.armies.behaviour.group.task.BaseTask;
 import undead.armies.behaviour.group.task.Mine;
 import undead.armies.behaviour.single.Single;
+import undead.armies.parser.config.ConfigParser;
+import undead.armies.parser.config.type.BaseType;
 
 import java.util.ArrayList;
 

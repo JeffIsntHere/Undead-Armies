@@ -1,21 +1,32 @@
 package undead.armies.parser.config.type;
 
-import undead.armies.parser.config.ConfigArgument;
-
-import java.util.function.Function;
-import java.util.function.Supplier;
-
-public class TypeArgument extends ConfigArgument
+public class TypeArgument
 {
-    public final Function<String, BaseType> type;
-    public TypeArgument(final Function<String, BaseType> type, final String name, final int length)
+    public final char[] query;
+    public final BaseType type;
+    public TypeArgument(final BaseType type, final String name, final int length)
     {
-        super(name, length);
         this.type = type;
+        this.query = new char[length];
+        for(int i = 0; i < length; i++)
+        {
+            this.query[i] = name.charAt(i);
+        }
     }
-    public TypeArgument(final Function<String, BaseType> type, char... query)
+    public boolean compare(final String string)
     {
-        super(query);
-        this.type = type;
+        final int length = this.query.length;
+        if(string.length() < length)
+        {
+            return false;
+        }
+        for(int i = 0; i < length; i++)
+        {
+            if(this.query[i] != string.charAt(i))
+            {
+                return false;
+            }
+        }
+        return true;
     }
 }

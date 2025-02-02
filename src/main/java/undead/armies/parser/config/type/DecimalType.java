@@ -7,15 +7,15 @@ public class DecimalType extends BaseType
     @Override
     public void save(String string)
     {
+        final double oldValue = this.value;
         try
         {
             this.value = Double.valueOf(string);
-            super.isDefault = false;
+            super.set = true;
         }
         catch (NumberFormatException e)
         {
-            this.value = 0.0;
-            super.isDefault = true;
+            this.value = oldValue;
         }
     }
 
@@ -28,10 +28,6 @@ public class DecimalType extends BaseType
     {
         super(name);
         this.value = value;
-        super.isDefault = false;
-    }
-    public DecimalType(final String name)
-    {
-        super(name);
+        super.set = false;
     }
 }

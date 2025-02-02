@@ -7,20 +7,28 @@ public class BooleanType extends BaseType
     @Override
     public void save(final String string)
     {
-        this.value = Boolean.parseBoolean(string);
+        if(string.length() == 0)
+        {
+            return;
+        }
+        final char firstChar = string.charAt(0);
+        if(firstChar == 't' || firstChar == 'y')
+        {
+            this.value = true;
+            this.set = true;
+        }
+        else if(firstChar == 'f' || firstChar == 'n')
+        {
+            this.value = false;
+            this.set = true;
+        }
     }
 
     public BooleanType(final String name, final boolean value)
     {
         super(name);
         this.value = value;
-        super.isDefault = false;
-    }
-
-    public BooleanType(final String name)
-    {
-        super(name);
-        super.isDefault = false;
+        super.set = true;
     }
 
     public String toString()

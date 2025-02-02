@@ -2,21 +2,35 @@ package undead.armies.behaviour.group;
 
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
+import undead.armies.UndeadArmies;
 import undead.armies.behaviour.group.task.selector.MineTaskSelector;
 import undead.armies.behaviour.group.task.selector.StackTaskSelector;
 import undead.armies.behaviour.group.task.selector.TaskSelectorStorage;
 import undead.armies.behaviour.single.Single;
+import undead.armies.parser.config.ConfigParser;
+import undead.armies.parser.config.type.BaseType;
+import undead.armies.parser.config.type.BooleanType;
 
 import java.util.ArrayList;
 
 public final class GroupUtil
 {
     public static final GroupUtil instance = new GroupUtil();
+    private GroupUtil(){}
+    public boolean enableStacking = true;
+    public boolean enableMining = true;
+
     //mix into this if you want to add your own tasks.
     public void setTaskSelectors(@NotNull final ArrayList<TaskSelectorStorage> taskSelectorStorages)
     {
-        taskSelectorStorages.add(new TaskSelectorStorage(StackTaskSelector.instance, StackTaskSelector.baseWeight));
-        taskSelectorStorages.add(new TaskSelectorStorage(MineTaskSelector.instance, MineTaskSelector.baseWeight));
+        if(this.enableStacking)
+        {
+            taskSelectorStorages.add(new TaskSelectorStorage(StackTaskSelector.instance, StackTaskSelector.baseWeight));
+        }
+        if(this.enableMining)
+        {
+            taskSelectorStorages.add(new TaskSelectorStorage(MineTaskSelector.instance, MineTaskSelector.baseWeight));
+        }
     }
     //mix into this if you want to use your own Group implementation.
     protected Group createGroup(LivingEntity target, Single requester)
@@ -54,5 +68,4 @@ public final class GroupUtil
         }
         return this.createGroupStorage(group, requester);
     }
-    private GroupUtil(){}
 }

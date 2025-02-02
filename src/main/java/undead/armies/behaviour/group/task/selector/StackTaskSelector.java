@@ -3,7 +3,6 @@ package undead.armies.behaviour.group.task.selector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import undead.armies.UndeadArmies;
 import undead.armies.Util;
 import undead.armies.behaviour.group.task.BaseTask;
 import undead.armies.behaviour.group.task.Stack;

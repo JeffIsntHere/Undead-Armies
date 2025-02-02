@@ -7,15 +7,15 @@ public class NumberType extends BaseType
     @Override
     public void save(String string)
     {
+        final int oldValue = this.value;
         try
         {
             this.value = Integer.valueOf(string);
-            super.isDefault = false;
+            super.set = true;
         }
         catch(NumberFormatException e)
         {
-            this.value = 0;
-            super.isDefault = true;
+            this.value = oldValue;
         }
     }
 
@@ -28,10 +28,6 @@ public class NumberType extends BaseType
     {
         super(name);
         this.value = value;
-        super.isDefault = false;
-    }
-    public NumberType(final String name)
-    {
-        super(name);
+        super.set = true;
     }
 }

@@ -85,23 +85,20 @@ public class LootParser extends Parser
             }
         }
     }
-    public long reload()
+    public void reload()
     {
         if(ServerLifecycleHooks.getCurrentServer() == null)
         {
-            return -1;
+            return;
         }
         loots.clear();
         this.itemParser = new ItemParser(ServerLifecycleHooks.getCurrentServer().registryAccess());
         final File file = new File();
         final Reader reader = file.getFileReader("loot");
-        long parseStart = System.nanoTime();
         super.parseFromInput(reader);
-        long parsingTime = System.nanoTime() - parseStart;
         File.closeReader(reader);
         this.itemParser = null;
         this.loots.removeIf(loot -> loot.item.isEmpty());
-        return parsingTime;
     }
     public void dropForPathfinderMob(@NotNull final PathfinderMob pathfinderMob)
     {

@@ -9,12 +9,6 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import org.slf4j.Logger;
-import undead.armies.parser.config.Config;
-import undead.armies.parser.config.ConfigParser;
-import undead.armies.parser.config.type.BooleanType;
-import undead.armies.parser.config.type.DecimalType;
-import undead.armies.parser.config.type.NumberType;
-import undead.armies.parser.config.type.TypeArgument;
 import undead.armies.parser.loot.LootParser;
 
 @Mod(UndeadArmies.modId)
@@ -37,23 +31,7 @@ public class UndeadArmies
     @SubscribeEvent
     public void serverStartedEvent(ServerStartedEvent serverStartedEvent)
     {
-        final long timeInNanoSeconds = LootParser.instance.reload();
-        if(timeInNanoSeconds == -1)
-        {
-            serverStartedEvent.getServer().sendSystemMessage(Component.literal("failed to load loot!"));
-        }
-        serverStartedEvent.getServer().sendSystemMessage(Component.literal("successfully reloaded! took " + ((double)timeInNanoSeconds/1000000.0d) + "ms"));
+        serverStartedEvent.getServer().sendSystemMessage(Component.literal("successfully reloaded!"));
         serverStartedEvent.getServer().sendSystemMessage(Component.literal("loaded: " + LootParser.instance.loots.size() + " items."));
-
-        final Config config = ConfigParser.instance.loadConfig("test", 1,
-                new TypeArgument(BooleanType::new, 'a', 'd'),
-                new TypeArgument(DecimalType::new, 'b', 'u'),
-                new TypeArgument(DecimalType::new, 'b', 'a'),
-                new TypeArgument(NumberType::new, 'c'));
-        UndeadArmies.logger.debug("loaded: \n" + config);
-        UndeadArmies.logger.debug("reading val ad! " + config.get('a', 'd'));
-        UndeadArmies.logger.debug("reading val ba! " + config.get('b', 'a'));
-        UndeadArmies.logger.debug("reading val bu! " + config.get('b', 'u'));
-        UndeadArmies.logger.debug("reading val c! " + config.get('c'));
     }
 }
