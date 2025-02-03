@@ -4,23 +4,15 @@ public class TypeArgument
 {
     public final char[] query;
     public final BaseType type;
-    public TypeArgument(final BaseType type, final String name, final int length)
+    public TypeArgument(final BaseType type, final String name)
     {
         this.type = type;
-        this.query = new char[length];
-        for(int i = 0; i < length; i++)
-        {
-            this.query[i] = name.charAt(i);
-        }
+        this.query = name.toCharArray();
     }
     public boolean compare(final String string)
     {
-        final int length = this.query.length;
-        if(string.length() < length)
-        {
-            return false;
-        }
-        for(int i = 0; i < length; i++)
+        final int upperBound = Math.min(this.query.length, string.length());
+        for(int i = 0; i < upperBound; i++)
         {
             if(this.query[i] != string.charAt(i))
             {

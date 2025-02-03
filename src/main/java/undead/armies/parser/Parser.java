@@ -16,6 +16,7 @@ public abstract class Parser
     protected abstract void process();
     protected final void parseFromInput(Reader reader)
     {
+        this.terminate = false;
         this.parentCount = 0;
         this.bufferedReaderWrapper = new BufferedReaderWrapper(reader);
         while(!terminate && this.bufferedReaderWrapper.hasNext())
@@ -48,7 +49,7 @@ public abstract class Parser
                 tempCharacterArrayList.add(tempChar);
             }
         }
-        return new String();
+        return "";
     }
     protected final String getKeyUntilOpenOrClose()
     {
@@ -75,7 +76,7 @@ public abstract class Parser
                 tempCharacterArrayList.add(tempChar);
             }
         }
-        return new String();
+        return "";
     }
     protected final char spinUntilNotWhitespace()
     {

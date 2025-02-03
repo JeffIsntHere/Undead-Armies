@@ -28,6 +28,5 @@ public class DecimalType extends BaseType
     {
         super(name);
         this.value = value;
-        super.set = false;
     }
 }

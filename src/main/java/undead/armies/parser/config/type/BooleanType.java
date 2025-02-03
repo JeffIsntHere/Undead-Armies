@@ -28,7 +28,6 @@ public class BooleanType extends BaseType
     {
         super(name);
         this.value = value;
-        super.set = true;
     }
 
     public String toString()

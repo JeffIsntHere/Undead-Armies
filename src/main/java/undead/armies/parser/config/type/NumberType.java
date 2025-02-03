@@ -28,6 +28,5 @@ public class NumberType extends BaseType
     {
         super(name);
         this.value = value;
-        super.set = true;
     }
 }

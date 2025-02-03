@@ -25,11 +25,12 @@ public class Config
     public String get(@NotNull final String name)
     {
         final char[] chars = name.toCharArray();
-        ArrayList<StringPair> past = this.data;
-        ArrayList<StringPair> present;
+        ArrayList<StringPair> past;
+        ArrayList<StringPair> present = this.data;
         int currentIndex = 0;
         do
         {
+            past = present;
             present = new ArrayList<>();
             for(final StringPair stringPair : past)
             {
@@ -43,18 +44,13 @@ public class Config
                 }
             }
             currentIndex++;
-            past = present;
         }
         while(!present.isEmpty() && (currentIndex < chars.length));
-        if(currentIndex == 1)
+        if(past == this.data)
         {
-            return null;
+            return (present.isEmpty()) ? null : present.getFirst().right;
         }
-        if(currentIndex >= chars.length && present.isEmpty())
-        {
-            return past.getFirst().right;
-        }
-        return null;
+        return past.getFirst().right;
     }
     public void process()
     {

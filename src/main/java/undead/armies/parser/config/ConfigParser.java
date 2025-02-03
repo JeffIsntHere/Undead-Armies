@@ -28,6 +28,7 @@ public class ConfigParser extends Parser
                 this.config = new Config(string);
                 ConfigParser.configCache.add(this.config);
             }
+            this.config.clear();
             super.parentCount++;
         }
         else if(super.parentCount == 1)
@@ -36,6 +37,7 @@ public class ConfigParser extends Parser
             if(super.bufferedReaderWrapper.character == '}')
             {
                 this.config = null;
+                super.parentCount = 0;
                 super.terminate = true;
                 return;
             }
@@ -47,34 +49,34 @@ public class ConfigParser extends Parser
     protected Config getConfigFromCache(@NotNull final String name)
     {
         final char[] chars = name.toCharArray();
-        ArrayList<Config> past = ConfigParser.configCache;
-        ArrayList<Config> present;
+        ArrayList<Config> past;
+        ArrayList<Config> present = ConfigParser.configCache;
         int currentIndex = 0;
         do
         {
+            past = present;
             present = new ArrayList<>();
             for(final Config config : past)
             {
+                if(currentIndex >= config.name.length())
+                {
+                    continue;
+                }
                 if(config.name.charAt(currentIndex) == chars[currentIndex])
                 {
                     present.add(config);
                 }
             }
             currentIndex++;
-            past = present;
         }
         while(!present.isEmpty() && (currentIndex < chars.length));
-        if(currentIndex == 1)
+        if(past == ConfigParser.configCache)
         {
-            return null;
+            return (present.isEmpty()) ? null : present.getFirst();
         }
-        if(currentIndex >= chars.length && present.isEmpty())
-        {
-            return past.getFirst();
-        }
-        return null;
+        return past.getFirst();
     }
-    public void reloadConfig()
+    public void reload()
     {
         final File file = new File();
         final Reader reader = file.getFileReader("config");

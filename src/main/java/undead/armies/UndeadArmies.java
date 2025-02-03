@@ -7,8 +7,12 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import org.slf4j.Logger;
+import undead.armies.parser.config.ConfigParser;
+import undead.armies.parser.config.type.BooleanType;
+import undead.armies.parser.config.type.TypeArgument;
 import undead.armies.parser.loot.LootParser;
 
 @Mod(UndeadArmies.modId)
@@ -28,10 +32,19 @@ public class UndeadArmies
     {
         Registry.registerCommands(registerCommandsEvent.getDispatcher());
     }
+    public final BooleanType enable = new BooleanType("enable",true);
+    @SubscribeEvent
+    public void serverAboutToStartEvent(ServerAboutToStartEvent serverAboutToStartEvent)
+    {
+        ConfigParser.instance.registerConfig("stacking", new TypeArgument(this.enable, "enable"));
+    }
     @SubscribeEvent
     public void serverStartedEvent(ServerStartedEvent serverStartedEvent)
     {
+        LootParser.instance.reload();
         serverStartedEvent.getServer().sendSystemMessage(Component.literal("successfully reloaded!"));
         serverStartedEvent.getServer().sendSystemMessage(Component.literal("loaded: " + LootParser.instance.loots.size() + " items."));
+        ConfigParser.instance.reload();
+        UndeadArmies.logger.debug("loaded conf enable: " + this.enable.value + " set? : " + this.enable.set);
     }
 }
