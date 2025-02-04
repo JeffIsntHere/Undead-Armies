@@ -1,5 +1,6 @@
 package undead.armies.behaviour.single;
 
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
@@ -122,10 +123,24 @@ public class Single implements Resettable
     public Single(final PathfinderMob pathfinderMob)
     {
         this.pathfinderMob = pathfinderMob;
-        this.baseType = TypeUtil.instance.getMobType(pathfinderMob.getRandom());
+        final BaseType typeFromId;
+        {
+            final CompoundTag data = new CompoundTag();
+            pathfinderMob.readAdditionalSaveData(data);
+            typeFromId = TypeUtil.instance.getMobType(data.getInt("MobType"));
+        }
+        if(typeFromId == null)
+        {
+            this.baseType = TypeUtil.instance.getMobType(pathfinderMob.getRandom());
+            this.baseType.init(this);
+        }
+        else
+        {
+            this.baseType = typeFromId;
+        }
         this.lastPosition = pathfinderMob.position();
         this.currentPosition = this.lastPosition;
-        final Pair<Integer, BaseTask> outputValue = TaskUtil.instance.getTask();
+        final Pair<Integer, BaseTask> outputValue = TaskUtil.instance.getTask(this);
         this.currentTask = outputValue.getRight();
         this.currentTaskLength = outputValue.getLeft();
     }

@@ -1,5 +1,6 @@
 package undead.armies.mixin;
 
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Zombie;
@@ -25,6 +26,11 @@ public abstract class ZombieMixin extends Monster implements GetSingle
     public void additionalTick(CallbackInfo callbackInfo)
     {
         this.single.tick();
+    }
+    @Inject(method="addAdditionalSaveData",at=@At("HEAD"))
+    public void addAdditionalSaveData(CompoundTag compoundTag, CallbackInfo callbackInfo)
+    {
+        compoundTag.putInt("MobType", this.single.baseType.getId());
     }
     @Override
     public Single getSingle()

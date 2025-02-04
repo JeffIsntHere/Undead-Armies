@@ -30,7 +30,7 @@ public class Mine extends BaseTask
             single.pathfinderMob.getNavigation().moveTo(this.mineTargetVec3.x, this.mineTargetVec3.y, this.mineTargetVec3.z, 0.2f);
             return this.starter.pathfinderMob.is(single.pathfinderMob);
         }
-        this.miningProgress+=1;
+        this.miningProgress+=single.baseType.getHitPower();
         final Level level = single.pathfinderMob.level();
         final BlockState blockState = level.getBlockState(this.mineTarget);
         if(blockState.isEmpty())

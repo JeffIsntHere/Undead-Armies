@@ -2,7 +2,6 @@ package undead.armies.behaviour.group;
 
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
-import undead.armies.UndeadArmies;
 import undead.armies.behaviour.group.task.BaseTask;
 import undead.armies.behaviour.group.task.selector.TaskSelectorStorage;
 import undead.armies.behaviour.single.Single;
@@ -42,7 +41,7 @@ public class Group
             {
                 final TaskSelectorStorage taskSelectorStorage = this.taskSelectorStorages.get(i);
                 cumulative += taskSelectorStorage.weight;
-                if(cumulative >= randomResult)
+                if(cumulative >= randomResult && single.baseType.canDoGroupTask(taskSelectorStorage.taskSelector.getClass()))
                 {
                     single.groupStorage.task = taskSelectorStorage.taskSelector.getSuitableTask(taskSelectorStorage, single, this.target);
                     if(single.groupStorage.task != null)

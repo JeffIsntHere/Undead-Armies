@@ -1,6 +1,9 @@
 package undead.armies.behaviour.type;
 
 import net.minecraft.util.RandomSource;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 
 public final class TypeUtil
@@ -10,7 +13,7 @@ public final class TypeUtil
     //if you are trying to add another type, please use mixins to override this method.
     public BaseType[] getAllMobTypes()
     {
-        return new BaseType[]{Alchemist.alchemist, Engineer.engineer, Giant.giant, Normal.normal};
+        return new BaseType[]{/*Engineer.engineer, */Giant.giant/*, Normal.normal*/};
     }
     public BaseType defaultMobType()
     {
@@ -39,5 +42,21 @@ public final class TypeUtil
             }
         }
         return this.defaultMobType();
+    }
+    @Nullable
+    public BaseType getMobType(int id)
+    {
+        if(id != 0)
+        {
+            final List<BaseType> mobList = List.of(this.getAllMobTypes());
+            for(BaseType baseType : mobList)
+            {
+                if(baseType.getId() == id)
+                {
+                    return baseType;
+                }
+            }
+        }
+        return null;
     }
 }

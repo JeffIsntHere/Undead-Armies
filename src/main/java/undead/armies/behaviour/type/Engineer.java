@@ -6,11 +6,17 @@ public class Engineer extends BaseType
     @Override
     public float chance()
     {
-        return 0.1f;
+        return 0.15f;
     }
     @Override
     public int actionCooldown()
     {
         return 10;
+    }
+
+    @Override
+    public int getId()
+    {
+        return 1;
     }
 }

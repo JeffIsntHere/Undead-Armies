@@ -2,6 +2,7 @@ package undead.armies.behaviour.single.task;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+import undead.armies.behaviour.single.Single;
 import undead.armies.parser.config.type.BooleanType;
 
 import java.util.ArrayList;
@@ -12,27 +13,27 @@ public final class TaskUtil
     public BooleanType enableSprintTask = new BooleanType("enable", true);
     public BooleanType enableGrabTask = new BooleanType("enable", true);
     public BooleanType enableJumpTask = new BooleanType("enable", true);
-    public ArrayList<BaseTask> getTaskPool()
+    public ArrayList<BaseTask> getTaskPool(@NotNull final Single single)
     {
         final ArrayList<BaseTask> output = new ArrayList<>();
-        if(this.enableSprintTask.value)
+        if(this.enableSprintTask.value && single.baseType.canDoTask(SprintTask.class))
         {
             output.add(new SprintTask());
         }
-        if(this.enableGrabTask.value)
+        if(this.enableGrabTask.value && single.baseType.canDoTask(GrabTask.class))
         {
             output.add(new GrabTask());
         }
-        if(this.enableJumpTask.value)
+        if(this.enableJumpTask.value && single.baseType.canDoTask(JumpTask.class))
         {
             output.add(new JumpTask());
         }
         return output;
     }
     @NotNull
-    public Pair<Integer, BaseTask> getTask()
+    public Pair<Integer, BaseTask> getTask(@NotNull final Single single)
     {
-        final ArrayList<BaseTask> taskPool = this.getTaskPool();
+        final ArrayList<BaseTask> taskPool = this.getTaskPool(single);
         if(taskPool.isEmpty())
         {
             return Pair.of(0, null);

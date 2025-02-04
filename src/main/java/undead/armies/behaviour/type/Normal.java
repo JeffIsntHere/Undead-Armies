@@ -6,11 +6,19 @@ public class Normal extends BaseType
     @Override
     public float chance()
     {
-        return 0.6f;
+        return 0.7f;
     }
+
     @Override
     public int actionCooldown()
     {
         return 20;
     }
+
+    @Override
+    public int getId()
+    {
+        return 3;
+    }
+
 }
