@@ -2,7 +2,7 @@ package undead.armies.parser.config.type;
 
 public class DecimalType extends BaseType
 {
-    public double value = 0.0;
+    public double value;
 
     @Override
     public void save(String string)
@@ -11,7 +11,6 @@ public class DecimalType extends BaseType
         try
         {
             this.value = Double.valueOf(string);
-            super.set = true;
         }
         catch (NumberFormatException e)
         {

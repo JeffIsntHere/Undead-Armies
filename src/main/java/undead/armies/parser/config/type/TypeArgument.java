@@ -1,13 +1,15 @@
 package undead.armies.parser.config.type;
 
+import undead.armies.parser.config.Config;
+
 public class TypeArgument
 {
     public final char[] query;
     public final BaseType type;
-    public TypeArgument(final BaseType type, final String name)
+    public TypeArgument(final BaseType type)
     {
         this.type = type;
-        this.query = name.toCharArray();
+        this.query = type.name.toCharArray();
     }
     public boolean compare(final String string)
     {
@@ -20,5 +22,18 @@ public class TypeArgument
             }
         }
         return true;
+    }
+    @Override
+    public boolean equals(Object other)
+    {
+        if(!(other instanceof TypeArgument))
+        {
+            return false;
+        }
+        return ((TypeArgument) other).type.equals(this.type);
+    }
+    public String toString()
+    {
+        return type.toString();
     }
 }

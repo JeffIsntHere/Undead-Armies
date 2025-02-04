@@ -28,6 +28,10 @@ public class Config
         ArrayList<StringPair> past;
         ArrayList<StringPair> present = this.data;
         int currentIndex = 0;
+        if(chars.length == 0)
+        {
+            return null;
+        }
         do
         {
             past = present;
@@ -46,11 +50,7 @@ public class Config
             currentIndex++;
         }
         while(!present.isEmpty() && (currentIndex < chars.length));
-        if(past == this.data)
-        {
-            return (present.isEmpty()) ? null : present.getFirst().right;
-        }
-        return past.getFirst().right;
+        return (present.isEmpty()) ? ((currentIndex < chars.length) ? null : past.getFirst().right) : present.getFirst().right;
     }
     public void process()
     {
@@ -76,5 +76,9 @@ public class Config
     public Config(@NotNull final String name)
     {
         this.name = name;
+    }
+    public String toString()
+    {
+        return this.name;
     }
 }

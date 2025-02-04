@@ -12,17 +12,60 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import undead.armies.parser.config.Config;
+import undead.armies.parser.config.ConfigParser;
+import undead.armies.parser.config.type.TypeArgument;
 import undead.armies.parser.loot.Loot;
 import undead.armies.parser.loot.LootParser;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class Registry
 {
     public static int reloadLoot(CommandContext<CommandSourceStack> commandContext)
     {
+        LootParser.instance.reload();
         commandContext.getSource().sendSuccess(() -> Component.translatable("successfully reloaded!"), true);
         commandContext.getSource().sendSuccess(() -> Component.translatable("loaded: " + LootParser.instance.loots.size() + " items."), true);
+        return 1;
+    }
+    public static int reloadConfig(CommandContext<CommandSourceStack> commandContext)
+    {
+        ConfigParser.instance.reload();
+        commandContext.getSource().sendSuccess(() -> Component.translatable("successfully reloaded!"), true);
+        return 1;
+    }
+    public static int dumpConfig(CommandContext<CommandSourceStack> commandContext)
+    {
+        final Entity sender = commandContext.getSource().getEntity();
+        final ArrayList<Config> configs = ConfigParser.instance.getConfigCache();
+        if(sender == null)
+        {
+            UndeadArmies.logger.info("");
+            for(Config config : configs)
+            {
+                UndeadArmies.logger.info("Config: " + config);
+                for(TypeArgument typeArgument : config.typeArguments)
+                {
+                    UndeadArmies.logger.info(">" + typeArgument);
+                }
+                UndeadArmies.logger.info("");
+            }
+        }
+        else
+        {
+            sender.sendSystemMessage(Component.literal(""));
+            for(Config config : configs)
+            {
+                sender.sendSystemMessage(Component.literal("§7Config: §f" + config));
+                for(TypeArgument typeArgument : config.typeArguments)
+                {
+                    sender.sendSystemMessage(Component.literal("§7>§f" + typeArgument));
+                }
+                sender.sendSystemMessage(Component.literal(""));
+            }
+        }
         return 1;
     }
     public static int getPower(CommandContext<CommandSourceStack> commandContext, Collection<? extends Entity> entities)
@@ -125,6 +168,8 @@ public class Registry
                                 .executes(commandContext -> Registry.getPower(commandContext, EntityArgument.getEntities(commandContext, "targets")))
                         )
                 )
+                .then(Commands.literal("reloadConfig").executes(Registry::reloadConfig))
+                .then(Commands.literal("dumpConfig").executes(Registry::dumpConfig))
         );
     }
 }

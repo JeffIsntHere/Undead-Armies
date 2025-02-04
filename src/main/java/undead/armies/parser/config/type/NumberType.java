@@ -2,7 +2,7 @@ package undead.armies.parser.config.type;
 
 public class NumberType extends BaseType
 {
-    public int value = 0;
+    public int value;
 
     @Override
     public void save(String string)
@@ -11,7 +11,6 @@ public class NumberType extends BaseType
         try
         {
             this.value = Integer.valueOf(string);
-            super.set = true;
         }
         catch(NumberFormatException e)
         {

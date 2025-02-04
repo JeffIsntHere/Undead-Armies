@@ -2,6 +2,7 @@ package undead.armies.parser.config;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import undead.armies.UndeadArmies;
 import undead.armies.parser.File;
 import undead.armies.parser.Parser;
 import undead.armies.parser.config.type.TypeArgument;
@@ -38,12 +39,15 @@ public class ConfigParser extends Parser
             {
                 this.config = null;
                 super.parentCount = 0;
-                super.terminate = true;
                 return;
             }
             final String right = super.parseValueToKey();
             this.config.add(new StringPair(left,right));
         }
+    }
+    public ArrayList<Config> getConfigCache()
+    {
+        return ConfigParser.configCache;
     }
     @Nullable
     protected Config getConfigFromCache(@NotNull final String name)
@@ -52,6 +56,11 @@ public class ConfigParser extends Parser
         ArrayList<Config> past;
         ArrayList<Config> present = ConfigParser.configCache;
         int currentIndex = 0;
+        if(chars.length == 0)
+        {
+            return null;
+        }
+        UndeadArmies.logger.debug("searching for config: " + name);
         do
         {
             past = present;
@@ -70,11 +79,7 @@ public class ConfigParser extends Parser
             currentIndex++;
         }
         while(!present.isEmpty() && (currentIndex < chars.length));
-        if(past == ConfigParser.configCache)
-        {
-            return (present.isEmpty()) ? null : present.getFirst();
-        }
-        return past.getFirst();
+        return (present.isEmpty()) ? ((currentIndex < chars.length) ? null : past.getFirst()) : present.getFirst();
     }
     public void reload()
     {

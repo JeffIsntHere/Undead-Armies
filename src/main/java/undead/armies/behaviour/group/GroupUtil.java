@@ -2,13 +2,10 @@ package undead.armies.behaviour.group;
 
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
-import undead.armies.UndeadArmies;
 import undead.armies.behaviour.group.task.selector.MineTaskSelector;
 import undead.armies.behaviour.group.task.selector.StackTaskSelector;
 import undead.armies.behaviour.group.task.selector.TaskSelectorStorage;
 import undead.armies.behaviour.single.Single;
-import undead.armies.parser.config.ConfigParser;
-import undead.armies.parser.config.type.BaseType;
 import undead.armies.parser.config.type.BooleanType;
 
 import java.util.ArrayList;
@@ -17,17 +14,17 @@ public final class GroupUtil
 {
     public static final GroupUtil instance = new GroupUtil();
     private GroupUtil(){}
-    public boolean enableStacking = true;
-    public boolean enableMining = true;
+    public BooleanType enableStacking = new BooleanType("enable", true);
+    public BooleanType enableMining = new BooleanType("enable", true);
 
     //mix into this if you want to add your own tasks.
     public void setTaskSelectors(@NotNull final ArrayList<TaskSelectorStorage> taskSelectorStorages)
     {
-        if(this.enableStacking)
+        if(this.enableStacking.value)
         {
             taskSelectorStorages.add(new TaskSelectorStorage(StackTaskSelector.instance, StackTaskSelector.baseWeight));
         }
-        if(this.enableMining)
+        if(this.enableMining.value)
         {
             taskSelectorStorages.add(new TaskSelectorStorage(MineTaskSelector.instance, MineTaskSelector.baseWeight));
         }

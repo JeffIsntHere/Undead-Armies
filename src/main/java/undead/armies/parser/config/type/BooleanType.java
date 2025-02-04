@@ -2,12 +2,12 @@ package undead.armies.parser.config.type;
 
 public class BooleanType extends BaseType
 {
-    public boolean value = true;
+    public boolean value;
 
     @Override
     public void save(final String string)
     {
-        if(string.length() == 0)
+        if(string.isEmpty())
         {
             return;
         }
@@ -15,12 +15,10 @@ public class BooleanType extends BaseType
         if(firstChar == 't' || firstChar == 'y')
         {
             this.value = true;
-            this.set = true;
         }
         else if(firstChar == 'f' || firstChar == 'n')
         {
             this.value = false;
-            this.set = true;
         }
     }
 
