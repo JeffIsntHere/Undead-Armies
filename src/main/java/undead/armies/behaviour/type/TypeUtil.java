@@ -2,7 +2,9 @@ package undead.armies.behaviour.type;
 
 import net.minecraft.util.RandomSource;
 import org.jetbrains.annotations.Nullable;
+import undead.armies.parser.config.type.BooleanType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -11,9 +13,21 @@ public final class TypeUtil
     public static final TypeUtil instance = new TypeUtil();
     private TypeUtil(){}
     //if you are trying to add another type, please use mixins to override this method.
+    public BooleanType enableEngineer = new BooleanType("enable", true);
+    public BooleanType enableGiant = new BooleanType("enable", true);
     public BaseType[] getAllMobTypes()
     {
-        return new BaseType[]{/*Engineer.engineer, */Giant.giant/*, Normal.normal*/};
+        final ArrayList<BaseType> types = new ArrayList<>();
+        types.add(Normal.normal);
+        if(this.enableEngineer.value)
+        {
+            types.add(Engineer.engineer);
+        }
+        if(this.enableGiant.value)
+        {
+            types.add(Giant.giant);
+        }
+        return (BaseType[]) types.toArray();
     }
     public BaseType defaultMobType()
     {

@@ -4,13 +4,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import undead.armies.UndeadArmies;
 import undead.armies.Util;
 import undead.armies.behaviour.group.task.BaseTask;
 import undead.armies.behaviour.group.task.Mine;
 import undead.armies.behaviour.single.Single;
-import undead.armies.parser.config.ConfigParser;
-import undead.armies.parser.config.type.BaseType;
 
 import java.util.ArrayList;
 

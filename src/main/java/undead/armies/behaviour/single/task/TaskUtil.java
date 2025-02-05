@@ -3,6 +3,7 @@ package undead.armies.behaviour.single.task;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import undead.armies.behaviour.single.Single;
+import undead.armies.behaviour.single.task.mine.MineTask;
 import undead.armies.parser.config.type.BooleanType;
 
 import java.util.ArrayList;
@@ -13,6 +14,9 @@ public final class TaskUtil
     public BooleanType enableSprintTask = new BooleanType("enable", true);
     public BooleanType enableGrabTask = new BooleanType("enable", true);
     public BooleanType enableJumpTask = new BooleanType("enable", true);
+    public BooleanType enableStackTask = new BooleanType("enable", true);
+    public BooleanType enableMineTask = new BooleanType("enable",true);
+    public BooleanType enableDismountTask = new BooleanType("enable",true);
     public ArrayList<BaseTask> getTaskPool(@NotNull final Single single)
     {
         final ArrayList<BaseTask> output = new ArrayList<>();
@@ -27,6 +31,18 @@ public final class TaskUtil
         if(this.enableJumpTask.value && single.baseType.canDoTask(JumpTask.class))
         {
             output.add(new JumpTask());
+        }
+        if(this.enableStackTask.value && single.baseType.canDoTask(StackTask.class))
+        {
+            output.add(new StackTask());
+        }
+        if(this.enableMineTask.value && single.baseType.canDoTask(MineTask.class))
+        {
+            output.add(new MineTask());
+        }
+        if(this.enableDismountTask.value && single.baseType.canDoTask(DismountTask.class))
+        {
+            output.add(new DismountTask());
         }
         return output;
     }
