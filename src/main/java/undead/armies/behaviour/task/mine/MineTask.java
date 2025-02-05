@@ -1,4 +1,4 @@
-package undead.armies.behaviour.single.task.mine;
+package undead.armies.behaviour.task.mine;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
@@ -7,7 +7,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import undead.armies.Util;
 import undead.armies.behaviour.single.Single;
-import undead.armies.behaviour.single.task.BaseTask;
+import undead.armies.behaviour.task.BaseTask;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package undead.armies.behaviour.single.task;
+package undead.armies.behaviour.task;
 
 import org.jetbrains.annotations.NotNull;
 import undead.armies.behaviour.single.Single;

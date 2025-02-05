@@ -1,4 +1,4 @@
-package undead.armies.behaviour.single.task;
+package undead.armies.behaviour.task;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -27,10 +27,15 @@ public class DismountTask extends BaseTask
             return false;
         }
         final AttributeInstance vehicleSpeed = ((LivingEntity) vehicle).getAttribute(Attributes.MOVEMENT_SPEED);
-        if(vehicleSpeed == null || vehicleSpeed.getValue() <= this.passengerSpeed.getValue())
+        if(vehicleSpeed == null || vehicleSpeed.getValue() + 0.1f < this.passengerSpeed.getValue())
         {
             single.pathfinderMob.stopRiding();
             return true;
+        }
+        final LivingEntity target = single.pathfinderMob.getTarget();
+        if(target != null && target.position().y < single.currentPosition.y)
+        {
+
         }
         return false;
     }

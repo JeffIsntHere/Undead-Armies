@@ -3,7 +3,7 @@ package undead.armies.behaviour.type;
 import org.jetbrains.annotations.NotNull;
 import undead.armies.behaviour.group.task.selector.BaseTaskSelector;
 import undead.armies.behaviour.single.Single;
-import undead.armies.behaviour.single.task.BaseTask;
+import undead.armies.behaviour.task.BaseTask;
 
 public abstract class BaseType
 {

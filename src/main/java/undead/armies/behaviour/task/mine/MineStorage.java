@@ -1,4 +1,4 @@
-package undead.armies.behaviour.single.task.mine;
+package undead.armies.behaviour.task.mine;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;

@@ -1,4 +1,4 @@
-package undead.armies.behaviour.single.task;
+package undead.armies.behaviour.task;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
