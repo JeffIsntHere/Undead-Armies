@@ -4,16 +4,18 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import undead.armies.behaviour.single.Single;
+import undead.armies.behaviour.Single;
 
 import java.util.List;
 
 public class MineStorage
 {
+    public static final float explosionMultiplier = 8.0f;
     public final List<BlockPos> blockPoss;
     public final Vec3 direction;
     public final Level level;
@@ -30,12 +32,13 @@ public class MineStorage
     {
         this.progress += single.baseType.getHitPower();
         final BlockState blockState = level.getBlockState(this.current);
-        final float explosionResistance = blockState.getBlock().getExplosionResistance();
+        final float explosionResistance = blockState.getBlock().getExplosionResistance() * MineStorage.explosionMultiplier;
         if(explosionResistance <= this.progress)
         {
             this.progress = 0;
             Block.dropResources(blockState, level, this.current);
             level.playSound(null, this.current, blockState.getSoundType(level, this.current, single.pathfinderMob).getBreakSound(), SoundSource.BLOCKS, 3.0f, 1.0f);
+            level.setBlock(this.current, Blocks.AIR.defaultBlockState(), 3);
             for(BlockPos blockPos : blockPoss)
             {
                 final BlockState nextBlockState = level.getBlockState(blockPos);
@@ -45,7 +48,6 @@ public class MineStorage
                 }
                 this.current = blockPos;
             }
-
         }
         else
         {

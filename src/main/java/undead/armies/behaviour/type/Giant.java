@@ -1,14 +1,12 @@
 package undead.armies.behaviour.type;
 
-import net.minecraft.server.commands.AttributeCommand;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import org.jetbrains.annotations.NotNull;
-import undead.armies.UndeadArmies;
-import undead.armies.behaviour.group.task.selector.BaseTaskSelector;
-import undead.armies.behaviour.group.task.selector.StackTaskSelector;
-import undead.armies.behaviour.single.Single;
+import undead.armies.behaviour.Single;
+import undead.armies.behaviour.task.BaseTask;
+import undead.armies.behaviour.task.StackTask;
 
 public class Giant extends BaseType
 {
@@ -59,8 +57,8 @@ public class Giant extends BaseType
     }
 
     @Override
-    public boolean canDoGroupTask(Class<? extends BaseTaskSelector> baseTaskSelector)
+    public boolean canDoTask(Class<? extends BaseTask> baseTaskSelector)
     {
-        return !baseTaskSelector.isAssignableFrom(StackTaskSelector.class);
+        return !baseTaskSelector.isAssignableFrom(StackTask.class);
     }
 }

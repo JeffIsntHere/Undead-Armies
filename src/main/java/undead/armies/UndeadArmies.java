@@ -10,7 +10,6 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import org.slf4j.Logger;
-import undead.armies.behaviour.group.GroupUtil;
 import undead.armies.behaviour.task.TaskUtil;
 import undead.armies.behaviour.type.TypeUtil;
 import undead.armies.parser.config.ConfigParser;

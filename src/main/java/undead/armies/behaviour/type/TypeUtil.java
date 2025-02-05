@@ -27,7 +27,8 @@ public final class TypeUtil
         {
             types.add(Giant.giant);
         }
-        return (BaseType[]) types.toArray();
+        final BaseType[] output = new BaseType[types.size()];
+        return types.toArray(output);
     }
     public BaseType defaultMobType()
     {

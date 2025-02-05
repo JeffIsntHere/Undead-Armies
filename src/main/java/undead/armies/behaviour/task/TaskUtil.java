@@ -2,7 +2,7 @@ package undead.armies.behaviour.task;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
-import undead.armies.behaviour.single.Single;
+import undead.armies.behaviour.Single;
 import undead.armies.behaviour.task.mine.MineTask;
 import undead.armies.parser.config.type.BooleanType;
 
@@ -17,6 +17,11 @@ public final class TaskUtil
     public BooleanType enableStackTask = new BooleanType("enable", true);
     public BooleanType enableMineTask = new BooleanType("enable",true);
     public BooleanType enableDismountTask = new BooleanType("enable",true);
+    //mix into this to add your own tasks!
+    public ArrayList<BaseTask> finalizeTaskPool( @NotNull final ArrayList<BaseTask> output)
+    {
+        return output;
+    }
     public ArrayList<BaseTask> getTaskPool(@NotNull final Single single)
     {
         final ArrayList<BaseTask> output = new ArrayList<>();
@@ -44,7 +49,7 @@ public final class TaskUtil
         {
             output.add(new DismountTask());
         }
-        return output;
+        return this.finalizeTaskPool(output);
     }
     @NotNull
     public Pair<Integer, BaseTask> getTask(@NotNull final Single single)
@@ -58,8 +63,8 @@ public final class TaskUtil
         BaseTask currentTask = firstTask;
         for(int i = 1; i < taskPool.size(); i++)
         {
-            firstTask.nextTask = taskPool.get(i);
-            currentTask = firstTask.nextTask;
+            currentTask.nextTask = taskPool.get(i);
+            currentTask = currentTask.nextTask;
         }
         currentTask.nextTask = firstTask;
         return Pair.of(taskPool.size(), firstTask);

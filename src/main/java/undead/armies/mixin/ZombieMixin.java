@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import undead.armies.base.GetSingle;
-import undead.armies.behaviour.single.Single;
+import undead.armies.behaviour.Single;
 
 @Mixin(Zombie.class)
 public abstract class ZombieMixin extends Monster implements GetSingle

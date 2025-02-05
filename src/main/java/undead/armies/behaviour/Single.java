@@ -1,10 +1,11 @@
-package undead.armies.behaviour.single;
+package undead.armies.behaviour;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+import undead.armies.UndeadArmies;
 import undead.armies.base.Resettable;
 import undead.armies.behaviour.task.BaseTask;
 import undead.armies.behaviour.task.TaskUtil;
@@ -47,20 +48,19 @@ public class Single implements Resettable
             return;
         }
         this.currentPosition = pathfinderMob.position();
-        if(this.pathfinderMob.tickCount % this.baseType.actionCooldown() != 0)
+
+        final int upperBound = this.currentTaskLength;
+        for(int i = 0; i < upperBound; i++)
         {
-            final int upperBound = this.currentTaskLength;
-            for(int i = 0; i < upperBound; i++)
+            final boolean result = this.currentTask.handleTask(this);
+            this.currentTask = this.currentTask.nextTask;
+            if(result)
             {
-                if(this.currentTask.handleTask(this))
-                {
-                    break;
-                }
-                this.currentTask = this.currentTask.nextTask;
+                break;
             }
-            return;
         }
         this.baseType.additionalTick(this);
+
         this.lastPosition = this.currentPosition;
     }
     public Single(final PathfinderMob pathfinderMob)

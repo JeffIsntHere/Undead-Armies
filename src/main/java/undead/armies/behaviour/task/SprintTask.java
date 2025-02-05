@@ -3,7 +3,7 @@ package undead.armies.behaviour.task;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import org.jetbrains.annotations.NotNull;
-import undead.armies.behaviour.single.Single;
+import undead.armies.behaviour.Single;
 
 public class SprintTask extends BaseTask
 {

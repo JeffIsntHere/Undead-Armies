@@ -11,7 +11,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import undead.armies.Util;
 import undead.armies.behaviour.ClosestBlockPos;
-import undead.armies.behaviour.single.Single;
+import undead.armies.behaviour.Single;
 
 import java.util.ArrayDeque;
 
