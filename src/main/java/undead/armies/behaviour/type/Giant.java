@@ -16,22 +16,11 @@ public class Giant extends BaseType
     {
         return 0.15f;
     }
-    @Override
-    public int actionCooldown()
-    {
-        return 30;
-    }
 
     @Override
     public int getId()
     {
         return 2;
-    }
-
-    @Override
-    public int getHitPower()
-    {
-        return 10;
     }
 
     @Override

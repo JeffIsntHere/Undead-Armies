@@ -7,9 +7,7 @@ import undead.armies.behaviour.task.BaseTask;
 public abstract class BaseType
 {
     public abstract float chance();
-    public abstract int actionCooldown();
     public abstract int getId(); //returns the id.
-    public int getHitPower(){return 1;}
     public void init(final @NotNull Single single){} //called once every time a mob's type is selected.
     public boolean canHoldItems() {return true;} //can it hold pickaxes? swords? etc...
     public boolean canWearArmor() {return true;} //can it wear leather helmet? iron chestplate? etc...

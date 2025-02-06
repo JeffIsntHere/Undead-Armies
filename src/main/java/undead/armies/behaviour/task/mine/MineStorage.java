@@ -16,6 +16,7 @@ import java.util.List;
 public class MineStorage
 {
     public static final float explosionMultiplier = 8.0f;
+    public static final float maxExplosionResistance = 100 * MineStorage.explosionMultiplier;
     public final List<BlockPos> blockPoss;
     public final Vec3 direction;
     public final Level level;
@@ -30,7 +31,7 @@ public class MineStorage
     }
     public void tick(@NotNull final Single single)
     {
-        this.progress += single.baseType.getHitPower();
+        this.progress += 1;
         final BlockState blockState = level.getBlockState(this.current);
         final float explosionResistance = blockState.getBlock().getExplosionResistance() * MineStorage.explosionMultiplier;
         if(explosionResistance <= this.progress)
@@ -42,7 +43,7 @@ public class MineStorage
             for(BlockPos blockPos : blockPoss)
             {
                 final BlockState nextBlockState = level.getBlockState(blockPos);
-                if(nextBlockState.isEmpty() || nextBlockState.getBlock() instanceof LiquidBlock)
+                if(nextBlockState.isEmpty() || nextBlockState.getBlock().getExplosionResistance() > MineStorage.maxExplosionResistance || nextBlockState.getBlock() instanceof LiquidBlock)
                 {
                     continue;
                 }

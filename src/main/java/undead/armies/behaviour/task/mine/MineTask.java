@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import undead.armies.Util;
 import undead.armies.behaviour.Single;
 import undead.armies.behaviour.task.BaseTask;
+import undead.armies.behaviour.type.Engineer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -88,9 +89,15 @@ public class MineTask extends BaseTask
         return zeroZero.getLast();
     }
 
+    public int triggerAfter = 0;
     @Override
     public boolean handleTask(@NotNull Single single)
     {
+        this.triggerAfter--;
+        if(triggerAfter > 0)
+        {
+            return false;
+        }
         if(Util.isMoving(single))
         {
             return false;
@@ -100,6 +107,7 @@ public class MineTask extends BaseTask
         {
             return false;
         }
+        this.triggerAfter = (single.baseType instanceof Engineer) ? 15 : 30;
         MineTask.getMineTask(single, target.position().subtract(single.currentPosition)).tick(single);
         return true;
     }

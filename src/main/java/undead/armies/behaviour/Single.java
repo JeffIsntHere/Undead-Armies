@@ -10,6 +10,7 @@ import undead.armies.base.Resettable;
 import undead.armies.behaviour.task.BaseTask;
 import undead.armies.behaviour.task.TaskUtil;
 import undead.armies.behaviour.type.BaseType;
+import undead.armies.behaviour.type.Normal;
 import undead.armies.behaviour.type.TypeUtil;
 import undead.armies.parser.loot.LootParser;
 
@@ -18,7 +19,7 @@ public class Single implements Resettable
     @NotNull
     public final PathfinderMob pathfinderMob;
     @NotNull
-    public final BaseType baseType;
+    public BaseType baseType;
     @NotNull
     public BaseTask currentTask;
     public int currentTaskLength;
@@ -63,15 +64,9 @@ public class Single implements Resettable
 
         this.lastPosition = this.currentPosition;
     }
-    public Single(final PathfinderMob pathfinderMob)
+    public void setMobType(final int id)
     {
-        this.pathfinderMob = pathfinderMob;
-        final BaseType typeFromId;
-        {
-            final CompoundTag data = new CompoundTag();
-            pathfinderMob.readAdditionalSaveData(data);
-            typeFromId = TypeUtil.instance.getMobType(data.getInt("MobType"));
-        }
+        final BaseType typeFromId = TypeUtil.instance.getMobType(id);
         if(typeFromId == null)
         {
             this.baseType = TypeUtil.instance.getMobType(pathfinderMob.getRandom());
@@ -81,6 +76,11 @@ public class Single implements Resettable
         {
             this.baseType = typeFromId;
         }
+    }
+    public Single(final PathfinderMob pathfinderMob)
+    {
+        this.pathfinderMob = pathfinderMob;
+        this.baseType = Normal.normal;
         this.lastPosition = pathfinderMob.position();
         this.currentPosition = this.lastPosition;
         final Pair<Integer, BaseTask> outputValue = TaskUtil.instance.getTask(this);

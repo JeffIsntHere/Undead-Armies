@@ -44,6 +44,7 @@ public class UndeadArmies
         ConfigParser.instance.registerConfig("jumping", new TypeArgument(TaskUtil.instance.enableJumpTask));
         ConfigParser.instance.registerConfig("engineer", new TypeArgument(TypeUtil.instance.enableEngineer));
         ConfigParser.instance.registerConfig("giant", new TypeArgument(TypeUtil.instance.enableGiant));
+        ConfigParser.instance.reload();
     }
     @SubscribeEvent
     public void serverStartedEvent(ServerStartedEvent serverStartedEvent)
@@ -51,6 +52,5 @@ public class UndeadArmies
         LootParser.instance.reload();
         serverStartedEvent.getServer().sendSystemMessage(Component.literal("successfully reloaded!"));
         serverStartedEvent.getServer().sendSystemMessage(Component.literal("loaded: " + LootParser.instance.loots.size() + " items."));
-        ConfigParser.instance.reload();
     }
 }

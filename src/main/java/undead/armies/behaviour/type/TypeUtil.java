@@ -2,6 +2,7 @@ package undead.armies.behaviour.type;
 
 import net.minecraft.util.RandomSource;
 import org.jetbrains.annotations.Nullable;
+import undead.armies.UndeadArmies;
 import undead.armies.parser.config.type.BooleanType;
 
 import java.util.ArrayList;
@@ -61,6 +62,7 @@ public final class TypeUtil
     @Nullable
     public BaseType getMobType(int id)
     {
+        UndeadArmies.logger.debug("found id " + id);
         if(id != 0)
         {
             final List<BaseType> mobList = List.of(this.getAllMobTypes());

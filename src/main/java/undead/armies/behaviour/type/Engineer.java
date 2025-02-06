@@ -9,12 +9,6 @@ public class Engineer extends BaseType
         return 0.15f;
     }
     @Override
-    public int actionCooldown()
-    {
-        return 10;
-    }
-
-    @Override
     public int getId()
     {
         return 1;
