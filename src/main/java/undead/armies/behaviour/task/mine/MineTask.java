@@ -17,6 +17,7 @@ public class MineTask extends BaseTask
 {
     public static final HashMap<ChunkPos, ArrayList<MineStorage>> tasks = new HashMap<>();
     public static final double minimumDotResult = 0.2f;
+    public static final double maxMiningDistance = 5.0d;
     public static int getPositiveOrNegativeOne(final double d)
     {
         if(d < 0)
@@ -67,6 +68,11 @@ public class MineTask extends BaseTask
         return output;
     }
 
+    public static Vec3 blockPosToVec3(@NotNull final BlockPos blockPos)
+    {
+        return new Vec3(blockPos.getX(), blockPos.getY(), blockPos.getZ());
+    }
+
     public static MineStorage getMineTask(@NotNull final Single single, @NotNull final Vec3 directionToTarget)
     {
         final ChunkPos currentChunkPos = single.pathfinderMob.chunkPosition();
@@ -78,9 +84,10 @@ public class MineTask extends BaseTask
             zeroZero.add(new MineStorage(MineTask.getBlockPosForSingle(single, directionToTarget), direction, single.pathfinderMob.level()));
             MineTask.tasks.put(currentChunkPos, zeroZero);
         }
+        final Vec3 singlePosition = single.currentPosition;
         for(MineStorage mineStorage : zeroZero)
         {
-            if(direction.dot(mineStorage.direction) > MineTask.minimumDotResult)
+            if(direction.dot(mineStorage.direction) > MineTask.minimumDotResult && singlePosition.distanceTo(MineTask.blockPosToVec3(mineStorage.current)) < MineTask.maxMiningDistance)
             {
                 return mineStorage;
             }
