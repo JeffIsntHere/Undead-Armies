@@ -81,10 +81,11 @@ public class MineTask extends BaseTask
         if(zeroZero == null)
         {
             zeroZero = new ArrayList<>();
-            zeroZero.add(new MineStorage(MineTask.getBlockPosForSingle(single, directionToTarget), direction, single.pathfinderMob.level()));
+            zeroZero.add(new MineStorage(MineTask.getBlockPosForSingle(single, direction), direction, single.pathfinderMob.level()));
             MineTask.tasks.put(currentChunkPos, zeroZero);
         }
         final Vec3 singlePosition = single.currentPosition;
+        zeroZero.removeIf(mineStorage -> mineStorage.finished);
         for(MineStorage mineStorage : zeroZero)
         {
             if(direction.dot(mineStorage.direction) > MineTask.minimumDotResult && singlePosition.distanceTo(MineTask.blockPosToVec3(mineStorage.current)) < MineTask.maxMiningDistance)
@@ -92,7 +93,7 @@ public class MineTask extends BaseTask
                 return mineStorage;
             }
         }
-        zeroZero.add(new MineStorage(MineTask.getBlockPosForSingle(single, directionToTarget), direction, single.pathfinderMob.level()));
+        zeroZero.add(new MineStorage(MineTask.getBlockPosForSingle(single, direction), direction, single.pathfinderMob.level()));
         return zeroZero.getLast();
     }
 
@@ -110,7 +111,7 @@ public class MineTask extends BaseTask
             return false;
         }
         final LivingEntity target = single.pathfinderMob.getTarget();
-        if(target == null || target.position().y <= single.currentPosition.y || single.pathfinderMob.isPassenger() || single.pathfinderMob.isVehicle())
+        if(target == null || target.position().y + 1 < single.currentPosition.y)
         {
             return false;
         }
