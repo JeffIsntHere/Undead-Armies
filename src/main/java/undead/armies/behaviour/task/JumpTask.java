@@ -10,7 +10,7 @@ import net.minecraft.world.level.material.LavaFluid;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import undead.armies.Util;
-import undead.armies.behaviour.ClosestBlockPos;
+import undead.armies.misc.RENAMELATER;
 import undead.armies.behaviour.Single;
 
 import java.util.ArrayDeque;
@@ -62,7 +62,7 @@ public class JumpTask extends BaseTask
     }
     protected int triggerAfter = 0;
     protected final ArrayDeque<BlockPos> blockPosMemory = new ArrayDeque<>();
-    protected void addToClosestBlockPosIfNotLastBlockPos(final ClosestBlockPos closestBlockPos, final BlockPos blockPos)
+    protected void addToClosestBlockPosIfNotLastBlockPos(final RENAMELATER RENAMELATER, final BlockPos blockPos)
     {
         for(BlockPos lastBlockPos : this.blockPosMemory)
         {
@@ -71,7 +71,7 @@ public class JumpTask extends BaseTask
                 return;
             }
         }
-        closestBlockPos.add(blockPos);
+        RENAMELATER.add(blockPos);
     }
     @Override
     public boolean handleTask(@NotNull Single single)
@@ -82,11 +82,9 @@ public class JumpTask extends BaseTask
         }
         triggerAfter = single.pathfinderMob.tickCount + 20;
         final LivingEntity target = single.pathfinderMob.getTarget();
-        final Vec3 targetPosition = target.position();
-        final double distance = single.currentPosition.distanceTo(targetPosition);
-        final ClosestBlockPos closestBlockPos = new ClosestBlockPos(targetPosition);
         final BlockPos startingPoint = single.pathfinderMob.blockPosition();
         final Level level = single.pathfinderMob.level();
+        final RENAMELATER RENAMELATER = new RENAMELATER(target.blockPosition(), level, startingPoint);
         for(Vec3i vec3i : locationTable)
         {
             final BlockPos middle = startingPoint.offset(vec3i);
@@ -106,32 +104,32 @@ public class JumpTask extends BaseTask
                         final BlockPos belowBottom = bottom.below();
                         if(blockIsGood(bottom.below(), level))
                         {
-                            this.addToClosestBlockPosIfNotLastBlockPos(closestBlockPos, belowBottom);
+                            this.addToClosestBlockPosIfNotLastBlockPos(RENAMELATER, belowBottom);
                         }
                     }
                     else if(blockIsNotLava(bottomBlockState))
                     {
-                        this.addToClosestBlockPosIfNotLastBlockPos(closestBlockPos, bottom);
+                        this.addToClosestBlockPosIfNotLastBlockPos(RENAMELATER, bottom);
                     }
                 }
                 else if(blockIsNotLava(belowMiddleBlockState) && level.getBlockState(middle.above()).isEmpty())
                 {
                     //?001?
-                    this.addToClosestBlockPosIfNotLastBlockPos(closestBlockPos, belowMiddle);
+                    this.addToClosestBlockPosIfNotLastBlockPos(RENAMELATER, belowMiddle);
                 }
             }
             else if(blockIsNotLava(middleBlockState) && level.getBlockState(middle.above()).isEmpty() && level.getBlockState(middle.above(2)).isEmpty())
             {
                 //001??
-                this.addToClosestBlockPosIfNotLastBlockPos(closestBlockPos, middle);
+                this.addToClosestBlockPosIfNotLastBlockPos(RENAMELATER, middle);
             }
         }
         final int blockPosMemorySize = blockPosMemory.size();
-        if(closestBlockPos.closest != null)
+        if(RENAMELATER.closest != null)
         {
             blockPosMemory.add(startingPoint.below());
             single.pathfinderMob.lookAt(target, 180.0f, 180.0f);
-            single.pathfinderMob.setDeltaMovement(single.pathfinderMob.getDeltaMovement().add(Util.getThrowVelocity(single.currentPosition, new Vec3(closestBlockPos.closest.getX() + 0.5d, closestBlockPos.closest.getY() + 1.0d, closestBlockPos.closest.getZ() + 0.5d), 5.0f, 0.5f)));
+            single.pathfinderMob.setDeltaMovement(single.pathfinderMob.getDeltaMovement().add(Util.getThrowVelocity(single.currentPosition, new Vec3(RENAMELATER.closest.getX() + 0.5d, RENAMELATER.closest.getY() + 1.0d, RENAMELATER.closest.getZ() + 0.5d), 5.0f, 0.5f)));
         }
         else if(blockPosMemorySize > 0)
         {
