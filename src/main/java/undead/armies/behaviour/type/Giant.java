@@ -4,6 +4,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import org.jetbrains.annotations.NotNull;
+import undead.armies.UndeadArmies;
 import undead.armies.behaviour.Single;
 import undead.armies.behaviour.task.BaseTask;
 import undead.armies.behaviour.task.StackTask;
@@ -26,6 +27,7 @@ public class Giant extends BaseType
     @Override
     public void init(final @NotNull Single single)
     {
+        UndeadArmies.logger.debug("added giant!");
         final AttributeMap attributeMap = single.pathfinderMob.getAttributes();
         final AttributeInstance scaleAttribute = attributeMap.getInstance(Attributes.SCALE);
         final AttributeInstance attackAttribute = attributeMap.getInstance(Attributes.ATTACK_DAMAGE);

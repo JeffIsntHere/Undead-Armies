@@ -62,7 +62,6 @@ public final class TypeUtil
     @Nullable
     public BaseType getMobType(int id)
     {
-        UndeadArmies.logger.debug("found id " + id);
         if(id != 0)
         {
             final List<BaseType> mobList = List.of(this.getAllMobTypes());
