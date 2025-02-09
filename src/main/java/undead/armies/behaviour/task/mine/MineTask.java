@@ -5,10 +5,11 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import undead.armies.Util;
+import undead.armies.misc.Util;
 import undead.armies.behaviour.Single;
 import undead.armies.behaviour.task.BaseTask;
 import undead.armies.behaviour.type.Engineer;
+import undead.armies.misc.PathfindingTracker;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -96,26 +97,28 @@ public class MineTask extends BaseTask
         zeroZero.add(new MineStorage(MineTask.getBlockPosForSingle(single, direction), direction, single.pathfinderMob.level()));
         return zeroZero.getLast();
     }
-
+    protected PathfindingTracker pathfindingTracker = new PathfindingTracker(30);
     public int triggerAfter = 0;
     @Override
     public boolean handleTask(@NotNull Single single)
     {
+        this.pathfindingTracker.tick();
         this.triggerAfter--;
         if(triggerAfter > 0)
         {
             return false;
         }
+        this.triggerAfter = (single.baseType instanceof Engineer) ? 15 : 30;
         if(Util.isMoving(single))
         {
+            this.pathfindingTracker.hasAttemptedPathfinding = false;
             return false;
         }
         final LivingEntity target = single.pathfinderMob.getTarget();
-        if(target == null || target.position().y + 1 < single.currentPosition.y)
+        if(target == null || target.position().y + 1 < single.currentPosition.y || !this.pathfindingTracker.tick(single))
         {
             return false;
         }
-        this.triggerAfter = (single.baseType instanceof Engineer) ? 15 : 30;
         MineTask.getMineTask(single, target.position().subtract(single.currentPosition)).tick(single);
         return true;
     }

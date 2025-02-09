@@ -1,4 +1,4 @@
-package undead.armies;
+package undead.armies.misc;
 
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;

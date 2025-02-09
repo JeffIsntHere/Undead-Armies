@@ -6,19 +6,20 @@ import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import undead.armies.UndeadArmies;
+import undead.armies.misc.blockcast.BlockRayCast;
 
-public class RENAMELATER
+public class ClosestUnobstructedBlock
 {
     public final BlockPos position;
     public final Level level;
     public final BlockPos renameLater;
     public BlockPos closest = null;
     protected double distance = Double.MAX_VALUE;
-    public RENAMELATER(@NotNull final BlockPos position, @NotNull final Level level, @NotNull final BlockPos renameLater)
+    public ClosestUnobstructedBlock(@NotNull final BlockPos position, @NotNull final Level level, @NotNull final BlockPos renameLater)
     {
         this.position = position;
         this.level = level;
-        this.renameLater = renameLater;
+        this.renameLater = renameLater.above();
     }
     public void add(@NotNull final BlockPos blockPos)
     {
@@ -28,19 +29,17 @@ public class RENAMELATER
             return;
         }
         UndeadArmies.logger.debug(this.renameLater.toString());
-        final RENAMELATER2 RENAMELATER2 = new RENAMELATER2(this.renameLater, blockPos.above());
-        int counter = 0;
-        do
+        final BlockRayCast BlockRayCast = new BlockRayCast(this.level, this.renameLater, blockPos.above());
+        BlockState blockState = BlockRayCast.stopWhenHit();
+        while(blockState != null)
         {
-            RENAMELATER2.traverse();
-            final BlockState blockState = level.getBlockState(RENAMELATER2.current);
-            if(!blockState.isEmpty() && !(blockState.getBlock() instanceof LiquidBlock))
+            if(blockState.getBlock() instanceof LiquidBlock)
             {
-                return;
+                blockState = BlockRayCast.stopWhenHit();
+                continue;
             }
-            counter++;
+            return;
         }
-        while(counter < RENAMELATER2.length);
         this.distance = blockPosDistance;
         this.closest = blockPos;
     }

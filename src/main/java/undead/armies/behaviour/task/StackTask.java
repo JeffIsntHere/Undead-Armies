@@ -5,7 +5,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
-import undead.armies.Util;
+import undead.armies.misc.Util;
 import undead.armies.base.GetSingle;
 import undead.armies.behaviour.Single;
 
@@ -31,7 +31,7 @@ public class StackTask extends BaseTask
         final double x = single.currentPosition.x;
         final double y = single.currentPosition.y;
         final double z = single.currentPosition.z;
-        final AABB stackingBox = new AABB(x - 2.0d, y - 0.1d, z - 2.0d, x + 2.0d, y + 0.1d, z + 2.0d);
+        final AABB stackingBox = new AABB(x - 1.0d, y - 0.1d, z - 1.0d, x + 1.0d, y + 0.1d, z + 1.0d);
         final List<Entity> entities = single.pathfinderMob.level().getEntities(single.pathfinderMob, stackingBox);
         for(Entity entity : entities)
         {

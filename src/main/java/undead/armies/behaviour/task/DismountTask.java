@@ -1,6 +1,7 @@
 package undead.armies.behaviour.task;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -9,11 +10,37 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
-import undead.armies.misc.RENAMELATER;
+import undead.armies.UndeadArmies;
+import undead.armies.misc.BlockUtil;
+import undead.armies.misc.ClosestUnobstructedBlock;
 import undead.armies.behaviour.Single;
 
 public class DismountTask extends BaseTask
 {
+    public static final Vec3i[] locationTable = new Vec3i[]{
+            new Vec3i(1,0,0),
+            new Vec3i(1,0,1),
+            new Vec3i(1,0,-1),
+            new Vec3i(-1,0,0),
+            new Vec3i(-1,0,1),
+            new Vec3i(-1,0,-1),
+            new Vec3i(0,0,-1),
+            new Vec3i(0,0,1),
+
+            new Vec3i(2,0,0),
+            new Vec3i(2,0,1),
+            new Vec3i(2,0,-1),
+            new Vec3i(-2,0,0),
+            new Vec3i(-2,0,1),
+            new Vec3i(-2,0,-1),
+
+            new Vec3i(0,0,2),
+            new Vec3i(1,0,2),
+            new Vec3i(-1,0,2),
+            new Vec3i(0,0,-2),
+            new Vec3i(1,0,-2),
+            new Vec3i(-1,0,-2),
+    };
     protected AttributeInstance passengerSpeed = null;
     public int triggerAfter = 0;
     @Override
@@ -55,56 +82,52 @@ public class DismountTask extends BaseTask
         }
         final BlockPos pathFinderMobBlockPos = single.pathfinderMob.blockPosition();
         final Level level = single.pathfinderMob.level();
-        final RENAMELATER RENAMELATER = new RENAMELATER(target.blockPosition(), level, pathFinderMobBlockPos);
-        for (int x = -2; x < 2; x++)
+        final ClosestUnobstructedBlock ClosestUnobstructedBlock = new ClosestUnobstructedBlock(target.blockPosition(), level, pathFinderMobBlockPos.above());
+        for(Vec3i vec3i : DismountTask.locationTable)
         {
-            for (int z = -2; z < 2; z++)
+            final BlockPos middle = pathFinderMobBlockPos.offset(vec3i);
+            final BlockPos aboveMiddle = middle.above();
+            final BlockPos belowMiddle = middle.below();
+            final BlockPos above = aboveMiddle.above();
+            final BlockState middleBlockState = level.getBlockState(middle);
+            UndeadArmies.logger.debug(middle.toString());
+            if(BlockUtil.blockIsGood(middleBlockState))
             {
-                final BlockPos middle = new BlockPos(pathFinderMobBlockPos.getX() + x, pathFinderMobBlockPos.getY(), pathFinderMobBlockPos.getZ() + z);
-                final BlockPos aboveMiddle = middle.above();
-                final BlockPos top = aboveMiddle.above();
-                final BlockState middleBlockState = level.getBlockState(aboveMiddle);
-                if (middleBlockState.isEmpty())
+                if(BlockUtil.blockIsEmptyOrNotLava(above, level))
                 {
-                    final BlockPos belowMiddle = middle.below();
-                    if(level.getBlockState(aboveMiddle).isEmpty())
+                    //??X?0
+                    final BlockState aboveMiddleBlockState = level.getBlockState(aboveMiddle);
+                    if(BlockUtil.blockIsGood(aboveMiddleBlockState) && BlockUtil.blockIsEmptyOrNotLava(above.above(), level))
                     {
-                        if(level.getBlockState(belowMiddle).isEmpty())
-                        {
-                            final BlockPos bottom = belowMiddle.below();
-                            final BlockState bottomBlockState = level.getBlockState(bottom);
-                            if(!bottomBlockState.isEmpty() && !(bottomBlockState.getBlock() instanceof LiquidBlock))
-                            {
-                                RENAMELATER.add(bottom);
-                            }
-                        }
-                        else if(!(level.getBlockState(belowMiddle).getBlock() instanceof LiquidBlock))
-                        {
-                            RENAMELATER.add(belowMiddle);
-                        }
-                        final BlockState topBlockState = level.getBlockState(top);
-                        if(!topBlockState.isEmpty() && !(topBlockState.getBlock() instanceof LiquidBlock) && level.getBlockState(top.above()).isEmpty() && level.getBlockState(top.above(2)).isEmpty())
-                        {
-                            RENAMELATER.add(top);
-                        }
+                        ClosestUnobstructedBlock.add(aboveMiddle);
+                    }
+                    else if(aboveMiddleBlockState.isEmpty())
+                    {
+                        ClosestUnobstructedBlock.add(middle);
                     }
                 }
-                else if(!(middleBlockState.getBlock() instanceof LiquidBlock) && level.getBlockState(aboveMiddle).isEmpty() && level.getBlockState(top).isEmpty())
+            }
+            else if(middleBlockState.isEmpty())
+            {
+                final BlockState belowMiddleBlockState = level.getBlockState(belowMiddle);
+                if(BlockUtil.blockIsGood(belowMiddleBlockState) && BlockUtil.blockIsEmptyOrNotLava(aboveMiddle, level))
                 {
-                    RENAMELATER.add(middle);
+                    ClosestUnobstructedBlock.add(belowMiddle);
+                    continue;
+                }
+                final BlockPos below = belowMiddle.below();
+                if(belowMiddleBlockState.isEmpty() && BlockUtil.blockIsGood(below, level))
+                {
+                    ClosestUnobstructedBlock.add(below);
                 }
             }
         }
-        if(RENAMELATER.closest == null)
-        {
-            return false;
-        }
-        if(RENAMELATER.closest.getY() < pathFinderMobBlockPos.getY() - 1)
+        if(ClosestUnobstructedBlock.closest == null)
         {
             return false;
         }
         single.pathfinderMob.stopRiding();
-        single.pathfinderMob.dismountTo(RENAMELATER.closest.getX() + 0.5d, RENAMELATER.closest.getY() + 1.0d, RENAMELATER.closest.getZ() + 0.5d);
+        single.pathfinderMob.dismountTo(ClosestUnobstructedBlock.closest.getX() + 0.5d, ClosestUnobstructedBlock.closest.getY() + 1.0d, ClosestUnobstructedBlock.closest.getZ() + 0.5d);
         return true;
     }
 }

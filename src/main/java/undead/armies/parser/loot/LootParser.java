@@ -6,7 +6,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
-import undead.armies.Util;
+import undead.armies.misc.Util;
 import undead.armies.parser.File;
 import undead.armies.parser.Parser;
 

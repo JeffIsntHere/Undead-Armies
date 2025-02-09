@@ -34,7 +34,6 @@ public class MineStorage
     }
     public void setCurrent(@NotNull final Level level)
     {
-        this.finished = true;
         for(BlockPos blockPos : blockPoss)
         {
             final BlockState nextBlockState = level.getBlockState(blockPos);
@@ -51,14 +50,18 @@ public class MineStorage
         this.progress += 1;
         final BlockState blockState = this.level.getBlockState(this.current);
         final float explosionResistance = blockState.getBlock().getExplosionResistance() * MineStorage.explosionMultiplier;
-        UndeadArmies.logger.debug("ticking mining: " + this.progress + " : " + explosionResistance);
+        if(this.finished)
+        {
+            this.setCurrent(this.level);
+            return;
+        }
         if(explosionResistance <= this.progress)
         {
             this.progress = 0;
             Block.dropResources(blockState, this.level, this.current);
             this.level.playSound(null, this.current, blockState.getSoundType(this.level, this.current, single.pathfinderMob).getBreakSound(), SoundSource.BLOCKS, 3.0f, 1.0f);
             this.level.setBlock(this.current, Blocks.AIR.defaultBlockState(), 3);
-            this.setCurrent(this.level);
+            this.finished = true;
         }
         else
         {
