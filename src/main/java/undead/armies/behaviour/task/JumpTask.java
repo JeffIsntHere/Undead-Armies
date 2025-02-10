@@ -98,15 +98,15 @@ public class JumpTask extends BaseTask
         {
             final BlockPos middle = startingPoint.offset(vec3i);
             final BlockState middleBlockState = level.getBlockState(middle);
-            if(middleBlockState.isEmpty())
+            if(middleBlockState.isAir())
             {
                 final BlockPos belowMiddle = middle.below();
                 final BlockState belowMiddleBlockState = level.getBlockState(belowMiddle);
-                if(belowMiddleBlockState.isEmpty())
+                if(belowMiddleBlockState.isAir())
                 {
                     final BlockPos bottom = belowMiddle.below();
                     final BlockState bottomBlockState = level.getBlockState(bottom);
-                    if(bottomBlockState.isEmpty())
+                    if(bottomBlockState.isAir())
                     {
                         final BlockPos belowBottom = bottom.below();
                         if(BlockUtil.blockIsGood(bottom.below(), level))
@@ -119,12 +119,12 @@ public class JumpTask extends BaseTask
                         this.addToClosestBlockPosIfNotLastBlockPos(ClosestUnobstructedBlock, bottom);
                     }
                 }
-                else if(BlockUtil.blockIsNotLava(belowMiddleBlockState) && level.getBlockState(middle.above()).isEmpty())
+                else if(BlockUtil.blockIsNotLava(belowMiddleBlockState) && level.getBlockState(middle.above()).isAir())
                 {
                     this.addToClosestBlockPosIfNotLastBlockPos(ClosestUnobstructedBlock, belowMiddle);
                 }
             }
-            else if(BlockUtil.blockIsNotLava(middleBlockState) && level.getBlockState(middle.above()).isEmpty() && level.getBlockState(middle.above(2)).isEmpty())
+            else if(BlockUtil.blockIsNotLava(middleBlockState) && level.getBlockState(middle.above()).isAir() && level.getBlockState(middle.above(2)).isAir())
             {
                 this.addToClosestBlockPosIfNotLastBlockPos(ClosestUnobstructedBlock, middle);
             }

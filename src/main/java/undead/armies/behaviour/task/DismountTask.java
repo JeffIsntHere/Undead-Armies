@@ -7,7 +7,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import undead.armies.UndeadArmies;
@@ -95,30 +94,30 @@ public class DismountTask extends BaseTask
             UndeadArmies.logger.debug(middle.toString());
             if(BlockUtil.blockIsGood(middleBlockState))
             {
-                if(BlockUtil.blockIsEmptyOrNotLava(above, level))
+                if(BlockUtil.blockIsAirOrNotLava(above, level))
                 {
                     //??X?0
                     final BlockState aboveMiddleBlockState = level.getBlockState(aboveMiddle);
-                    if(BlockUtil.blockIsGood(aboveMiddleBlockState) && BlockUtil.blockIsEmptyOrNotLava(above.above(), level))
+                    if(BlockUtil.blockIsGood(aboveMiddleBlockState) && BlockUtil.blockIsAirOrNotLava(above.above(), level))
                     {
                         ClosestUnobstructedBlock.add(aboveMiddle);
                     }
-                    else if(aboveMiddleBlockState.isEmpty())
+                    else if(aboveMiddleBlockState.isAir())
                     {
                         ClosestUnobstructedBlock.add(middle);
                     }
                 }
             }
-            else if(middleBlockState.isEmpty())
+            else if(middleBlockState.isAir())
             {
                 final BlockState belowMiddleBlockState = level.getBlockState(belowMiddle);
-                if(BlockUtil.blockIsGood(belowMiddleBlockState) && BlockUtil.blockIsEmptyOrNotLava(aboveMiddle, level))
+                if(BlockUtil.blockIsGood(belowMiddleBlockState) && BlockUtil.blockIsAirOrNotLava(aboveMiddle, level))
                 {
                     ClosestUnobstructedBlock.add(belowMiddle);
                     continue;
                 }
                 final BlockPos below = belowMiddle.below();
-                if(belowMiddleBlockState.isEmpty() && BlockUtil.blockIsGood(below, level))
+                if(belowMiddleBlockState.isAir() && BlockUtil.blockIsGood(below, level))
                 {
                     ClosestUnobstructedBlock.add(below);
                 }

@@ -19,19 +19,19 @@ public final class BlockUtil
     public static boolean blockIsGood(final BlockPos blockPos, final Level level)
     {
         final BlockState blockState = level.getBlockState(blockPos);
-        return !blockState.isEmpty() && BlockUtil.blockIsNotLava(blockState);
+        return !blockState.isAir() && BlockUtil.blockIsNotLava(blockState);
     }
     public static boolean blockIsGood(final BlockState blockState)
     {
-        return !blockState.isEmpty() && BlockUtil.blockIsNotLava(blockState);
+        return !blockState.isAir() && BlockUtil.blockIsNotLava(blockState);
     }
-    public static boolean blockIsEmptyOrNotLava(final BlockPos blockPos, final Level level)
+    public static boolean blockIsAirOrNotLava(final BlockPos blockPos, final Level level)
     {
         final BlockState blockState = level.getBlockState(blockPos);
-        return blockState.isEmpty() || BlockUtil.blockIsNotLava(blockState);
+        return blockState.isAir() || BlockUtil.blockIsNotLava(blockState);
     }
-    public static boolean blockIsEmptyOrNotLava(final BlockState blockState)
+    public static boolean blockIsAirOrNotLava(final BlockState blockState)
     {
-        return blockState.isEmpty() || BlockUtil.blockIsNotLava(blockState);
+        return blockState.isAir() || BlockUtil.blockIsNotLava(blockState);
     }
 }

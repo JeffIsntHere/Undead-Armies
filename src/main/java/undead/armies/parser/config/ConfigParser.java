@@ -87,7 +87,7 @@ public class ConfigParser extends Parser
     public void reload()
     {
         final File file = new File();
-        final Reader reader = file.getFileReader("config");
+        final Reader reader = file.getFileReader("config.txt");
         super.parseFromInput(reader);
         File.closeReader(reader);
         for(final Config config : ConfigParser.configCache)

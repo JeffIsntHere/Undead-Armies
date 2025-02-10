@@ -94,7 +94,7 @@ public class LootParser extends Parser
         loots.clear();
         this.itemParser = new ItemParser(ServerLifecycleHooks.getCurrentServer().registryAccess());
         final File file = new File();
-        final Reader reader = file.getFileReader("loot");
+        final Reader reader = file.getFileReader("loot.txt");
         super.parseFromInput(reader);
         File.closeReader(reader);
         this.itemParser = null;
