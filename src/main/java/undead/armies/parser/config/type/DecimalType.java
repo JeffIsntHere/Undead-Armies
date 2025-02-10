@@ -23,6 +23,12 @@ public class DecimalType extends BaseType
         return super.toString() + " : " + this.value;
     }
 
+    public DecimalType(final String name, final String desc, final double value)
+    {
+        super(name, desc);
+        this.value = value;
+    }
+
     public DecimalType(final String name, final double value)
     {
         super(name);

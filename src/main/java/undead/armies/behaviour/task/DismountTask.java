@@ -14,6 +14,7 @@ import undead.armies.UndeadArmies;
 import undead.armies.misc.BlockUtil;
 import undead.armies.misc.ClosestUnobstructedBlock;
 import undead.armies.behaviour.Single;
+import undead.armies.parser.config.type.NumberType;
 
 public class DismountTask extends BaseTask
 {
@@ -41,6 +42,7 @@ public class DismountTask extends BaseTask
             new Vec3i(1,0,-2),
             new Vec3i(-1,0,-2),
     };
+    public static NumberType cooldown = new NumberType("cooldown", "cooldown for each attempt at dismounting.",3);
     protected AttributeInstance passengerSpeed = null;
     public int triggerAfter = 0;
     @Override
@@ -51,7 +53,7 @@ public class DismountTask extends BaseTask
         {
             return false;
         }
-        triggerAfter = 3;
+        triggerAfter = DismountTask.cooldown.value;
         final Entity vehicle = single.pathfinderMob.getVehicle();
         if(vehicle == null)
         {

@@ -8,11 +8,13 @@ import org.jetbrains.annotations.NotNull;
 import undead.armies.misc.Util;
 import undead.armies.base.GetSingle;
 import undead.armies.behaviour.Single;
+import undead.armies.parser.config.type.NumberType;
 
 import java.util.List;
 
 public class StackTask extends BaseTask
 {
+    public static final NumberType cooldown = new NumberType("cooldown", "cooldown for each stacking attempt.", 20);
     public int triggerAfter = 0;
     @Override
     public boolean handleTask(@NotNull Single single)
@@ -22,7 +24,7 @@ public class StackTask extends BaseTask
         {
             return false;
         }
-        triggerAfter = 20;
+        triggerAfter = StackTask.cooldown.value;
         final LivingEntity target = single.pathfinderMob.getTarget();
         if(target == null || target.position().y <= single.currentPosition.y)
         {

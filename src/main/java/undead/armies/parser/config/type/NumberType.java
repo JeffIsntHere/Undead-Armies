@@ -23,6 +23,12 @@ public class NumberType extends BaseType
         return super.toString() + " : " + this.value;
     }
 
+    public NumberType(final String name, final String desc, final int value)
+    {
+        super(name, desc);
+        this.value = value;
+    }
+
     public NumberType(final String name, final int value)
     {
         super(name);

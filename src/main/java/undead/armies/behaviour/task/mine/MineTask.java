@@ -10,6 +10,7 @@ import undead.armies.behaviour.Single;
 import undead.armies.behaviour.task.BaseTask;
 import undead.armies.behaviour.type.Engineer;
 import undead.armies.misc.PathfindingTracker;
+import undead.armies.parser.config.type.DecimalType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,8 +18,9 @@ import java.util.HashMap;
 public class MineTask extends BaseTask
 {
     public static final HashMap<ChunkPos, ArrayList<MineStorage>> tasks = new HashMap<>();
+    public static final DecimalType maxMiningDistance = new DecimalType("maxMiningDistance", 5.0d);
+    public static final DecimalType blockHealthMultiplier = new DecimalType("blockHealthMultiplier", "a block's hp is calculated using this: Blast resistance * blockHealthMultiplier. The result is how many hits is required to break the block.", 8.0d);
     public static final double minimumDotResult = 0.2f;
-    public static final double maxMiningDistance = 5.0d;
     public static int getPositiveOrNegativeOne(final double d)
     {
         if(d < 0)
@@ -89,7 +91,7 @@ public class MineTask extends BaseTask
         zeroZero.removeIf(mineStorage -> mineStorage.finished);
         for(MineStorage mineStorage : zeroZero)
         {
-            if(direction.dot(mineStorage.direction) > MineTask.minimumDotResult && singlePosition.distanceTo(MineTask.blockPosToVec3(mineStorage.current)) < MineTask.maxMiningDistance)
+            if(direction.dot(mineStorage.direction) > MineTask.minimumDotResult && singlePosition.distanceTo(MineTask.blockPosToVec3(mineStorage.current)) < MineTask.maxMiningDistance.value)
             {
                 return mineStorage;
             }

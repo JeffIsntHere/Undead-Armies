@@ -46,12 +46,16 @@ public class Registry
             UndeadArmies.logger.info("");
             for(Config config : configs)
             {
-                UndeadArmies.logger.info("Config: " + config);
+                UndeadArmies.logger.info("---> Config: " + config);
                 for(TypeArgument typeArgument : config.typeArguments)
                 {
                     UndeadArmies.logger.info(">" + typeArgument);
+                    if(!typeArgument.type.desc.isEmpty())
+                    {
+                        sender.sendSystemMessage(Component.literal(">" + typeArgument.type.desc));
+                    }
+                    UndeadArmies.logger.info("");
                 }
-                UndeadArmies.logger.info("");
             }
         }
         else
@@ -59,12 +63,16 @@ public class Registry
             sender.sendSystemMessage(Component.literal(""));
             for(Config config : configs)
             {
-                sender.sendSystemMessage(Component.literal("§7Config: §f" + config));
+                sender.sendSystemMessage(Component.literal("§7---> Config: §f" + config));
                 for(TypeArgument typeArgument : config.typeArguments)
                 {
                     sender.sendSystemMessage(Component.literal("§7>§f" + typeArgument));
+                    if(!typeArgument.type.desc.isEmpty())
+                    {
+                        sender.sendSystemMessage(Component.literal("§7>" + typeArgument.type.desc));
+                    }
+                    sender.sendSystemMessage(Component.literal(""));
                 }
-                sender.sendSystemMessage(Component.literal(""));
             }
         }
         return 1;

@@ -22,14 +22,20 @@ public class BooleanType extends BaseType
         }
     }
 
+    public String toString()
+    {
+        return super.toString() + " : " + this.value;
+    }
+
+    public BooleanType(final String name, final String desc, final boolean value)
+    {
+        super(name, desc);
+        this.value = value;
+    }
+
     public BooleanType(final String name, final boolean value)
     {
         super(name);
         this.value = value;
-    }
-
-    public String toString()
-    {
-        return super.toString() + " : " + this.value;
     }
 }

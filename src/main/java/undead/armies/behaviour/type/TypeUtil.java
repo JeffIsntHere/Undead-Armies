@@ -2,7 +2,6 @@ package undead.armies.behaviour.type;
 
 import net.minecraft.util.RandomSource;
 import org.jetbrains.annotations.Nullable;
-import undead.armies.UndeadArmies;
 import undead.armies.parser.config.type.BooleanType;
 
 import java.util.ArrayList;

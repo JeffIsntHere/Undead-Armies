@@ -10,7 +10,8 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import org.slf4j.Logger;
-import undead.armies.behaviour.task.TaskUtil;
+import undead.armies.behaviour.task.*;
+import undead.armies.behaviour.task.mine.MineTask;
 import undead.armies.behaviour.type.TypeUtil;
 import undead.armies.parser.config.ConfigParser;
 import undead.armies.parser.config.type.TypeArgument;
@@ -36,12 +37,30 @@ public class UndeadArmies
     @SubscribeEvent
     public void serverAboutToStartEvent(ServerAboutToStartEvent serverAboutToStartEvent)
     {
-        ConfigParser.instance.registerConfig("stacking", new TypeArgument(TaskUtil.instance.enableStackTask));
-        ConfigParser.instance.registerConfig("mining", new TypeArgument(TaskUtil.instance.enableMineTask));
-        ConfigParser.instance.registerConfig("dismount", new TypeArgument(TaskUtil.instance.enableDismountTask));
-        ConfigParser.instance.registerConfig("sprinting", new TypeArgument(TaskUtil.instance.enableSprintTask));
-        ConfigParser.instance.registerConfig("grab", new TypeArgument(TaskUtil.instance.enableGrabTask));
-        ConfigParser.instance.registerConfig("jumping", new TypeArgument(TaskUtil.instance.enableJumpTask));
+        ConfigParser.instance.registerConfig("mining",
+                new TypeArgument(TaskUtil.instance.enableMineTask),
+                new TypeArgument(MineTask.maxMiningDistance),
+                new TypeArgument(MineTask.blockHealthMultiplier));
+        ConfigParser.instance.registerConfig("dismount",
+                new TypeArgument(TaskUtil.instance.enableDismountTask),
+                new TypeArgument(DismountTask.cooldown));
+        ConfigParser.instance.registerConfig("grab",
+                new TypeArgument(TaskUtil.instance.enableGrabTask),
+                new TypeArgument(GrabTask.grabDistance),
+                new TypeArgument(GrabTask.maxSlowdown));
+        ConfigParser.instance.registerConfig("jumping",
+                new TypeArgument(TaskUtil.instance.enableJumpTask),
+                new TypeArgument(JumpTask.cooldown),
+                new TypeArgument(JumpTask.maxMemorySize),
+                new TypeArgument(JumpTask.disableMovementCheck));
+        ConfigParser.instance.registerConfig("sprinting",
+                new TypeArgument(TaskUtil.instance.enableSprintTask),
+                new TypeArgument(SprintTask.sprintDistance),
+                new TypeArgument(SprintTask.alwaysSprintWhenDistanceIsThisFar),
+                new TypeArgument(SprintTask.cooldown));
+        ConfigParser.instance.registerConfig("stacking",
+                new TypeArgument(TaskUtil.instance.enableStackTask),
+                new TypeArgument(StackTask.cooldown));
         ConfigParser.instance.registerConfig("engineer", new TypeArgument(TypeUtil.instance.enableEngineer));
         ConfigParser.instance.registerConfig("giant", new TypeArgument(TypeUtil.instance.enableGiant));
         ConfigParser.instance.reload();

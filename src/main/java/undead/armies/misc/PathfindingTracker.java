@@ -3,7 +3,6 @@ package undead.armies.misc;
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 import undead.armies.behaviour.Single;
-import undead.armies.behaviour.task.JumpTask;
 
 public class PathfindingTracker
 {
@@ -32,7 +31,7 @@ public class PathfindingTracker
         {
             return false;
         }
-        if(single.pathfinderMob.isPathFinding() || this.notPathfindingTicks > JumpTask.cooldown)
+        if(single.pathfinderMob.isPathFinding() || this.notPathfindingTicks > this.maxNotPathfindingTicks)
         {
             this.hasAttemptedPathfinding = true;
         }

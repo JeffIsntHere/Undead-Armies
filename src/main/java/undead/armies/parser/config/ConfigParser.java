@@ -27,7 +27,10 @@ public class ConfigParser extends Parser
             if(this.config == null)
             {
                 this.config = new Config(string);
-                ConfigParser.configCache.add(this.config);
+                if(!string.isEmpty())
+                {
+                    ConfigParser.configCache.add(this.config);
+                }
             }
             this.config.clear();
             super.parentCount++;

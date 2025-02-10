@@ -1,7 +1,5 @@
 package undead.armies.parser.config.type;
 
-import undead.armies.parser.config.Config;
-
 public class TypeArgument
 {
     public final char[] query;

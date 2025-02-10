@@ -9,14 +9,13 @@ import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import undead.armies.UndeadArmies;
 import undead.armies.behaviour.Single;
 
 import java.util.List;
 
 public class MineStorage
 {
-    public static final float explosionMultiplier = 8.0f;
+    public static final float explosionMultiplier = (float) MineTask.blockHealthMultiplier.value;
     public static final float maxExplosionResistance = 100 * MineStorage.explosionMultiplier;
     public final List<BlockPos> blockPoss;
     public final Vec3 direction;

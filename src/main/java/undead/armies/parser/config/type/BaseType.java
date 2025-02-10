@@ -1,13 +1,18 @@
 package undead.armies.parser.config.type;
 
-import undead.armies.parser.config.Config;
-
 public abstract class BaseType
 {
     public final String name;
+    public final String desc;
+    protected BaseType(final String name, final String desc)
+    {
+        this.name = name;
+        this.desc = desc;
+    }
     protected BaseType(final String name)
     {
         this.name = name;
+        this.desc = "";
     }
     public abstract void save(final String string);
     @Override
