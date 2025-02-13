@@ -1,5 +1,7 @@
 package undead.armies.parser.config.type;
 
+import java.util.Objects;
+
 public abstract class BaseType
 {
     public final String name;
@@ -15,6 +17,10 @@ public abstract class BaseType
         this.desc = "";
     }
     public abstract void save(final String string);
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
+    }
     @Override
     public boolean equals(Object other)
     {

@@ -22,6 +22,10 @@ public class TypeArgument
         return true;
     }
     @Override
+    public int hashCode() {
+        return this.type.hashCode();
+    }
+    @Override
     public boolean equals(Object other)
     {
         if(!(other instanceof TypeArgument))

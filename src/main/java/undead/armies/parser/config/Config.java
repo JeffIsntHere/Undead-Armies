@@ -6,12 +6,17 @@ import undead.armies.parser.config.type.TypeArgument;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Objects;
 
 public class Config
 {
     public final String name;
     protected final ArrayList<StringPair> data = new ArrayList<>();
     public final HashSet<TypeArgument> typeArguments = new HashSet<>();
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
+    }
     @Override
     public boolean equals(Object other)
     {
