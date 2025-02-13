@@ -86,7 +86,7 @@ public class MineTask extends BaseTask
             zeroZero.add(new MineStorage(MineTask.getBlockPosForSingle(single, direction), direction, single.pathfinderMob.level()));
             MineTask.tasks.put(currentChunkPos, zeroZero);
         }
-        final Vec3 singlePosition = single.currentPosition;
+        final Vec3 singlePosition = single.position();
         zeroZero.removeIf(mineStorage -> mineStorage.finished);
         for(MineStorage mineStorage : zeroZero)
         {
@@ -101,7 +101,7 @@ public class MineTask extends BaseTask
     protected PathfindingTracker pathfindingTracker = new PathfindingTracker(30);
     public int triggerAfter = 0;
     @Override
-    public boolean handleTask(@NotNull Single single)
+    public boolean handleTask(@NotNull Single single, final int arguments)
     {
         this.pathfindingTracker.tick();
         this.triggerAfter--;
@@ -110,17 +110,16 @@ public class MineTask extends BaseTask
             return false;
         }
         this.triggerAfter = 20;
-        if(Util.isMoving(single))
+        if((arguments & 1) != 1 || (arguments & 2) == 2)
         {
-            this.pathfindingTracker.hasAttemptedPathfinding = false;
             return false;
         }
         final LivingEntity target = single.pathfinderMob.getTarget();
-        if(target == null || target.position().y + 1 < single.currentPosition.y || !this.pathfindingTracker.tick(single))
+        if(target.position().y + 1 < single.position().y || !this.pathfindingTracker.tick(single))
         {
             return false;
         }
-        MineTask.getMineTask(single, target.position().subtract(single.currentPosition)).tick(single);
+        MineTask.getMineTask(single, target.position().subtract(single.position())).tick(single);
         return true;
     }
 }

@@ -28,35 +28,37 @@ public class UndeadArmies
     @SubscribeEvent
     public void registerCommandsEvent(RegisterCommandsEvent registerCommandsEvent)
     {
-        Registry.registerCommands(registerCommandsEvent.getDispatcher());
+        Registry.instance.getInstance().registerCommands(registerCommandsEvent.getDispatcher());
     }
     @SubscribeEvent
     public void serverAboutToStartEvent(ServerAboutToStartEvent serverAboutToStartEvent)
     {
-        ConfigParser.instance.registerConfig("mining",
+        ConfigParser.instance.getInstance().registerConfig("mining",
                 new TypeArgument(TaskUtil.instance.enableMineTask),
                 new TypeArgument(MineTask.maxMiningDistance),
                 new TypeArgument(MineTask.blockHealthMultiplier));
-        ConfigParser.instance.registerConfig("dismount",
+        ConfigParser.instance.getInstance().registerConfig("dismount",
                 new TypeArgument(TaskUtil.instance.enableDismountTask),
                 new TypeArgument(DismountTask.cooldown));
-        ConfigParser.instance.registerConfig("grab",
+        ConfigParser.instance.getInstance().registerConfig("grab",
                 new TypeArgument(TaskUtil.instance.enableGrabTask),
                 new TypeArgument(GrabTask.grabDistance),
                 new TypeArgument(GrabTask.maxSlowdown));
-        ConfigParser.instance.registerConfig("jumping",
+        ConfigParser.instance.getInstance().registerConfig("jumping",
                 new TypeArgument(TaskUtil.instance.enableJumpTask),
                 new TypeArgument(JumpTask.cooldown),
                 new TypeArgument(JumpTask.maxMemorySize),
                 new TypeArgument(JumpTask.disableMovementCheck));
-        ConfigParser.instance.registerConfig("sprinting",
+        ConfigParser.instance.getInstance().registerConfig("sprinting",
                 new TypeArgument(TaskUtil.instance.enableSprintTask),
                 new TypeArgument(SprintTask.sprintDistance),
                 new TypeArgument(SprintTask.alwaysSprintWhenDistanceIsThisFar),
-                new TypeArgument(SprintTask.cooldown));
-        ConfigParser.instance.registerConfig("stacking",
+                new TypeArgument(SprintTask.cooldown),
+                new TypeArgument(SprintTask.duration),
+                new TypeArgument(SprintTask.amplifier));
+        ConfigParser.instance.getInstance().registerConfig("stacking",
                 new TypeArgument(TaskUtil.instance.enableStackTask),
                 new TypeArgument(StackTask.cooldown));
-        ConfigParser.instance.reload();
+        ConfigParser.instance.getInstance().reload();
     }
 }

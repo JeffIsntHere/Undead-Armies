@@ -26,7 +26,7 @@ public final class Util
         final int slowDownAmplifier = (slowDown == null) ? 0 : slowDown.getAmplifier();
         final MobEffectInstance speedUp = single.pathfinderMob.getEffect(MobEffects.MOVEMENT_SPEED);
         final int speedUpAmplifier = (speedUp == null) ? 0 : speedUp.getAmplifier();
-        return single.lastPosition.distanceTo(single.currentPosition) >= Util.distanceToBeConsideredAsMoving * 1.0d/(1.0d + Util.movementSlowDownConstant * slowDownAmplifier) * (1 + Util.movementSpeedUpConstant * speedUpAmplifier);
+        return single.lastPosition.distanceTo(single.position()) >= Util.distanceToBeConsideredAsMoving * 1.0d/(1.0d + Util.movementSlowDownConstant * slowDownAmplifier) * (1 + Util.movementSpeedUpConstant * speedUpAmplifier);
     }
     public static Vec3 getThrowVelocity(final Vec3 start, final Vec3 end, final float divisor, final float y)
     {

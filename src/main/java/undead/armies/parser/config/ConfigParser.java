@@ -15,8 +15,13 @@ public class ConfigParser extends Parser
 {
     public static final ConfigParser instance = new ConfigParser();
     protected static final ArrayList<Config> configCache = new ArrayList<>();
+    protected ConfigParser(){}
+    //mix into this to replace groupUtil with your own implementation.
+    public ConfigParser getInstance()
+    {
+        return ConfigParser.instance;
+    }
     protected Config config = null;
-    private ConfigParser(){}
     @Override
     protected void process()
     {

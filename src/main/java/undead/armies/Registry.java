@@ -14,16 +14,23 @@ import java.util.ArrayList;
 
 public class Registry
 {
-    public static int reloadConfig(CommandContext<CommandSourceStack> commandContext)
+    public static final Registry instance = new Registry();
+    protected Registry(){}
+    //mix into this to replace groupUtil with your own implementation.
+    public Registry getInstance()
     {
-        ConfigParser.instance.reload();
+        return Registry.instance;
+    }
+    public int reloadConfig(CommandContext<CommandSourceStack> commandContext)
+    {
+        ConfigParser.instance.getInstance().reload();
         commandContext.getSource().sendSuccess(() -> Component.translatable("successfully reloaded!"), true);
         return 1;
     }
-    public static int dumpConfig(CommandContext<CommandSourceStack> commandContext)
+    public int dumpConfig(CommandContext<CommandSourceStack> commandContext)
     {
         final Entity sender = commandContext.getSource().getEntity();
-        final ArrayList<Config> configs = ConfigParser.instance.getConfigCache();
+        final ArrayList<Config> configs = ConfigParser.instance.getInstance().getConfigCache();
         if(sender == null)
         {
             UndeadArmies.logger.info("");
@@ -60,12 +67,12 @@ public class Registry
         }
         return 1;
     }
-    public static void registerCommands(final CommandDispatcher<CommandSourceStack> commandDispatcher)
+    public void registerCommands(final CommandDispatcher<CommandSourceStack> commandDispatcher)
     {
         commandDispatcher.register(Commands.literal("undeadArmies")
                 .requires(commandSourceStack -> commandSourceStack.hasPermission(Commands.LEVEL_ADMINS))
-                .then(Commands.literal("reloadConfig").executes(Registry::reloadConfig))
-                .then(Commands.literal("dumpConfig").executes(Registry::dumpConfig))
+                .then(Commands.literal("reloadConfig").executes(this::reloadConfig))
+                .then(Commands.literal("dumpConfig").executes(this::dumpConfig))
         );
     }
 }

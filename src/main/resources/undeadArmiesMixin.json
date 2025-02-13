@@ -4,7 +4,8 @@
   "package": "undead.armies.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "ZombieMixin"
+    "ZombieMixin",
+    "SkeletonMixin"
   ],
   "injectors": {
     "defaultRequire": 1

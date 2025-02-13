@@ -70,7 +70,7 @@ public class JumpTask extends BaseTask
     }
     protected PathfindingTracker pathfindingTracker = new PathfindingTracker(JumpTask.cooldown.value);
     @Override
-    public boolean handleTask(@NotNull Single single)
+    public boolean handleTask(@NotNull Single single, final int arguments)
     {
         this.pathfindingTracker.tick();
         if(this.triggerAfter > single.pathfinderMob.tickCount)
@@ -79,14 +79,18 @@ public class JumpTask extends BaseTask
         }
         final LivingEntity target = single.pathfinderMob.getTarget();
         this.triggerAfter = single.pathfinderMob.tickCount + JumpTask.cooldown.value;
+        if((arguments & 8) == 8 || (arguments & 4) != 4)
+        {
+            return false;
+        }
         if(JumpTask.disableMovementCheck.value)
         {
-            if(single.pathfinderMob.isPassenger() || !single.pathfinderMob.onGround() || target == null)
+            if((arguments & 1) != 1)
             {
                 return false;
             }
         }
-        else if(single.pathfinderMob.isPassenger() || !single.pathfinderMob.onGround() || !this.pathfindingTracker.tick(single))
+        else if(!this.pathfindingTracker.tick(single))
         {
             return false;
         }
@@ -134,7 +138,7 @@ public class JumpTask extends BaseTask
         {
             blockPosMemory.add(startingPoint.below());
             single.pathfinderMob.lookAt(target, 180.0f, 180.0f);
-            single.pathfinderMob.setDeltaMovement(Util.getThrowVelocity(single.currentPosition, new Vec3(ClosestUnobstructedBlock.closest.getX() + 0.5d, ClosestUnobstructedBlock.closest.getY() + 1.0d, ClosestUnobstructedBlock.closest.getZ() + 0.5d), 5.0f, 0.5f));
+            single.pathfinderMob.setDeltaMovement(Util.getThrowVelocity(single.position(), new Vec3(ClosestUnobstructedBlock.closest.getX() + 0.5d, ClosestUnobstructedBlock.closest.getY() + 1.0d, ClosestUnobstructedBlock.closest.getZ() + 0.5d), 5.0f, 0.5f));
         }
         else if(blockPosMemorySize > 0)
         {

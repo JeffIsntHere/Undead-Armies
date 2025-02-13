@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import undead.armies.base.Resettable;
 import undead.armies.behaviour.task.BaseTask;
 import undead.armies.behaviour.task.TaskUtil;
+import undead.armies.misc.Util;
 
 public class Single implements Resettable
 {
@@ -17,40 +18,71 @@ public class Single implements Resettable
     public int currentTaskLength;
     @NotNull
     public Vec3 lastPosition;
-    @NotNull
-    public Vec3 currentPosition;
     public void reset()
     {
         this.lastPosition = pathfinderMob.position();
-        this.currentPosition = this.lastPosition;
     }
-    protected boolean droppedLoot = false;
+    /*
+    stores common arguments or checks to an int. [number = bit position]
+    0 = has target (1)
+    1 = is moving (2)
+    2 = on ground (4)
+    3 = is passenger (8)
+    4 = is vehicle (16)
+     */
+    public int arguments;
+    //mix into this to add your own arguments
+    public void updateArguments()
+    {
+        this.arguments = 0;
+        if(this.pathfinderMob.getTarget() != null)
+        {
+            this.arguments |= 1;
+        }
+        if(Util.isMoving(this))
+        {
+            this.arguments |= 2;
+        }
+        if(this.pathfinderMob.onGround())
+        {
+            this.arguments |= 4;
+        }
+        if(this.pathfinderMob.isPassenger())
+        {
+            this.arguments |= 8;
+        }
+        if(this.pathfinderMob.isVehicle())
+        {
+            this.arguments |= 16;
+        }
+    }
+    public Vec3 position()
+    {
+        return this.pathfinderMob.position();
+    }
     public void tick()
     {
         if(this.pathfinderMob.level().isClientSide)
         {
             return;
         }
-        this.currentPosition = pathfinderMob.position();
-
+        this.updateArguments();
         final int upperBound = this.currentTaskLength;
         for(int i = 0; i < upperBound; i++)
         {
-            final boolean result = this.currentTask.handleTask(this);
+            final boolean result = this.currentTask.handleTask(this, this.arguments);
             this.currentTask = this.currentTask.nextTask;
             if(result)
             {
                 break;
             }
         }
-
-        this.lastPosition = this.currentPosition;
+        this.lastPosition = pathfinderMob.position();
     }
     public Single(final PathfinderMob pathfinderMob)
     {
         this.pathfinderMob = pathfinderMob;
         this.lastPosition = pathfinderMob.position();
-        this.currentPosition = this.lastPosition;
         final Pair<Integer, BaseTask> outputValue = TaskUtil.instance.getTask(this);
         this.currentTask = outputValue.getRight();
         this.currentTaskLength = outputValue.getLeft();
