@@ -10,7 +10,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import undead.armies.UndeadArmies;
 import undead.armies.base.GetSingle;
 import undead.armies.behaviour.Single;
 
@@ -27,16 +26,6 @@ public abstract class ZombieMixin extends Monster implements GetSingle
     public void additionalTick(CallbackInfo callbackInfo)
     {
         this.single.tick();
-    }
-    @Inject(method="addAdditionalSaveData",at=@At("RETURN"))
-    public void addAdditionalSaveData(CompoundTag compoundTag, CallbackInfo callbackInfo)
-    {
-        compoundTag.putInt("MobType", this.single.baseType.getId());
-    }
-    @Inject(method="readAdditionalSaveData",at=@At("RETURN"))
-    public void readAdditionalSaveData(CompoundTag compoundTag, CallbackInfo callbackInfo)
-    {
-        this.single.setMobType(compoundTag.getInt("MobType"));
     }
     @Override
     public Single getSingle()

@@ -64,17 +64,4 @@ public final class Util
     {
         mob.setItemInHand(InteractionHand.MAIN_HAND, itemStack);
     }
-    public static double getPower(final LivingEntity livingEntity)
-    {
-        try
-        {
-            final double power = ((float) livingEntity.getAttributeValue(Attributes.ATTACK_DAMAGE) + 3.0f) * (livingEntity.getMaxHealth() + Math.pow((float) livingEntity.getAttributeValue(Attributes.ARMOR_TOUGHNESS), 2.0f)
-                    * Math.sqrt((float) livingEntity.getAttributeValue(Attributes.MOVEMENT_SPEED) + (float) livingEntity.getAttributeValue(Attributes.MOVEMENT_EFFICIENCY))) / 120.0f;
-            return power;
-        }
-        catch(IllegalArgumentException illegalArgumentException)
-        {
-            return 0;
-        }
-    }
 }

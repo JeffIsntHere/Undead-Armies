@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 import undead.armies.misc.Util;
 import undead.armies.behaviour.Single;
 import undead.armies.behaviour.task.BaseTask;
-import undead.armies.behaviour.type.Engineer;
 import undead.armies.misc.PathfindingTracker;
 import undead.armies.parser.config.type.DecimalType;
 
@@ -110,7 +109,7 @@ public class MineTask extends BaseTask
         {
             return false;
         }
-        this.triggerAfter = (single.baseType instanceof Engineer) ? 15 : 30;
+        this.triggerAfter = 20;
         if(Util.isMoving(single))
         {
             this.pathfindingTracker.hasAttemptedPathfinding = false;

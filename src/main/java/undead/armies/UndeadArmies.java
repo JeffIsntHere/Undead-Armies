@@ -1,21 +1,17 @@
 package undead.armies;
 
 import com.mojang.logging.LogUtils;
-import net.minecraft.network.chat.Component;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
-import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import org.slf4j.Logger;
 import undead.armies.behaviour.task.*;
 import undead.armies.behaviour.task.mine.MineTask;
-import undead.armies.behaviour.type.TypeUtil;
 import undead.armies.parser.config.ConfigParser;
 import undead.armies.parser.config.type.TypeArgument;
-import undead.armies.parser.loot.LootParser;
 
 @Mod(UndeadArmies.modId)
 public class UndeadArmies
@@ -61,15 +57,6 @@ public class UndeadArmies
         ConfigParser.instance.registerConfig("stacking",
                 new TypeArgument(TaskUtil.instance.enableStackTask),
                 new TypeArgument(StackTask.cooldown));
-        ConfigParser.instance.registerConfig("engineer", new TypeArgument(TypeUtil.instance.enableEngineer));
-        ConfigParser.instance.registerConfig("giant", new TypeArgument(TypeUtil.instance.enableGiant));
         ConfigParser.instance.reload();
-    }
-    @SubscribeEvent
-    public void serverStartedEvent(ServerStartedEvent serverStartedEvent)
-    {
-        LootParser.instance.reload();
-        serverStartedEvent.getServer().sendSystemMessage(Component.literal("successfully reloaded!"));
-        serverStartedEvent.getServer().sendSystemMessage(Component.literal("loaded: " + LootParser.instance.loots.size() + " items."));
     }
 }

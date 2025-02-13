@@ -25,27 +25,27 @@ public final class TaskUtil
     public ArrayList<BaseTask> getTaskPool(@NotNull final Single single)
     {
         final ArrayList<BaseTask> output = new ArrayList<>();
-        if(this.enableSprintTask.value && single.baseType.canDoTask(SprintTask.class))
+        if(this.enableSprintTask.value)
         {
             output.add(new SprintTask());
         }
-        if(this.enableGrabTask.value && single.baseType.canDoTask(GrabTask.class))
+        if(this.enableGrabTask.value)
         {
             output.add(new GrabTask());
         }
-        if(this.enableJumpTask.value && single.baseType.canDoTask(JumpTask.class))
+        if(this.enableJumpTask.value)
         {
             output.add(new JumpTask());
         }
-        if(this.enableStackTask.value && single.baseType.canDoTask(StackTask.class))
+        if(this.enableStackTask.value)
         {
             output.add(new StackTask());
         }
-        if(this.enableMineTask.value && single.baseType.canDoTask(MineTask.class))
+        if(this.enableMineTask.value)
         {
             output.add(new MineTask());
         }
-        if(this.enableDismountTask.value && single.baseType.canDoTask(DismountTask.class))
+        if(this.enableDismountTask.value)
         {
             output.add(new DismountTask());
         }
