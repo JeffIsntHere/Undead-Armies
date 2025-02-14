@@ -13,9 +13,9 @@ public class GrabTask extends BaseTask
     public static final NumberType maxSlowdown = new NumberType("maxSlowness", "the maximum level of slowness the target can have.", 5);
     public static final DecimalType grabDistance = new DecimalType("grabDistance", 2.0d);
     @Override
-    public boolean handleTask(@NotNull Single single, final int arguments)
+    public boolean handleTask(@NotNull Single single, final Argument argument)
     {
-        if((arguments & 1) != 1)
+        if((argument.value & 1) == 0)
         {
             return false;
         }

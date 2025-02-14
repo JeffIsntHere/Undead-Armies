@@ -16,16 +16,16 @@ public class StackTask extends BaseTask
     public static final NumberType cooldown = new NumberType("cooldown", "cooldown for each stacking attempt.", 20);
     public int triggerAfter = 0;
     @Override
-    public boolean handleTask(@NotNull Single single, final int arguments)
+    public boolean handleTask(@NotNull final Single single, final Argument argument)
     {
         triggerAfter--;
-        if(triggerAfter > 0 || (arguments & 2) == 2)
+        if(triggerAfter > 0 || (argument.value & 2) == 2)
         {
             return false;
         }
         triggerAfter = StackTask.cooldown.value;
         final LivingEntity target = single.pathfinderMob.getTarget();
-        if((arguments & 1) != 1 || target.position().y <= single.position().y)
+        if((argument.value & 1) != 1 || target.position().y <= single.position().y)
         {
             return false;
         }

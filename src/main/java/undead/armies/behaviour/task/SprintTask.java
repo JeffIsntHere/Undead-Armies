@@ -16,10 +16,10 @@ public class SprintTask extends BaseTask
     public static final NumberType amplifier = new NumberType("amplifier", 1);
     protected int triggerAfter = 0;
     @Override
-    public boolean handleTask(@NotNull Single single, final int arguments)
+    public boolean handleTask(@NotNull Single single, final Argument argument)
     {
         final int tickCount = single.pathfinderMob.tickCount;
-        if(this.triggerAfter > tickCount || (arguments & 8) == 8 || (arguments & 1) != 1)
+        if(this.triggerAfter > tickCount || (argument.value & 8) == 8 || (argument.value & 1) == 0)
         {
             return false;
         }

@@ -45,7 +45,7 @@ public class DismountTask extends BaseTask
     protected AttributeInstance passengerSpeed = null;
     public int triggerAfter = 0;
     @Override
-    public boolean handleTask(@NotNull Single single, final int arguments)
+    public boolean handleTask(@NotNull Single single, final Argument argument)
     {
         triggerAfter--;
         if(triggerAfter > 0)
@@ -53,7 +53,7 @@ public class DismountTask extends BaseTask
             return false;
         }
         triggerAfter = DismountTask.cooldown.value;
-        if((arguments & 16) != 16)
+        if((argument.value & 24) != 8)
         {
             return false;
         }
@@ -61,7 +61,7 @@ public class DismountTask extends BaseTask
         final LivingEntity target = single.pathfinderMob.getTarget();
         if(target == null)
         {
-            if((arguments & 4) == 4)
+            if((argument.value & 4) == 4)
             {
                 return false;
             }
@@ -124,7 +124,7 @@ public class DismountTask extends BaseTask
             }
         }
         //check if closest's y is higher than current y.
-        if(ClosestUnobstructedBlock.closest == null && ClosestUnobstructedBlock.closest.getY() + 0.1 > single.position().y)
+        if(ClosestUnobstructedBlock.closest == null && ClosestUnobstructedBlock.closest.getY() > single.position().y + 1.0f)
         {
             return false;
         }

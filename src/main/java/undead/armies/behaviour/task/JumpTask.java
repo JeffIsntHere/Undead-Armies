@@ -70,7 +70,7 @@ public class JumpTask extends BaseTask
     }
     protected PathfindingTracker pathfindingTracker = new PathfindingTracker(JumpTask.cooldown.value);
     @Override
-    public boolean handleTask(@NotNull Single single, final int arguments)
+    public boolean handleTask(@NotNull Single single, final Argument argument)
     {
         this.pathfindingTracker.tick();
         if(this.triggerAfter > single.pathfinderMob.tickCount)
@@ -79,13 +79,13 @@ public class JumpTask extends BaseTask
         }
         final LivingEntity target = single.pathfinderMob.getTarget();
         this.triggerAfter = single.pathfinderMob.tickCount + JumpTask.cooldown.value;
-        if((arguments & 8) == 8 || (arguments & 4) != 4)
+        if((argument.value & 8) == 8 || (argument.value & 4) == 0)
         {
             return false;
         }
         if(JumpTask.disableMovementCheck.value)
         {
-            if((arguments & 1) != 1)
+            if((argument.value & 1) == 0)
             {
                 return false;
             }

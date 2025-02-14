@@ -7,5 +7,5 @@ public abstract class BaseTask
 {
     @NotNull
     public BaseTask nextTask = this;
-    public abstract boolean handleTask(@NotNull final Single single, final int arguments);
+    public abstract boolean handleTask(@NotNull final Single single, final Argument argument);
 }

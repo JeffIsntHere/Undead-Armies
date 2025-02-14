@@ -6,8 +6,11 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import org.slf4j.Logger;
+import undead.armies.base.GetSingle;
 import undead.armies.behaviour.task.*;
 import undead.armies.behaviour.task.mine.MineTask;
 import undead.armies.parser.config.ConfigParser;
@@ -29,6 +32,22 @@ public class UndeadArmies
     public void registerCommandsEvent(RegisterCommandsEvent registerCommandsEvent)
     {
         Registry.instance.getInstance().registerCommands(registerCommandsEvent.getDispatcher());
+    }
+    @SubscribeEvent
+    public void livingChangeTargetEvent(LivingChangeTargetEvent livingChangeTargetEvent)
+    {
+        if(livingChangeTargetEvent.getNewAboutToBeSetTarget() instanceof GetSingle getSingle)
+        {
+            getSingle.getSingle().beingTargetBy(livingChangeTargetEvent.getEntity());
+        }
+    }
+    @SubscribeEvent
+    public void livingDamageEventPre(LivingDamageEvent.Pre damageEvent)
+    {
+        if(damageEvent.getEntity() instanceof GetSingle getSingle)
+        {
+            getSingle.getSingle().hit(damageEvent);
+        }
     }
     @SubscribeEvent
     public void serverAboutToStartEvent(ServerAboutToStartEvent serverAboutToStartEvent)

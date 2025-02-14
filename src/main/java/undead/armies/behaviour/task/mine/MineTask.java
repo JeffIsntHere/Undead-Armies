@@ -5,6 +5,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import undead.armies.behaviour.task.Argument;
 import undead.armies.misc.Util;
 import undead.armies.behaviour.Single;
 import undead.armies.behaviour.task.BaseTask;
@@ -101,7 +102,7 @@ public class MineTask extends BaseTask
     protected PathfindingTracker pathfindingTracker = new PathfindingTracker(30);
     public int triggerAfter = 0;
     @Override
-    public boolean handleTask(@NotNull Single single, final int arguments)
+    public boolean handleTask(@NotNull Single single, final Argument argument)
     {
         this.pathfindingTracker.tick();
         this.triggerAfter--;
@@ -110,7 +111,7 @@ public class MineTask extends BaseTask
             return false;
         }
         this.triggerAfter = 20;
-        if((arguments & 1) != 1 || (arguments & 2) == 2)
+        if((argument.value & 1) == 0 || (argument.value & 2) == 2)
         {
             return false;
         }
