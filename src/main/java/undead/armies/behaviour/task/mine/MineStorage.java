@@ -33,6 +33,7 @@ public class MineStorage
     }
     public void setCurrent(@NotNull final Level level)
     {
+        this.finished = true;
         for(BlockPos blockPos : blockPoss)
         {
             final BlockState nextBlockState = level.getBlockState(blockPos);

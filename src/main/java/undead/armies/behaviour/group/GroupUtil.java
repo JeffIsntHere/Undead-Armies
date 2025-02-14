@@ -1,5 +1,6 @@
 package undead.armies.behaviour.group;
 
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
@@ -13,11 +14,11 @@ public final class GroupUtil
     private GroupUtil(){};
     public boolean isValidTarget(final LivingEntity livingEntity)
     {
-        return !livingEntity.isDeadOrDying();
+        return !livingEntity.isDeadOrDying() || !(livingEntity instanceof ServerPlayer serverPlayer && (serverPlayer.isCreative() || serverPlayer.isSpectator()));
     }
     public boolean isInvalidTarget(final LivingEntity livingEntity)
     {
-        return livingEntity.isDeadOrDying();
+        return livingEntity.isDeadOrDying() || (livingEntity instanceof ServerPlayer serverPlayer && (serverPlayer.isCreative() || serverPlayer.isSpectator()));
     }
     public boolean shouldJoin(@NotNull final Single single, final LivingEntity target)
     {
