@@ -90,7 +90,8 @@ public class Single implements Resettable
         {
             return;
         }
-        this.group.parentGroup.subTargets.add(new TargetWrapper(livingEntity));
+        final TargetWrapper targetWrapper = new TargetWrapper(livingEntity);
+        this.group.parentGroup.subTargets.put(targetWrapper, targetWrapper);
     }
     public void recruit()
     {
