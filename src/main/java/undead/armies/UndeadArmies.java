@@ -11,6 +11,7 @@ import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import org.slf4j.Logger;
 import undead.armies.base.GetSingle;
+import undead.armies.behaviour.Single;
 import undead.armies.behaviour.task.*;
 import undead.armies.behaviour.task.mine.MineTask;
 import undead.armies.parser.config.ConfigParser;
@@ -78,6 +79,10 @@ public class UndeadArmies
         ConfigParser.instance.getInstance().registerConfig("stacking",
                 new TypeArgument(TaskUtil.instance.enableStackTask),
                 new TypeArgument(StackTask.cooldown));
+        ConfigParser.instance.getInstance().registerConfig("misc",
+                new TypeArgument(Single.recruitChance),
+                new TypeArgument(Single.boxLength),
+                new TypeArgument(Single.boxHeight));
         ConfigParser.instance.getInstance().reload();
     }
 }

@@ -22,24 +22,26 @@ If the main target is attacking with range, then march into the target with a zi
  */
 public class Group
 {
-    public static DecimalType setTargetChance = new DecimalType("setTargetChance", "chance for an undead mob to recruit other undead mobs to attack a target.", 0.8d);
     public Group parentGroup = this;
     public Group mergeWith = null;
+    public HashMap<GroupMember, GroupMember> members = new HashMap<>();
     public final LivingEntity target;
     public void tick(@NotNull final Single single, final Argument argument)
     {
+        if(this.mergeWith != null)
+        {
+            single.setGroup(this.mergeWith);
+        }
         if(GroupUtil.instance.isInvalidTarget(this.target))
         {
-            single.group = null;
-            if(this.mergeWith != null)
-            {
-                UndeadArmies.logger.debug("setting to mergeWith");
-                single.group = this.mergeWith;
-                return;
-            }
             if(!this.target.is(this.parentGroup.target))
             {
                 single.setGroup(parentGroup);
+            }
+            else
+            {
+                single.group = null;
+                this.members.remove(new GroupMember(single));
             }
         }
     }

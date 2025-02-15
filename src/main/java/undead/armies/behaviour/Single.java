@@ -9,10 +9,10 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
-import undead.armies.UndeadArmies;
 import undead.armies.base.GetSingle;
 import undead.armies.base.Resettable;
 import undead.armies.behaviour.group.Group;
+import undead.armies.behaviour.group.GroupMember;
 import undead.armies.behaviour.group.GroupUtil;
 import undead.armies.behaviour.task.BaseTask;
 import undead.armies.behaviour.task.TaskUtil;
@@ -25,6 +25,8 @@ import java.util.List;
 public class Single implements Resettable
 {
     public static DecimalType recruitChance = new DecimalType("recruitChance", "chance for an undead mob to recruit other undead mobs to attack a target.", 0.2d);
+    public static DecimalType boxLength = new DecimalType("length", "length of the horizontal side of the recruitment box.", 20.0d);
+    public static DecimalType boxHeight = new DecimalType("height", "height and depth of the recruitment box", 3.0d);
     @NotNull
     public final PathfinderMob pathfinderMob;
     @NotNull
@@ -69,8 +71,17 @@ public class Single implements Resettable
     }
     public void setGroup(@NotNull final Group group)
     {
+        final GroupMember groupMember = new GroupMember(this);
+        if(this.group != null)
+        {
+            this.group.members.remove(groupMember);
+        }
         this.group = group;
-        this.pathfinderMob.setTarget(group.target);
+        this.group.members.put(groupMember, groupMember);
+        if(this.pathfinderMob.getTarget() != group.target)
+        {
+            this.pathfinderMob.setTarget(group.target);
+        }
     }
     public void beingTargetBy(@NotNull final LivingEntity livingEntity)
     {
@@ -98,7 +109,9 @@ public class Single implements Resettable
         final double x = this.position().x;
         final double y = this.position().y;
         final double z = this.position().z;
-        final AABB checkingBox = new AABB(x - 10.0d, y - 3.0d, z - 10.0d, x + 10.0d, y + 3.0d, z + 10.0d);
+        final double lengthDiv2 = Single.boxLength.value / 2.0;
+        final double heightDiv2 = Single.boxHeight.value / 2.0;
+        final AABB checkingBox = new AABB(x - lengthDiv2, y - heightDiv2, z - lengthDiv2, x + lengthDiv2, y + heightDiv2, z + lengthDiv2);
         final List<Entity> entities = this.pathfinderMob.level().getEntities(this.pathfinderMob, checkingBox);
         final LivingEntity target = this.pathfinderMob.getTarget();
         double requiredCapability = GroupUtil.instance.getCapability(target) - GroupUtil.instance.getCapability(this.pathfinderMob);

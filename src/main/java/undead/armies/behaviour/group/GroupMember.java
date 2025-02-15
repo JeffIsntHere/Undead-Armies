@@ -2,17 +2,18 @@ package undead.armies.behaviour.group;
 
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
+import undead.armies.behaviour.Single;
 
 import java.util.UUID;
 
-public class TargetWrapper
+public class GroupMember
 {
-    public final LivingEntity target;
+    public final Single member;
     public final UUID uuid;
-    public TargetWrapper(final @NotNull LivingEntity target)
+    public GroupMember(final @NotNull Single member)
     {
-        this.target = target;
-        this.uuid = target.getUUID();
+        this.member = member;
+        this.uuid = member.pathfinderMob.getUUID();
     }
     @Override
     public int hashCode()

@@ -6,7 +6,6 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import undead.armies.behaviour.task.Argument;
-import undead.armies.misc.Util;
 import undead.armies.behaviour.Single;
 import undead.armies.behaviour.task.BaseTask;
 import undead.armies.misc.PathfindingTracker;
