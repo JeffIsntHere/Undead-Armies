@@ -35,14 +35,6 @@ public class UndeadArmies
         Registry.instance.getInstance().registerCommands(registerCommandsEvent.getDispatcher());
     }
     @SubscribeEvent
-    public void livingChangeTargetEvent(LivingChangeTargetEvent livingChangeTargetEvent)
-    {
-        if(livingChangeTargetEvent.getNewAboutToBeSetTarget() instanceof GetSingle getSingle)
-        {
-            getSingle.getSingle().beingTargetBy(livingChangeTargetEvent.getEntity());
-        }
-    }
-    @SubscribeEvent
     public void livingDamageEventPre(LivingDamageEvent.Pre damageEvent)
     {
         if(damageEvent.getEntity() instanceof GetSingle getSingle)

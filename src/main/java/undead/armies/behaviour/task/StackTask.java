@@ -36,7 +36,7 @@ public class StackTask extends BaseTask
         final List<Entity> entities = single.pathfinderMob.level().getEntities(single.pathfinderMob, stackingBox);
         for(Entity entity : entities)
         {
-            if(!(entity instanceof GetSingle))
+            if(!(entity instanceof GetSingle getSingle) || !(Single.sameType(single, getSingle.getSingle()) || Single.targetCompatible(getSingle.getSingle(), target)))
             {
                 continue;
             }

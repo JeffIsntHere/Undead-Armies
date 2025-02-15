@@ -1,6 +1,7 @@
 package undead.armies.mixin;
 
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.monster.AbstractSkeleton;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Skeleton;
 import net.minecraft.world.level.Level;
@@ -13,9 +14,9 @@ import undead.armies.base.GetSingle;
 import undead.armies.behaviour.Single;
 
 @Mixin(Skeleton.class)
-public class SkeletonMixin extends Monster implements GetSingle
+public abstract class SkeletonMixin extends AbstractSkeleton implements GetSingle
 {
-    protected SkeletonMixin(EntityType<? extends Monster> pEntityType, Level pLevel)
+    protected SkeletonMixin(EntityType<? extends AbstractSkeleton> pEntityType, Level pLevel)
     {
         super(pEntityType, pLevel);
     }

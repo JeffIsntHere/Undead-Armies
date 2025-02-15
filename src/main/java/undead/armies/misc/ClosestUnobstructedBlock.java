@@ -5,7 +5,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
-import undead.armies.UndeadArmies;
 import undead.armies.misc.blockcast.BlockRayCast;
 
 public class ClosestUnobstructedBlock
@@ -28,7 +27,6 @@ public class ClosestUnobstructedBlock
         {
             return;
         }
-        UndeadArmies.logger.debug(this.renameLater.toString());
         final BlockRayCast BlockRayCast = new BlockRayCast(this.level, this.renameLater, blockPos.above());
         BlockState blockState = BlockRayCast.stopWhenHit();
         while(blockState != null)

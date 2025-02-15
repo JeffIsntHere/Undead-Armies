@@ -9,7 +9,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
-import undead.armies.UndeadArmies;
 import undead.armies.misc.BlockUtil;
 import undead.armies.misc.ClosestUnobstructedBlock;
 import undead.armies.behaviour.Single;
@@ -91,7 +90,6 @@ public class DismountTask extends BaseTask
             final BlockPos belowMiddle = middle.below();
             final BlockPos above = aboveMiddle.above();
             final BlockState middleBlockState = level.getBlockState(middle);
-            UndeadArmies.logger.debug(middle.toString());
             if(BlockUtil.blockIsGood(middleBlockState))
             {
                 if(BlockUtil.blockIsAirOrNotLava(above, level))

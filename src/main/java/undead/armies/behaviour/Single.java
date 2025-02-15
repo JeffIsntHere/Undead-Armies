@@ -4,15 +4,18 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.ai.goal.GoalSelector;
+import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+import undead.armies.UndeadArmies;
 import undead.armies.base.GetSingle;
+import undead.armies.base.GetTargetType;
 import undead.armies.base.Resettable;
 import undead.armies.behaviour.group.Group;
-import undead.armies.behaviour.group.GroupMember;
 import undead.armies.behaviour.group.GroupUtil;
 import undead.armies.behaviour.task.BaseTask;
 import undead.armies.behaviour.task.TaskUtil;
@@ -27,6 +30,22 @@ public class Single implements Resettable
     public static DecimalType recruitChance = new DecimalType("recruitChance", "chance for an undead mob to recruit other undead mobs to attack a target.", 0.2d);
     public static DecimalType boxLength = new DecimalType("length", "length of the horizontal side of the recruitment box.", 20.0d);
     public static DecimalType boxHeight = new DecimalType("height", "height and depth of the recruitment box", 3.0d);
+    public static boolean sameType(@NotNull final Single left, @NotNull final Single right)
+    {
+        return left.pathfinderMob.getClass() == right.pathfinderMob.getClass();
+    }
+    public static boolean targetCompatible(@NotNull final Single single, @NotNull final LivingEntity target)
+    {
+        final GoalSelector targetSelector = single.pathfinderMob.targetSelector;
+        for(WrappedGoal wrappedGoal : targetSelector.getAvailableGoals())
+        {
+            if(wrappedGoal.getGoal() instanceof GetTargetType<?> getTargetType && getTargetType.targetType().isAssignableFrom(target.getClass()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
     @NotNull
     public final PathfinderMob pathfinderMob;
     @NotNull
@@ -47,6 +66,7 @@ public class Single implements Resettable
         if(this.pathfinderMob.getTarget() != null)
         {
             this.argument.value |= 1;
+            UndeadArmies.logger.debug("targeting: " + this.pathfinderMob.getTarget());
         }
         if(Util.isMoving(this))
         {
@@ -71,40 +91,22 @@ public class Single implements Resettable
     }
     public void setGroup(@NotNull final Group group)
     {
-        final GroupMember groupMember = new GroupMember(this);
         if(this.group != null)
         {
-            this.group.members.remove(groupMember);
+            if(this.group != group)
+            {
+                this.group.remove(this);
+            }
+            else
+            {
+                return;
+            }
         }
         this.group = group;
-        this.group.members.put(groupMember, groupMember);
-        if(this.pathfinderMob.getTarget() != group.target)
-        {
-            this.pathfinderMob.setTarget(group.target);
-        }
+        this.group.add(this);
+        this.pathfinderMob.setTarget(this.group.target);
     }
-    public void beingTargetBy(@NotNull final LivingEntity livingEntity)
-    {
-        if(GroupUtil.instance.isInvalidTarget(livingEntity))
-        {
-            return;
-        }
-        if(this.pathfinderMob.getTarget() == null)
-        {
-            this.pathfinderMob.setTarget(livingEntity);
-            return;
-        }
-        if(this.group == null)
-        {
-            this.group = new Group(livingEntity);
-            this.recruit();
-        }
-        else
-        {
-            this.group.trySplit(this, livingEntity);
-        }
-    }
-    public void recruit()
+    public List<Entity> getNearbyEntities()
     {
         final double x = this.position().x;
         final double y = this.position().y;
@@ -112,19 +114,56 @@ public class Single implements Resettable
         final double lengthDiv2 = Single.boxLength.value / 2.0;
         final double heightDiv2 = Single.boxHeight.value / 2.0;
         final AABB checkingBox = new AABB(x - lengthDiv2, y - heightDiv2, z - lengthDiv2, x + lengthDiv2, y + heightDiv2, z + lengthDiv2);
-        final List<Entity> entities = this.pathfinderMob.level().getEntities(this.pathfinderMob, checkingBox);
+        return this.pathfinderMob.level().getEntities(this.pathfinderMob, checkingBox);
+    }
+    public void recruit()
+    {
         final LivingEntity target = this.pathfinderMob.getTarget();
-        double requiredCapability = GroupUtil.instance.getCapability(target) - GroupUtil.instance.getCapability(this.pathfinderMob);
-        if(requiredCapability <= 0)
-        {
-            return;
-        }
+        final List<Entity> entities = this.getNearbyEntities();
         for(Entity entity : entities)
         {
             if(entity instanceof GetSingle getSingle)
             {
                 final Single single = getSingle.getSingle();
                 final double power = GroupUtil.instance.getCapability(single.pathfinderMob);
+                if(!(Single.sameType(single, this) || Single.targetCompatible(single, target)) || single.group == this.group)
+                {
+                    continue;
+                }
+                if(single.group == null)
+                {
+                    single.setGroup(this.group);
+                }
+                else if(!single.group.tryMerge(this.group) && GroupUtil.instance.shouldJoin(single, target))
+                {
+                    single.setGroup(this.group);
+                }
+            }
+        }
+    }
+    public void recruit(double requiredCapability)
+    {
+        final LivingEntity target = this.pathfinderMob.getTarget();
+        if(target == null)
+        {
+            return;
+        }
+        if(requiredCapability <= 0)
+        {
+            return;
+        }
+        requiredCapability *= 2;
+        final List<Entity> entities = this.getNearbyEntities();
+        for(Entity entity : entities)
+        {
+            if(entity instanceof GetSingle getSingle)
+            {
+                final Single single = getSingle.getSingle();
+                final double power = GroupUtil.instance.getCapability(single.pathfinderMob);
+                if(!(Single.sameType(single, this) || Single.targetCompatible(single, target)) || single.group == this.group)
+                {
+                    continue;
+                }
                 if(single.group == null)
                 {
                     single.setGroup(this.group);
@@ -179,6 +218,10 @@ public class Single implements Resettable
         {
             this.group = new Group(livingEntity);
             this.recruit();
+        }
+        if(this.group != null)
+        {
+            this.group.hit(this);
         }
     }
     public Single(final PathfinderMob pathfinderMob)
