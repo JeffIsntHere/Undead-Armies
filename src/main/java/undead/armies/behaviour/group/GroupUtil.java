@@ -26,7 +26,7 @@ public final class GroupUtil
         {
             return true;
         }
-        return GroupUtil.instance.getTargetPriority(single, single.pathfinderMob.getTarget()) < GroupUtil.instance.getTargetPriority(single, target);
+        return GroupUtil.instance.getTargetPriority(single) < GroupUtil.instance.getTargetPriority(single, target);
     }
     public double getCapability(@NotNull final LivingEntity livingEntity)
     {
@@ -49,11 +49,20 @@ public final class GroupUtil
         }
         return output;
     }
-    public double getTargetPriority(@NotNull final Single single, final LivingEntity target)
+    public double getTargetPriority(@NotNull final Single single, @NotNull final LivingEntity target)
     {
         if(target == null)
         {
-            return 1.0d;
+            return 0.0d;
+        }
+        return GroupUtil.instance.getCapability(single.pathfinderMob) / GroupUtil.instance.getCapability(target) / single.pathfinderMob.distanceTo(target);
+    }
+    public double getTargetPriority(@NotNull final Single single)
+    {
+        final LivingEntity target = single.pathfinderMob;
+        if(target == null)
+        {
+            return 0.0d;
         }
         return GroupUtil.instance.getCapability(single.pathfinderMob) / GroupUtil.instance.getCapability(target) / single.pathfinderMob.distanceTo(target);
     }

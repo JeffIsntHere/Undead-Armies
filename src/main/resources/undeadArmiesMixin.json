@@ -5,7 +5,7 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "ZombieMixin",
-    "SkeletonMixin",
+    "AbstractSkeletonMixin",
     "NearestAttackableTargetGoalMixin"
   ],
   "injectors": {

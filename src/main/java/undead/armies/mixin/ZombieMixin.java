@@ -1,6 +1,5 @@
 package undead.armies.mixin;
 
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Zombie;
@@ -22,7 +21,7 @@ public abstract class ZombieMixin extends Monster implements GetSingle
     }
     @Unique
     private final Single single = new Single(this);
-    @Inject(method="tick",at=@At("HEAD"))
+    @Inject(method="aiStep",at=@At("HEAD"))
     public void additionalTick(CallbackInfo callbackInfo)
     {
         this.single.tick();
