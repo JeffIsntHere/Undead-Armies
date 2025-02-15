@@ -14,7 +14,7 @@ public final class GroupUtil
     private GroupUtil(){};
     public boolean isValidTarget(final LivingEntity livingEntity)
     {
-        return !livingEntity.isDeadOrDying() || !(livingEntity instanceof ServerPlayer serverPlayer && (serverPlayer.isCreative() || serverPlayer.isSpectator()));
+        return !livingEntity.isDeadOrDying() && !(livingEntity instanceof ServerPlayer serverPlayer && (serverPlayer.isCreative() || serverPlayer.isSpectator()));
     }
     public boolean isInvalidTarget(final LivingEntity livingEntity)
     {

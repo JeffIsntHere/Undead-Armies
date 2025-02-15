@@ -2,17 +2,18 @@ package undead.armies.behaviour;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+import undead.armies.UndeadArmies;
 import undead.armies.base.GetSingle;
 import undead.armies.base.Resettable;
 import undead.armies.behaviour.group.Group;
 import undead.armies.behaviour.group.GroupUtil;
-import undead.armies.behaviour.group.TargetWrapper;
 import undead.armies.behaviour.task.BaseTask;
 import undead.armies.behaviour.task.TaskUtil;
 import undead.armies.behaviour.task.Argument;
@@ -71,16 +72,12 @@ public class Single implements Resettable
         this.group = group;
         this.pathfinderMob.setTarget(group.target);
     }
-    public List<Entity> getNearbyEntities()
-    {
-        final double x = this.position().x;
-        final double y = this.position().y;
-        final double z = this.position().z;
-        final AABB checkingBox = new AABB(x - 5.0d, y - 5.0d, z - 5.0d, x + 5.0d, y + 5.0d, z + 5.0d);
-        return this.pathfinderMob.level().getEntities(this.pathfinderMob, checkingBox);
-    }
     public void beingTargetBy(@NotNull final LivingEntity livingEntity)
     {
+        if(GroupUtil.instance.isInvalidTarget(livingEntity))
+        {
+            return;
+        }
         if(this.pathfinderMob.getTarget() == null)
         {
             this.pathfinderMob.setTarget(livingEntity);
@@ -88,27 +85,46 @@ public class Single implements Resettable
         }
         if(this.group == null)
         {
-            return;
+            this.group = new Group(livingEntity);
+            this.recruit();
         }
-        final TargetWrapper targetWrapper = new TargetWrapper(livingEntity);
-        this.group.parentGroup.subTargets.put(targetWrapper, targetWrapper);
+        else
+        {
+            this.group.trySplit(this, livingEntity);
+        }
     }
     public void recruit()
     {
-        final List<Entity> entities = this.getNearbyEntities();
+        final double x = this.position().x;
+        final double y = this.position().y;
+        final double z = this.position().z;
+        final AABB checkingBox = new AABB(x - 10.0d, y - 3.0d, z - 10.0d, x + 10.0d, y + 3.0d, z + 10.0d);
+        final List<Entity> entities = this.pathfinderMob.level().getEntities(this.pathfinderMob, checkingBox);
         final LivingEntity target = this.pathfinderMob.getTarget();
+        double requiredCapability = GroupUtil.instance.getCapability(target) - GroupUtil.instance.getCapability(this.pathfinderMob);
+        if(requiredCapability <= 0)
+        {
+            return;
+        }
         for(Entity entity : entities)
         {
             if(entity instanceof GetSingle getSingle)
             {
                 final Single single = getSingle.getSingle();
+                final double power = GroupUtil.instance.getCapability(single.pathfinderMob);
                 if(single.group == null)
                 {
                     single.setGroup(this.group);
+                    requiredCapability -= power;
                 }
-                else if(this.pathfinderMob.getRandom().nextFloat() < 0.5f && !single.group.tryMerge(this.group) && GroupUtil.instance.shouldJoin(single, target))
+                else if(!single.group.tryMerge(this.group) && GroupUtil.instance.shouldJoin(single, target))
                 {
                     single.setGroup(this.group);
+                    requiredCapability -= power;
+                }
+                if(requiredCapability <= 0)
+                {
+                    return;
                 }
             }
         }

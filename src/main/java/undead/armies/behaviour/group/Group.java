@@ -3,6 +3,7 @@ package undead.armies.behaviour.group;
 import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import org.jetbrains.annotations.NotNull;
+import undead.armies.UndeadArmies;
 import undead.armies.behaviour.task.Argument;
 import undead.armies.behaviour.Single;
 import undead.armies.parser.config.type.DecimalType;
@@ -25,58 +26,6 @@ public class Group
     public Group parentGroup = this;
     public Group mergeWith = null;
     public final LivingEntity target;
-    public final HashMap<TargetWrapper, TargetWrapper> subTargets = new HashMap<>();
-    public void setTarget(@NotNull final Single single, final Argument argument)
-    {
-        double highestWeight = GroupUtil.instance.getTargetPriority(single, this.target);
-        LivingEntity bestTarget = this.target;
-        final ArrayList<TargetWrapper> removal = new ArrayList<>();
-        for(TargetWrapper targetWrapper : this.subTargets.keySet())
-        {
-            if(GroupUtil.instance.isInvalidTarget(targetWrapper.target))
-            {
-                removal.add(targetWrapper);
-                continue;
-            }
-            final double currentWeight = GroupUtil.instance.getTargetPriority(single, targetWrapper.target);
-            if(currentWeight > highestWeight)
-            {
-                highestWeight = currentWeight;
-                bestTarget = targetWrapper.target;
-            }
-        }
-        for(TargetWrapper targetWrapper : removal)
-        {
-            this.subTargets.remove(targetWrapper);
-        }
-        if(GroupUtil.instance.isInvalidTarget(bestTarget))
-        {
-            return;
-        }
-        single.pathfinderMob.setTarget(bestTarget);
-        argument.value |= 1;
-    }
-    public void updateTarget(@NotNull final Single single, final Argument argument)
-    {
-        final LivingEntity target = single.pathfinderMob.getTarget();
-        if((argument.value & 1) == 1)
-        {
-            if(GroupUtil.instance.isInvalidTarget(target))
-            {
-                this.setTarget(single, argument);
-                return;
-            }
-            if(target.is(this.target) || subTargets.get(target) != null)
-            {
-                return;
-            }
-        }
-        final double random = single.pathfinderMob.getRandom().nextDouble();
-        if(random <= Group.setTargetChance.value)
-        {
-            this.setTarget(single, argument);
-        }
-    }
     public void tick(@NotNull final Single single, final Argument argument)
     {
         if(GroupUtil.instance.isInvalidTarget(this.target))
@@ -84,15 +33,15 @@ public class Group
             single.group = null;
             if(this.mergeWith != null)
             {
+                UndeadArmies.logger.debug("setting to mergeWith");
                 single.group = this.mergeWith;
                 return;
             }
-            if(single.group != this.parentGroup)
+            if(!this.target.is(this.parentGroup.target))
             {
-                single.group = parentGroup;
+                single.setGroup(parentGroup);
             }
         }
-        this.updateTarget(single, argument);
     }
     public boolean tryMerge(@NotNull final Group group)
     {
