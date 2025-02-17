@@ -122,7 +122,7 @@ public class DismountTask extends BaseTask
             }
         }
         //check if closest's y is higher than current y.
-        if(ClosestUnobstructedBlock.closest != null && ClosestUnobstructedBlock.closest.getY() > single.position().y + 1.0f)
+        if(ClosestUnobstructedBlock.closest == null || ClosestUnobstructedBlock.closest.getY() <= single.position().y + 1.0f)
         {
             return false;
         }
