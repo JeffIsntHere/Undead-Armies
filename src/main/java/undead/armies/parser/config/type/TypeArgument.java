@@ -38,4 +38,8 @@ public class TypeArgument
     {
         return type.toString();
     }
+    public String getValue()
+    {
+        return this.type.toString().substring(this.type.name.length() + 3);
+    }
 }

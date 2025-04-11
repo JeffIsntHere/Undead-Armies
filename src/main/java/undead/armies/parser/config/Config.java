@@ -4,6 +4,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import undead.armies.parser.config.type.TypeArgument;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Objects;
@@ -56,6 +59,23 @@ public class Config
         }
         while(!present.isEmpty() && (currentIndex < chars.length));
         return (present.isEmpty()) ? ((currentIndex < chars.length) ? null : past.getFirst().right) : present.getFirst().right;
+    }
+    public void print(PrintStream printStream)
+    {
+        printStream.println(this.name);
+        printStream.print("{");
+        for(TypeArgument typeArgument : this.typeArguments)
+        {
+            printStream.println();
+            printStream.println("  " + typeArgument.type.name);
+            if(!typeArgument.type.desc.isEmpty())
+            {
+                printStream.println("  --> " + typeArgument.type.desc);
+            }
+            printStream.println("  {" + typeArgument.getValue() + "}");
+        }
+        printStream.println("}");
+        printStream.println();
     }
     public void process()
     {

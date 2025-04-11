@@ -7,6 +7,7 @@ import undead.armies.parser.File;
 import undead.armies.parser.Parser;
 import undead.armies.parser.config.type.TypeArgument;
 
+import java.io.PrintStream;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
@@ -92,12 +93,23 @@ public class ConfigParser extends Parser
     public void reload()
     {
         final File file = new File();
-        final Reader reader = file.getFileReader("config.txt");
-        super.parseFromInput(reader);
-        File.closeReader(reader);
-        for(final Config config : ConfigParser.configCache)
+        if(!file.fileExists("config.txt"))
         {
-            config.process();
+            final PrintStream printStream = file.getFilePrinter("config.txt");
+            for (final Config config : ConfigParser.configCache)
+            {
+                config.print(printStream);
+            }
+        }
+        else
+        {
+            final Reader reader = file.getFileReader("config.txt");
+            super.parseFromInput(reader);
+            File.closeReader(reader);
+            for (final Config config : ConfigParser.configCache)
+            {
+                config.process();
+            }
         }
     }
     public void registerConfig(@NotNull final String name, @NotNull final TypeArgument... arguments)
