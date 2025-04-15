@@ -3,7 +3,6 @@ package undead.armies.behaviour.task;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import undead.armies.behaviour.Single;
-import undead.armies.behaviour.task.mine.MineTask;
 import undead.armies.parser.config.type.BooleanType;
 
 import java.util.ArrayList;

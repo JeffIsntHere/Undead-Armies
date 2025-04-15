@@ -6,7 +6,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
-import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import org.slf4j.Logger;
@@ -14,7 +13,7 @@ import undead.armies.base.GetSingle;
 import undead.armies.behaviour.Single;
 import undead.armies.behaviour.group.Group;
 import undead.armies.behaviour.task.*;
-import undead.armies.behaviour.task.mine.MineTask;
+import undead.armies.behaviour.task.MineTask;
 import undead.armies.parser.config.ConfigParser;
 import undead.armies.parser.config.type.TypeArgument;
 
