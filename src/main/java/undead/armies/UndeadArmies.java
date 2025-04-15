@@ -13,7 +13,7 @@ import undead.armies.base.GetSingle;
 import undead.armies.behaviour.Single;
 import undead.armies.behaviour.group.Group;
 import undead.armies.behaviour.task.*;
-import undead.armies.behaviour.task.MineTask;
+import undead.armies.behaviour.task.mine.MineWrapper;
 import undead.armies.parser.config.ConfigParser;
 import undead.armies.parser.config.type.TypeArgument;
 
@@ -47,8 +47,8 @@ public class UndeadArmies
     {
         ConfigParser.instance.getInstance().registerConfig("mining",
                 new TypeArgument(TaskUtil.instance.enableMineTask),
-                new TypeArgument(MineTask.maxMiningDistance),
-                new TypeArgument(MineTask.blockHealthMultiplier));
+                new TypeArgument(MineWrapper.maxMiningDistance),
+                new TypeArgument(MineWrapper.blockHealthMultiplier));
         ConfigParser.instance.getInstance().registerConfig("dismount",
                 new TypeArgument(TaskUtil.instance.enableDismountTask),
                 new TypeArgument(DismountTask.cooldown));
