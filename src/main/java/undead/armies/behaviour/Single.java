@@ -18,6 +18,7 @@ import undead.armies.behaviour.group.GroupUtil;
 import undead.armies.behaviour.task.BaseTask;
 import undead.armies.behaviour.task.TaskUtil;
 import undead.armies.behaviour.task.Argument;
+import undead.armies.misc.LinkedList;
 import undead.armies.misc.Util;
 import undead.armies.parser.config.type.DecimalType;
 
@@ -45,6 +46,8 @@ public class Single implements Resettable
     }
     @NotNull
     public final PathfinderMob pathfinderMob;
+    @NotNull
+    public LinkedList<BaseTask> task;
     @NotNull
     public BaseTask currentTask;
     public int currentTaskLength;
