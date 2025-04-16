@@ -10,7 +10,6 @@ import undead.armies.parser.config.type.DecimalType;
 public class MineWrapper extends BaseTask
 {
     public static final DecimalType maxMiningDistance = new DecimalType("maxMiningDistance", 5.0d);
-    public static final DecimalType blockHealthMultiplier = new DecimalType("blockHealthMultiplier", "a block's hp is calculated using this: Blast resistance * blockHealthMultiplier. The result is how many hits is required to break the block.", 8.0d);
     protected PathfindingTracker pathfindingTracker = new PathfindingTracker(30);
     protected MineTask mineTask = new MineTask();
     public int triggerAfter = 0;

@@ -9,9 +9,14 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import undead.armies.behaviour.Single;
 import undead.armies.misc.blockcast.offset.*;
+import undead.armies.parser.config.type.DecimalType;
+import undead.armies.parser.config.type.StringType;
 
 public class MineTask
 {
+    public static final DecimalType unbreakable = new DecimalType("unbreakable", "any blocks with block hp over this value will be regarded as unbreakable.", 72.0d);
+    public static final StringType specific = new StringType("specific", "this is used to manually specify block hp for any block.","");
+    public static final DecimalType blockHealthMultiplier = new DecimalType("blockHealthMultiplier", "a block's hp is calculated using this: Blast resistance * blockHealthMultiplier. The result is how many hits is required to break the block.", 8.0d);
     public static final Base[][] offsets =
             {
                     {YPlus.instance, ZPlus.instance, YMinus.instance},
@@ -29,14 +34,15 @@ public class MineTask
                     {ZMinus.instance, YMinus.instance, YMinus.instance},
                     {YMinus.instance, YMinus.instance, YMinus.instance}
             };
-    public static int getBlockHp(final Block block)
+    public static double getBlockHp(final Block block)
     {
+        final double explosionResistance = block.getExplosionResistance() * MineTask.blockHealthMultiplier.value;
         return 0;
     }
     protected BlockPos currentBlockPos = null;
     protected Level level = null;
     protected Block currentBlock = null;
-    protected int remainingHp = 0;
+    protected double remainingHp = 0;
     protected int offsetIndex = 0;
     protected int offsetIndexIndex = 1;
     public boolean handle(Single single)
