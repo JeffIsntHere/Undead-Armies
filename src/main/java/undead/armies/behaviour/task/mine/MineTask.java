@@ -154,6 +154,11 @@ public class MineTask
         {
             this.remainingHp = MineTask.getBlockHp(blockState);
         }
+        if(this.remainingHp > MineTask.unbreakable.value)
+        {
+
+        }
+        this.remainingHp--;
         if(this.remainingHp < 1)
         {
             if(!blockState.isAir())
