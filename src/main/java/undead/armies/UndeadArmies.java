@@ -33,7 +33,7 @@ public class UndeadArmies
     @SubscribeEvent
     public void registerCommandsEvent(RegisterCommandsEvent registerCommandsEvent)
     {
-        Registry.instance.getInstance().registerCommands(registerCommandsEvent.getDispatcher());
+        Registry.instance.getInstance().registerCommands(registerCommandsEvent.getDispatcher(), registerCommandsEvent.getBuildContext());
     }
     @SubscribeEvent
     public void livingDamageEventPre(LivingDamageEvent.Pre damageEvent)

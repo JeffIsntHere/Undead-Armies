@@ -7,10 +7,13 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import undead.armies.UndeadArmies;
 import undead.armies.behaviour.Single;
 import undead.armies.misc.blockcast.offset.*;
 import undead.armies.parser.config.type.DecimalType;
 import undead.armies.parser.config.type.StringType;
+
+import java.util.HashMap;
 
 public class MineTask
 {
@@ -34,10 +37,24 @@ public class MineTask
                     {ZMinus.instance, YMinus.instance, YMinus.instance},
                     {YMinus.instance, YMinus.instance, YMinus.instance}
             };
-    public static double getBlockHp(final Block block)
+    public static double getBlockHp(final BlockState blockState)
     {
-        final double explosionResistance = block.getExplosionResistance() * MineTask.blockHealthMultiplier.value;
-        return 0;
+        final HashMap<BlockStateBlockPair, Double> specific = MineParser.instance.getData(MineTask.specific.value);
+        for(BlockStateBlockPair blockStateBlockPair : specific.keySet())
+        {
+            UndeadArmies.logger.debug(blockStateBlockPair.equals(new BlockStateBlockPair(null, blockState.getBlock())) + "");
+        }
+        Double blockHp = specific.get(new BlockStateBlockPair(blockState, null));
+        if(blockHp != null)
+        {
+            return blockHp;
+        }
+        blockHp = specific.get(new BlockStateBlockPair(null, blockState.getBlock()));
+        if(blockHp != null)
+        {
+            return blockHp;
+        }
+        return blockState.getBlock().getExplosionResistance() * MineTask.blockHealthMultiplier.value;
     }
     protected BlockPos currentBlockPos = null;
     protected Level level = null;
@@ -132,13 +149,13 @@ public class MineTask
         this.level = single.pathfinderMob.level();
         this.currentBlockPos = MineTask.offsets[this.offsetIndex][this.offsetIndexIndex].offset(this.currentBlockPos);
         this.currentBlock = this.level.getBlockState(this.currentBlockPos).getBlock();
-        if(!this.level.getBlockState(this.currentBlockPos).is(this.currentBlock))
+        final BlockState blockState = this.level.getBlockState(this.currentBlockPos);
+        if(!blockState.is(this.currentBlock))
         {
-            this.remainingHp = MineTask.getBlockHp(this.currentBlock);
+            this.remainingHp = MineTask.getBlockHp(blockState);
         }
         if(this.remainingHp < 1)
         {
-            final BlockState blockState = this.level.getBlockState(this.currentBlockPos);
             if(!blockState.isAir())
             {
                 Block.dropResources(blockState, this.level, this.currentBlockPos);
@@ -152,7 +169,7 @@ public class MineTask
             this.currentBlockPos = MineTask.offsets[this.offsetIndex][this.offsetIndexIndex].offset(this.currentBlockPos);
             this.offsetIndexIndex++;
             this.currentBlock = this.level.getBlockState(this.currentBlockPos).getBlock();
-            this.remainingHp = MineTask.getBlockHp(this.currentBlock);
+            this.remainingHp = MineTask.getBlockHp(this.level.getBlockState(this.currentBlockPos));
         }
         return true;
     }
