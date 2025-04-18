@@ -25,7 +25,7 @@ public class MineTask
                     {YPlus.instance, ZPlus.instance, YMinus.instance},
                     {YPlus.instance, XPlus.instance, YMinus.instance},
                     {YPlus.instance, ZMinus.instance, YMinus.instance},
-                    {YPlus.instance, YMinus.instance, YMinus.instance},
+                    {YPlus.instance, XMinus.instance, YMinus.instance},
 
                     {ZPlus.instance, YMinus.instance, NoOffset.instance},
                     {XPlus.instance, YMinus.instance, NoOffset.instance},
@@ -56,20 +56,16 @@ public class MineTask
         }
         return blockState.getBlock().getExplosionResistance() * MineTask.blockHealthMultiplier.value;
     }
+    protected BlockPos startingPoint = null;
     protected BlockPos currentBlockPos = null;
     protected Level level = null;
     protected Block currentBlock = null;
     protected double remainingHp = 0;
-    protected int offsetIndex = 0;
+    protected int offsetIndex = -1;
     protected int offsetIndexIndex = 1;
-    public boolean handle(Single single)
+    public void init(final Single single)
     {
-        if(this.level != single.pathfinderMob.level())
-        {
-            return false;
-        }
-        this.currentBlockPos = single.pathfinderMob.blockPosition().above();
-        this.offsetIndexIndex = 1;
+        this.startingPoint = single.pathfinderMob.blockPosition().above();
         final Vec3 buffer = single.pathfinderMob.getTarget().position().subtract(single.position());
         if(buffer.y >= -0.5f && buffer.y <= 0.5f)
         {
@@ -147,8 +143,19 @@ public class MineTask
             }
         }
         this.level = single.pathfinderMob.level();
-        this.currentBlockPos = MineTask.offsets[this.offsetIndex][this.offsetIndexIndex].offset(this.currentBlockPos);
+        this.currentBlockPos = MineTask.offsets[this.offsetIndex][this.offsetIndexIndex].offset(this.startingPoint);
         this.currentBlock = this.level.getBlockState(this.currentBlockPos).getBlock();
+    }
+    public boolean handle(Single single)
+    {
+        if(this.offsetIndex == -1)
+        {
+            this.init(single);
+        }
+        else if(this.level != single.pathfinderMob.level())
+        {
+            return false;
+        }
         final BlockState blockState = this.level.getBlockState(this.currentBlockPos);
         if(!blockState.is(this.currentBlock))
         {
@@ -156,7 +163,55 @@ public class MineTask
         }
         if(this.remainingHp > MineTask.unbreakable.value)
         {
-
+            this.offsetIndex = this.offsetIndex % 4;
+            if(this.level.getRandom().nextBoolean())
+            {
+                //go left
+                switch(this.offsetIndex)
+                {
+                    case 0:
+                        offsetIndex = 3;
+                        break;
+                    case 1:
+                        offsetIndex = 0;
+                        break;
+                    case 2:
+                        offsetIndex = 1;
+                        break;
+                    case 3:
+                        offsetIndex = 2;
+                }
+            }
+            else
+            {
+                //go right
+                switch(this.offsetIndex)
+                {
+                    case 0:
+                        offsetIndex = 1;
+                        break;
+                    case 1:
+                        offsetIndex = 2;
+                        break;
+                    case 2:
+                        offsetIndex = 3;
+                        break;
+                    case 3:
+                        offsetIndex = 0;
+                }
+            }
+            final Vec3 buffer = single.pathfinderMob.getTarget().position().subtract(single.position());
+            if(buffer.y >= -0.5f && buffer.y <= 0.5f)
+            {
+                offsetIndex += 4;
+            }
+            else if(buffer.y < 0)
+            {
+                offsetIndex += 8;
+            }
+            this.currentBlockPos = MineTask.offsets[this.offsetIndex][0].offset(this.startingPoint);
+            this.currentBlock = this.level.getBlockState(this.currentBlockPos).getBlock();
+            this.offsetIndexIndex = 1;
         }
         this.remainingHp--;
         if(this.remainingHp < 1)
@@ -175,6 +230,10 @@ public class MineTask
             this.offsetIndexIndex++;
             this.currentBlock = this.level.getBlockState(this.currentBlockPos).getBlock();
             this.remainingHp = MineTask.getBlockHp(this.level.getBlockState(this.currentBlockPos));
+        }
+        else
+        {
+            this.level.playSound(null, this.currentBlockPos, blockState.getSoundType(this.level, this.currentBlockPos, single.pathfinderMob).getHitSound(), SoundSource.BLOCKS, 2.0f / (float)this.remainingHp, 1.0f);
         }
         return true;
     }
