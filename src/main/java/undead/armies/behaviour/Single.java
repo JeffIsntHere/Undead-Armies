@@ -63,7 +63,6 @@ public class Single implements Resettable
         if(this.pathfinderMob.getTarget() != null)
         {
             this.argument.value |= 1;
-            UndeadArmies.logger.debug("targeting: " + this.pathfinderMob.getTarget());
         }
         if(Util.isMoving(this))
         {
