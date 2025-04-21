@@ -1,73 +1,68 @@
 package undead.armies.behaviour.task;
 
-import org.apache.commons.lang3.tuple.Pair;
+import net.minecraft.util.RandomSource;
 import org.jetbrains.annotations.NotNull;
 import undead.armies.behaviour.Single;
+import undead.armies.behaviour.Strategy;
 import undead.armies.behaviour.task.mine.MineWrapper;
-import undead.armies.parser.config.type.BooleanType;
+import undead.armies.parser.config.type.DecimalType;
 
 import java.util.ArrayList;
 
 public final class TaskUtil
 {
     public final static TaskUtil instance = new TaskUtil();
-    public BooleanType enableSprintTask = new BooleanType("enable", true);
-    public BooleanType enableGrabTask = new BooleanType("enable", true);
-    public BooleanType enableJumpTask = new BooleanType("enable", true);
-    public BooleanType enableStackTask = new BooleanType("enable", true);
-    public BooleanType enableMineTask = new BooleanType("enable",true);
-    public BooleanType enableDismountTask = new BooleanType("enable",true);
-    //mix into this to add your own tasks!
-    public ArrayList<BaseTask> finalizeTaskPool( @NotNull final ArrayList<BaseTask> output)
+    public DecimalType sprintTaskChance = new DecimalType("enableChance", 1.0d);
+    public DecimalType grabTaskChance = new DecimalType("enableChance", 1.0d);
+    public DecimalType jumpTaskChance = new DecimalType("enableChance", 1.0d);
+    public DecimalType stackTaskChance = new DecimalType("enableChance", "enabling this enables dismountTask, if this is disabled dismountTask will also be disabled.",1.0d);
+    public DecimalType mineTaskChance = new DecimalType("enableChance", 1.0d);
+    private final ArrayList<BaseTask> taskPool = new ArrayList<>();
+    public void setPursueTaskPool(@NotNull final RandomSource randomSource)
     {
-        return output;
+        this.taskPool.clear();
+        if(TaskUtil.instance.stackTaskChance.value != 0 && TaskUtil.instance.stackTaskChance.value >= randomSource.nextDouble())
+        {
+            this.taskPool.add(new StackTask());
+            this.taskPool.add(new DismountTask());//if this was removed, undead mobs wont be able to dismount after climbing each other.
+        }
+        if(TaskUtil.instance.mineTaskChance.value != 0 && TaskUtil.instance.mineTaskChance.value >= randomSource.nextDouble())
+        {
+            this.taskPool.add(new MineWrapper());
+        }
+        if(TaskUtil.instance.jumpTaskChance.value != 0 && TaskUtil.instance.jumpTaskChance.value >= randomSource.nextDouble())
+        {
+            this.taskPool.add(new JumpTask());
+        }
+        if(TaskUtil.instance.sprintTaskChance.value != 0 && TaskUtil.instance.sprintTaskChance.value >= randomSource.nextDouble())
+        {
+            this.taskPool.add(new SprintTask());
+        }
     }
-    public ArrayList<BaseTask> getTaskPool(@NotNull final Single single)
+    public void setKillTaskPool(@NotNull final RandomSource randomSource)
     {
-        final ArrayList<BaseTask> output = new ArrayList<>();
-        if(this.enableSprintTask.value)
+        this.taskPool.clear();
+        if(TaskUtil.instance.grabTaskChance.value != 0 && TaskUtil.instance.grabTaskChance.value >= randomSource.nextDouble())
         {
-            output.add(new SprintTask());
+            this.taskPool.add(new GrabTask());
         }
-        if(this.enableGrabTask.value)
-        {
-            output.add(new GrabTask());
-        }
-        if(this.enableJumpTask.value)
-        {
-            output.add(new JumpTask());
-        }
-        if(this.enableStackTask.value)
-        {
-            output.add(new StackTask());
-        }
-        if(this.enableMineTask.value)
-        {
-            output.add(new MineWrapper());
-        }
-        if(this.enableDismountTask.value)
-        {
-            output.add(new DismountTask());
-        }
-        return this.finalizeTaskPool(output);
     }
-    @NotNull
-    public Pair<Integer, BaseTask> getTask(@NotNull final Single single)
+    public void setEradicationTaskPool(@NotNull final RandomSource randomSource)
     {
-        final ArrayList<BaseTask> taskPool = this.getTaskPool(single);
-        if(taskPool.isEmpty())
-        {
-            return Pair.of(0, null);
-        }
-        final BaseTask firstTask = taskPool.getFirst();
-        BaseTask currentTask = firstTask;
-        for(int i = 1; i < taskPool.size(); i++)
-        {
-            currentTask.nextTask = taskPool.get(i);
-            currentTask = currentTask.nextTask;
-        }
-        currentTask.nextTask = firstTask;
-        return Pair.of(taskPool.size(), firstTask);
+        //todo: move multiTargeting to here.
+    }
+    public void setStrategies(@NotNull final Single single)
+    {
+        final RandomSource randomSource = single.pathfinderMob.getRandom();
+        single.strategies.clear();
+
+        this.setPursueTaskPool(randomSource);
+        single.strategies.add(new Strategy("pursue", this.taskPool));
+
+        this.setKillTaskPool(randomSource);
+        single.strategies.add(new Strategy("kill", this.taskPool));
+
+        this.taskPool.clear();
     }
     private TaskUtil(){};
 }

@@ -9,6 +9,8 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
+import undead.armies.behaviour.task.argument.Argument;
+import undead.armies.behaviour.task.argument.Situation;
 import undead.armies.misc.BlockUtil;
 import undead.armies.misc.ClosestUnobstructedBlock;
 import undead.armies.behaviour.Single;
@@ -129,5 +131,23 @@ public class DismountTask extends BaseTask
         single.pathfinderMob.stopRiding();
         single.pathfinderMob.dismountTo(ClosestUnobstructedBlock.closest.getX() + 0.5d, ClosestUnobstructedBlock.closest.getY() + 1.0d, ClosestUnobstructedBlock.closest.getZ() + 0.5d);
         return true;
+    }
+    @Override
+    public int situationScore(@NotNull Single single, final Situation situation)
+    {
+        int score = 0;
+        if((situation.value & 1) == 0)
+        {
+            score++;
+        }
+        if((situation.value & 2) == 0)
+        {
+            score++;
+        }
+        if((situation.value & 8) == 8)
+        {
+            score++;
+        }
+        return score;
     }
 }

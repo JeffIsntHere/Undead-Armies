@@ -4,6 +4,8 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import org.jetbrains.annotations.NotNull;
 import undead.armies.behaviour.Single;
+import undead.armies.behaviour.task.argument.Argument;
+import undead.armies.behaviour.task.argument.Situation;
 import undead.armies.parser.config.type.DecimalType;
 import undead.armies.parser.config.type.NumberType;
 
@@ -31,5 +33,23 @@ public class SprintTask extends BaseTask
         this.triggerAfter = tickCount + SprintTask.cooldown.value;
         single.pathfinderMob.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, SprintTask.duration.value, SprintTask.amplifier.value,true,false));
         return true;
+    }
+    @Override
+    public int situationScore(@NotNull Single single, final Situation situation)
+    {
+        int score = 0;
+        if((situation.value & 1) == 1)
+        {
+            score++;
+        }
+        if((situation.value & 2) == 2)
+        {
+            score++;
+        }
+        if((situation.value & 4) == 4)
+        {
+            score++;
+        }
+        return score;
     }
 }

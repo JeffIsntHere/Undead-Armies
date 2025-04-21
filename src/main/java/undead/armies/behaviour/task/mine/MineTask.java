@@ -13,6 +13,7 @@ import net.minecraft.world.phys.Vec3;
 import undead.armies.UndeadArmies;
 import undead.armies.base.GetSingle;
 import undead.armies.behaviour.Single;
+import undead.armies.behaviour.Strategy;
 import undead.armies.behaviour.task.BaseTask;
 import undead.armies.misc.blockcast.offset.*;
 import undead.armies.parser.config.type.DecimalType;
@@ -36,7 +37,7 @@ public class MineTask
                     {ZPlus.instance, YMinus.instance, NoOffset.instance},
                     {XPlus.instance, YMinus.instance, NoOffset.instance},
                     {ZMinus.instance, YMinus.instance, NoOffset.instance},
-                    {YMinus.instance, YMinus.instance, NoOffset.instance},
+                    {XMinus.instance, YMinus.instance, NoOffset.instance},
 
                     {ZPlus.instance, YMinus.instance, YMinus.instance},
                     {XPlus.instance, YMinus.instance, YMinus.instance},
@@ -80,16 +81,24 @@ public class MineTask
                 final Single buffer = getSingle.getSingle();
                 if(Single.targetCompatible(buffer, target))
                 {
-                    BaseTask currentTask = buffer.currentTask;
-                    for(int i = 0; i < buffer.currentTaskLength; i++)
+                    Strategy bufferStrategy = null;
+                    for(Strategy strategy : buffer.strategies)
                     {
-                        if(currentTask instanceof MineWrapper mineWrapper)
+                        if(strategy.name == "pursue")
                         {
-                            mineWrapper.mineTask = this;
-                            break;
+                            bufferStrategy = strategy;
                         }
-                        currentTask = currentTask.nextTask;
                     }
+                    if(bufferStrategy == null)
+                    {
+                        continue;
+                    }
+                    MineWrapper currentTask = bufferStrategy.findTask(MineWrapper.class);
+                    if(currentTask == null)
+                    {
+                        continue;
+                    }
+                    currentTask.mineTask = this;
                 }
             }
         }
@@ -101,22 +110,22 @@ public class MineTask
             {
                 if(buffer.z < 0)
                 {
-                    this.offsetIndex = 4;
+                    this.offsetIndex = 6;
                 }
                 else
                 {
-                    this.offsetIndex = 6;
+                    this.offsetIndex = 4;
                 }
             }
             else
             {
                 if(buffer.x < 0)
                 {
-                    this.offsetIndex = 5;
+                    this.offsetIndex = 7;
                 }
                 else
                 {
-                    this.offsetIndex = 7;
+                    this.offsetIndex = 5;
                 }
             }
         }
@@ -126,22 +135,22 @@ public class MineTask
             {
                 if(buffer.z < 0)
                 {
-                    this.offsetIndex = 0;
+                    this.offsetIndex = 2;
                 }
                 else
                 {
-                    this.offsetIndex = 2;
+                    this.offsetIndex = 0;
                 }
             }
             else
             {
                 if(buffer.x < 0)
                 {
-                    this.offsetIndex = 1;
+                    this.offsetIndex = 3;
                 }
                 else
                 {
-                    this.offsetIndex = 3;
+                    this.offsetIndex = 1;
                 }
             }
         }
@@ -151,30 +160,29 @@ public class MineTask
             {
                 if(buffer.z < 0)
                 {
-                    this.offsetIndex = 8;
+                    this.offsetIndex = 10;
                 }
                 else
                 {
-                    this.offsetIndex = 10;
+                    this.offsetIndex = 8;
                 }
             }
             else
             {
                 if(buffer.x < 0)
                 {
-                    this.offsetIndex = 9;
+                    this.offsetIndex = 11;
                 }
                 else
                 {
-                    this.offsetIndex = 11;
+                    this.offsetIndex = 9;
                 }
             }
         }
         this.level = single.pathfinderMob.level();
-        this.currentBlockPos = MineTask.offsets[this.offsetIndex][this.offsetIndexIndex].offset(this.startingPoint);
+        this.currentBlockPos = MineTask.offsets[this.offsetIndex][0].offset(this.startingPoint);
         this.currentBlockState = this.level.getBlockState(this.currentBlockPos);
         this.remainingHp = MineTask.getBlockHp(this.currentBlockState);
-        UndeadArmies.logger.debug("Init HP" + this.remainingHp + " BlockPos " + this.currentBlockPos + " Buffer " + buffer);
     }
     public boolean handle(Single single)
     {
@@ -193,7 +201,6 @@ public class MineTask
         }
         if(this.remainingHp > MineTask.unbreakable.value)
         {
-            UndeadArmies.logger.debug("rotating, Starting point is: " + this.startingPoint);
             this.offsetIndex = this.offsetIndex % 4;
             if(this.level.getRandom().nextBoolean())
             {
@@ -245,7 +252,6 @@ public class MineTask
             this.remainingHp = MineTask.getBlockHp(this.currentBlockState);
             this.offsetIndexIndex = 1;
         }
-        UndeadArmies.logger.debug("Currently Breaking " + this.currentBlockPos);
         this.remainingHp--;
         single.pathfinderMob.swing(InteractionHand.MAIN_HAND);
         if(this.remainingHp <= 0)

@@ -1,4 +1,4 @@
-package undead.armies.behaviour.task;
+package undead.armies.behaviour.task.argument;
 
 public class Argument
 {

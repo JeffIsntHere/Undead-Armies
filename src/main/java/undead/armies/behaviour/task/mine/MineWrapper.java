@@ -2,8 +2,9 @@ package undead.armies.behaviour.task.mine;
 
 import org.jetbrains.annotations.NotNull;
 import undead.armies.behaviour.Single;
-import undead.armies.behaviour.task.Argument;
+import undead.armies.behaviour.task.argument.Argument;
 import undead.armies.behaviour.task.BaseTask;
+import undead.armies.behaviour.task.argument.Situation;
 import undead.armies.misc.PathfindingTracker;
 import undead.armies.parser.config.type.DecimalType;
 
@@ -36,5 +37,27 @@ public class MineWrapper extends BaseTask
             this.mineTask = new MineTask();
         }
         return true;
+    }
+    @Override
+    public int situationScore(@NotNull Single single, final Situation situation)
+    {
+        int score = 0;
+        if((situation.value & 1) == 1)
+        {
+            score++;
+        }
+        if((situation.value & 2) == 0)
+        {
+            score++;
+        }
+        if(situation.targetYDifference < 2)
+        {
+            score++;
+        }
+        if(situation.nearbyEntitiesWithGetSingle > 0)
+        {
+            score++;
+        }
+        return score;
     }
 }

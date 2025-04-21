@@ -6,7 +6,7 @@ import net.minecraft.world.entity.Mob;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import org.jetbrains.annotations.NotNull;
 import undead.armies.base.GetSingle;
-import undead.armies.behaviour.task.Argument;
+import undead.armies.behaviour.task.argument.Argument;
 import undead.armies.behaviour.Single;
 import undead.armies.parser.config.type.DecimalType;
 

@@ -47,32 +47,31 @@ public class UndeadArmies
     public void serverAboutToStartEvent(ServerAboutToStartEvent serverAboutToStartEvent)
     {
         ConfigParser.instance.getInstance().registerConfig("mining",
-                new TypeArgument(TaskUtil.instance.enableMineTask),
+                new TypeArgument(TaskUtil.instance.mineTaskChance),
                 new TypeArgument(MineWrapper.maxMiningDistance),
                 new TypeArgument(MineTask.blockHealthMultiplier),
                 new TypeArgument(MineTask.specific),
                 new TypeArgument(MineTask.unbreakable));
         ConfigParser.instance.getInstance().registerConfig("dismount",
-                new TypeArgument(TaskUtil.instance.enableDismountTask),
                 new TypeArgument(DismountTask.cooldown));
         ConfigParser.instance.getInstance().registerConfig("grab",
-                new TypeArgument(TaskUtil.instance.enableGrabTask),
+                new TypeArgument(TaskUtil.instance.grabTaskChance),
                 new TypeArgument(GrabTask.grabDistance),
                 new TypeArgument(GrabTask.maxSlowdown));
         ConfigParser.instance.getInstance().registerConfig("jumping",
-                new TypeArgument(TaskUtil.instance.enableJumpTask),
+                new TypeArgument(TaskUtil.instance.jumpTaskChance),
                 new TypeArgument(JumpTask.cooldown),
                 new TypeArgument(JumpTask.maxMemorySize),
                 new TypeArgument(JumpTask.disableMovementCheck));
         ConfigParser.instance.getInstance().registerConfig("sprinting",
-                new TypeArgument(TaskUtil.instance.enableSprintTask),
+                new TypeArgument(TaskUtil.instance.sprintTaskChance),
                 new TypeArgument(SprintTask.sprintDistance),
                 new TypeArgument(SprintTask.alwaysSprintWhenDistanceIsThisFar),
                 new TypeArgument(SprintTask.cooldown),
                 new TypeArgument(SprintTask.duration),
                 new TypeArgument(SprintTask.amplifier));
         ConfigParser.instance.getInstance().registerConfig("stacking",
-                new TypeArgument(TaskUtil.instance.enableStackTask),
+                new TypeArgument(TaskUtil.instance.stackTaskChance),
                 new TypeArgument(StackTask.cooldown));
         ConfigParser.instance.getInstance().registerConfig("misc",
                 new TypeArgument(Group.recruitChance),

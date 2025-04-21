@@ -8,19 +8,19 @@ import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
-import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
-import undead.armies.UndeadArmies;
+import undead.armies.base.GetSingle;
 import undead.armies.base.GetTargetType;
 import undead.armies.base.Resettable;
 import undead.armies.behaviour.group.Group;
 import undead.armies.behaviour.group.GroupUtil;
-import undead.armies.behaviour.task.BaseTask;
 import undead.armies.behaviour.task.TaskUtil;
-import undead.armies.behaviour.task.Argument;
+import undead.armies.behaviour.task.argument.Argument;
+import undead.armies.behaviour.task.argument.Situation;
 import undead.armies.misc.Util;
 import undead.armies.parser.config.type.DecimalType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Single implements Resettable
@@ -44,10 +44,9 @@ public class Single implements Resettable
         return false;
     }
     @NotNull
-    public final PathfinderMob pathfinderMob;
+    public final ArrayList<Strategy> strategies = new ArrayList<>();
     @NotNull
-    public BaseTask currentTask;
-    public int currentTaskLength;
+    public final PathfinderMob pathfinderMob;
     @NotNull
     public Vec3 lastPosition;
     public Group group = null;
@@ -81,6 +80,25 @@ public class Single implements Resettable
             this.argument.value |= 16;
         }
     }
+    protected Situation getSituation()
+    {
+        final Situation situation = new Situation();
+        situation.value = this.argument.value;
+        for(Entity entity : this.getNearbyEntities())
+        {
+            if(entity instanceof GetSingle)
+            {
+                situation.nearbyEntitiesWithGetSingle++;
+            }
+        }
+        if((situation.value & 1) == 1)
+        {
+            final Vec3 direction = this.pathfinderMob.getTarget().position().subtract(this.position());
+            situation.targetDistance = direction.length();
+            situation.targetYDifference = direction.y;
+        }
+        return situation;
+    }
     public Vec3 position()
     {
         return this.pathfinderMob.position();
@@ -112,6 +130,7 @@ public class Single implements Resettable
         final AABB checkingBox = new AABB(x - lengthDiv2, y - heightDiv2, z - lengthDiv2, x + lengthDiv2, y + heightDiv2, z + lengthDiv2);
         return this.pathfinderMob.level().getEntities(this.pathfinderMob, checkingBox);
     }
+    protected int strategyIndex = 0;
     public void tick()
     {
         if(this.pathfinderMob.level().isClientSide)
@@ -123,12 +142,15 @@ public class Single implements Resettable
         {
             this.group.tick(this, this.argument);
         }
-        final int upperBound = this.currentTaskLength;
-        for(int i = 0; i < upperBound; i++)
+        for(int i = 0; i < strategies.size(); i++, this.strategyIndex = ((this.strategyIndex + 1) % this.strategies.size()))
         {
-            final boolean result = this.currentTask.handleTask(this, this.argument);
-            this.currentTask = this.currentTask.nextTask;
-            if(result)
+            final Strategy strategy = this.strategies.get(this.strategyIndex);
+            final Situation situation = this.getSituation();
+            if(strategy.getCurrentScore(this, situation) == 0)
+            {
+                strategy.searchOtherStrategies(this, situation);
+            }
+            if(strategy.doStrategy(this,this.argument))
             {
                 break;
             }
@@ -152,8 +174,6 @@ public class Single implements Resettable
     {
         this.pathfinderMob = pathfinderMob;
         this.lastPosition = pathfinderMob.position();
-        final Pair<Integer, BaseTask> outputValue = TaskUtil.instance.getTask(this);
-        this.currentTask = outputValue.getRight();
-        this.currentTaskLength = outputValue.getLeft();
+        TaskUtil.instance.setStrategies(this);
     }
 }

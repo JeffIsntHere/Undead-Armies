@@ -7,6 +7,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import undead.armies.behaviour.task.argument.Argument;
+import undead.armies.behaviour.task.argument.Situation;
 import undead.armies.misc.BlockUtil;
 import undead.armies.misc.Util;
 import undead.armies.misc.ClosestUnobstructedBlock;
@@ -149,5 +151,19 @@ public class JumpTask extends BaseTask
             blockPosMemory.removeFirst();
         }
         return true;
+    }
+    @Override
+    public int situationScore(@NotNull Single single, final Situation situation)
+    {
+        int score = 0;
+        if((situation.value & 1) == 1)
+        {
+            score++;
+        }
+        if((situation.value & 2) == 0)
+        {
+            score++;
+        }
+        return score;
     }
 }

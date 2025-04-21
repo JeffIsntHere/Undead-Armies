@@ -7,6 +7,8 @@ import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
 import undead.armies.base.GetSingle;
 import undead.armies.behaviour.Single;
+import undead.armies.behaviour.task.argument.Argument;
+import undead.armies.behaviour.task.argument.Situation;
 import undead.armies.parser.config.type.NumberType;
 
 import java.util.List;
@@ -66,5 +68,27 @@ public class StackTask extends BaseTask
             return true;
         }
         return false;
+    }
+    @Override
+    public int situationScore(@NotNull Single single, final Situation situation)
+    {
+        int score = 0;
+        if((situation.value & 1) == 1)
+        {
+            score++;
+        }
+        if((situation.value & 2) == 0)
+        {
+            score++;
+        }
+        if(situation.targetYDifference > 1)
+        {
+            score++;
+        }
+        if(situation.nearbyEntitiesWithGetSingle * 1.5 > situation.targetYDifference)
+        {
+            score++;
+        }
+        return score;
     }
 }
