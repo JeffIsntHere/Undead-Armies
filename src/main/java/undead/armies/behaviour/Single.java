@@ -9,6 +9,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import org.jetbrains.annotations.NotNull;
+import undead.armies.UndeadArmies;
 import undead.armies.base.GetSingle;
 import undead.armies.base.GetTargetType;
 import undead.armies.base.Resettable;
@@ -130,6 +131,7 @@ public class Single implements Resettable
         final AABB checkingBox = new AABB(x - lengthDiv2, y - heightDiv2, z - lengthDiv2, x + lengthDiv2, y + heightDiv2, z + lengthDiv2);
         return this.pathfinderMob.level().getEntities(this.pathfinderMob, checkingBox);
     }
+    double patience = 200.0d;
     protected int strategyIndex = 0;
     public void tick()
     {
@@ -146,14 +148,17 @@ public class Single implements Resettable
         {
             final Strategy strategy = this.strategies.get(this.strategyIndex);
             final Situation situation = this.getSituation();
-            if(strategy.getCurrentScore(this, situation) == 0)
+            if(strategy.getCurrentScore(this, situation) == 0 || this.patience < 0)
             {
                 strategy.searchOtherStrategies(this, situation);
+                this.patience = this.pathfinderMob.getRandom().nextDouble() * 200;
             }
+            this.patience -= this.pathfinderMob.getRandom().nextDouble();
             if(strategy.doStrategy(this,this.argument))
             {
                 break;
             }
+            this.patience -= 10.0d;
         }
         this.lastPosition = pathfinderMob.position();
     }
