@@ -1,7 +1,9 @@
 package undead.armies.misc;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -48,6 +50,17 @@ public final class Util
             thrownPotion.shoot(x,distance/velocity * 0.5 ,z,velocity, accuracy);
             level.addFreshEntity(thrownPotion);
         }
+    }
+    public static void makeEntityLookAtBlockPos(final LivingEntity livingEntity, final BlockPos blockPos)
+    {
+        double x = (blockPos.getX() + 0.5f) - livingEntity.getX();
+        double y = (blockPos.getY() + 0.5f) - livingEntity.getY();
+        double z = (blockPos.getZ() + 0.5f) - livingEntity.getZ();
+        double xZLen = Math.sqrt(x*x + z*z);
+        float xRot = (float)(-(Mth.atan2(y, xZLen) * 180.0F / (float)Math.PI));
+        float yRot = (float)(Mth.atan2(z, x) * 180.0F / (float)Math.PI) - 90.0F;
+        livingEntity.setXRot(xRot);
+        livingEntity.setYRot(yRot);
     }
     public static final ItemStack air = new ItemStack(Items.AIR);
     public static final ItemStack redWool = new ItemStack(Items.RED_WOOL);

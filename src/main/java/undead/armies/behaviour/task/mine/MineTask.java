@@ -82,14 +82,7 @@ public class MineTask
                 final Single buffer = getSingle.getSingle();
                 if(Single.targetCompatible(buffer, target))
                 {
-                    Strategy bufferStrategy = null;
-                    for(Strategy strategy : buffer.strategies)
-                    {
-                        if(strategy.name == "pursue")
-                        {
-                            bufferStrategy = strategy;
-                        }
-                    }
+                    Strategy bufferStrategy = buffer.getStrategyByName("pursue");
                     if(bufferStrategy == null)
                     {
                         continue;

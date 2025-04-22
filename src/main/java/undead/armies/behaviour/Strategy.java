@@ -13,6 +13,10 @@ public class Strategy
     public final String name;
     BaseTask currentTask;
     int currentTaskLength;
+    public BaseTask getCurrentTask()
+    {
+        return this.currentTask;
+    }
     public <T extends BaseTask> T findTask(Class<T> instance)
     {
         BaseTask buffer = this.currentTask;

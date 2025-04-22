@@ -63,6 +63,17 @@ public class Single implements Resettable
         this.lastPosition = pathfinderMob.position();
     }
     public Argument argument = new Argument();
+    public Strategy getStrategyByName(final String string)
+    {
+        for(Strategy strategy : this.strategies)
+        {
+            if(strategy.name == string)
+            {
+                return strategy;
+            }
+        }
+        return null;
+    }
     //mix into this to add your own arguments
     public void updateArguments()
     {
