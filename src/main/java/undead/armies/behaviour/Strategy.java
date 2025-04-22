@@ -32,7 +32,6 @@ public class Strategy
         {
             return false;
         }
-        UndeadArmies.logger.debug("doing task: ! " + this.currentTask.getClass().getCanonicalName());
         return this.currentTask.handleTask(single, argument);
     }
     //in the future all tasks should return a score based off how good they are for the situation
