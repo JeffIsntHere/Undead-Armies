@@ -1,9 +1,6 @@
 package undead.armies.behaviour;
 
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.phys.Vec3;
 import undead.armies.UndeadArmies;
-import undead.armies.base.GetSingle;
 import undead.armies.behaviour.task.argument.Argument;
 import undead.armies.behaviour.task.BaseTask;
 import undead.armies.behaviour.task.argument.Situation;
@@ -35,7 +32,7 @@ public class Strategy
         {
             return false;
         }
-        //UndeadArmies.logger.debug("doing task: ! " + this.currentTask.getClass().getCanonicalName());
+        UndeadArmies.logger.debug("doing task: ! " + this.currentTask.getClass().getCanonicalName());
         return this.currentTask.handleTask(single, argument);
     }
     //in the future all tasks should return a score based off how good they are for the situation

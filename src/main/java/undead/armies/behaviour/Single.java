@@ -1,10 +1,12 @@
 package undead.armies.behaviour;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
@@ -18,7 +20,12 @@ import undead.armies.behaviour.group.GroupUtil;
 import undead.armies.behaviour.task.TaskUtil;
 import undead.armies.behaviour.task.argument.Argument;
 import undead.armies.behaviour.task.argument.Situation;
+import undead.armies.misc.BlockUtil;
 import undead.armies.misc.Util;
+import undead.armies.misc.blockcast.offset.XMinus;
+import undead.armies.misc.blockcast.offset.XPlus;
+import undead.armies.misc.blockcast.offset.ZMinus;
+import undead.armies.misc.blockcast.offset.ZPlus;
 import undead.armies.parser.config.type.DecimalType;
 
 import java.util.ArrayList;
@@ -80,6 +87,46 @@ public class Single implements Resettable
         {
             this.argument.value |= 16;
         }
+        if(this.pathfinderMob.isPathFinding())
+        {
+            this.argument.value |= 32;
+        }
+        else if((this.argument.value & 1) == 1)
+        {
+            Vec3 direction = this.pathfinderMob.getTarget().position().subtract(this.position());
+            BlockPos blockPos = this.pathfinderMob.blockPosition().below();
+            final Level level = this.pathfinderMob.level();
+            if(Math.abs(direction.x) > Math.abs(direction.z))
+            {
+                if(direction.x > 0)
+                {
+                    blockPos = XPlus.instance.offset(blockPos);
+                }
+                else
+                {
+                    blockPos = XMinus.instance.offset(blockPos);
+                }
+            }
+            else
+            {
+                if(direction.z > 0)
+                {
+                    blockPos = ZPlus.instance.offset(blockPos);
+                }
+                else
+                {
+                    blockPos = ZMinus.instance.offset(blockPos);
+                }
+            }
+            if(BlockUtil.blockIsSolid(level.getBlockState(blockPos)) || BlockUtil.blockIsSolid(level.getBlockState(blockPos.above())) || BlockUtil.blockIsSolid(level.getBlockState(blockPos.above().above())))
+            {
+                this.argument.value |= 64;
+            }
+            else
+            {
+                this.argument.value |= 128;
+            }
+        }
     }
     protected Situation getSituation()
     {
@@ -131,7 +178,7 @@ public class Single implements Resettable
         final AABB checkingBox = new AABB(x - lengthDiv2, y - heightDiv2, z - lengthDiv2, x + lengthDiv2, y + heightDiv2, z + lengthDiv2);
         return this.pathfinderMob.level().getEntities(this.pathfinderMob, checkingBox);
     }
-    double patience = 200.0d;
+    double patience = 0.0d;
     protected int strategyIndex = 0;
     public void tick()
     {
@@ -151,9 +198,8 @@ public class Single implements Resettable
             if(strategy.getCurrentScore(this, situation) == 0 || this.patience < 0)
             {
                 strategy.searchOtherStrategies(this, situation);
-                this.patience = this.pathfinderMob.getRandom().nextDouble() * 200;
+                this.patience = this.pathfinderMob.getRandom().nextDouble() * 400;
             }
-            this.patience -= this.pathfinderMob.getRandom().nextDouble();
             if(strategy.doStrategy(this,this.argument))
             {
                 break;

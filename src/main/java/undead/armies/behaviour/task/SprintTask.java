@@ -50,6 +50,10 @@ public class SprintTask extends BaseTask
         {
             score++;
         }
+        if((situation.value & 32) == 32 && situation.targetDistance > 2)
+        {
+            score++;
+        }
         return score;
     }
 }

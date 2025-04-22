@@ -34,4 +34,8 @@ public final class BlockUtil
     {
         return blockState.isAir() || BlockUtil.blockIsNotLava(blockState);
     }
+    public static boolean blockIsSolid(final BlockState blockState)
+    {
+        return !blockState.isAir() && !(blockState.getBlock() instanceof LiquidBlock);
+    }
 }

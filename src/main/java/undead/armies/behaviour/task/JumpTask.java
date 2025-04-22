@@ -168,6 +168,10 @@ public class JumpTask extends BaseTask
         {
             score++;
         }
+        if((situation.value & 128) == 128)
+        {
+            score++;
+        }
         return score;
     }
 }

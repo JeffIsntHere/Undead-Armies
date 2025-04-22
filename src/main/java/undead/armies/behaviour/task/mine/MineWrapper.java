@@ -32,11 +32,16 @@ public class MineWrapper extends BaseTask
         {
             return false;
         }
+        boolean returnValue = true;
         if(!this.mineTask.handle(single))
         {
+            if(this.mineTask.blocksBroken == 0)
+            {
+                returnValue = false;
+            }
             this.mineTask = new MineTask();
         }
-        return true;
+        return returnValue;
     }
     @Override
     public int situationScore(@NotNull Single single, final Situation situation)
@@ -47,6 +52,10 @@ public class MineWrapper extends BaseTask
             score++;
         }
         if((situation.value & 2) == 0)
+        {
+            score++;
+        }
+        if((situation.value & 64) == 64)
         {
             score++;
         }

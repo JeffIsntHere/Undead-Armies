@@ -9,6 +9,9 @@ public class Argument
     2 = on ground (4)
     3 = is passenger (8)
     4 = is vehicle (16)
+    5 = is pathfinding (32)
+    6 = unable to pathfind due to obstructed path (64)
+    7 = unable to pathfind due to hole in path (128)
      */
     public int value = 0;
 }

@@ -81,6 +81,10 @@ public class StackTask extends BaseTask
         {
             score++;
         }
+        if((situation.value & 64) == 64)
+        {
+            score++;
+        }
         if(situation.targetYDifference > 1)
         {
             score++;

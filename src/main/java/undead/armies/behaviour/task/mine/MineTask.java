@@ -70,6 +70,7 @@ public class MineTask
     protected double remainingHp = 0;
     protected int offsetIndex = -1;
     protected int offsetIndexIndex = 1;
+    protected int blocksBroken = 0;
     public void init(final Single single)
     {
         final LivingEntity target = single.pathfinderMob.getTarget();
@@ -258,6 +259,7 @@ public class MineTask
         {
             if(!blockState.isAir())
             {
+                this.blocksBroken++;
                 Block.dropResources(blockState, this.level, this.currentBlockPos);
                 this.level.playSound(null, this.currentBlockPos, blockState.getSoundType(this.level, this.currentBlockPos, single.pathfinderMob).getBreakSound(), SoundSource.BLOCKS, 3.0f, 1.0f);
                 this.level.setBlock(this.currentBlockPos, Blocks.AIR.defaultBlockState(), 3);
