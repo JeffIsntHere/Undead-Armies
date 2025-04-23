@@ -11,6 +11,7 @@ import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import org.slf4j.Logger;
 import undead.armies.base.GetSingle;
 import undead.armies.behaviour.Single;
+import undead.armies.behaviour.Strategy;
 import undead.armies.behaviour.group.Group;
 import undead.armies.behaviour.task.*;
 import undead.armies.behaviour.task.mine.MineTask;
@@ -76,7 +77,8 @@ public class UndeadArmies
         ConfigParser.instance.getInstance().registerConfig("misc",
                 new TypeArgument(Group.recruitChance),
                 new TypeArgument(Single.boxLength),
-                new TypeArgument(Single.boxHeight));
+                new TypeArgument(Single.boxHeight),
+                new TypeArgument(Strategy.biasOnKeepingFirstTask));
         ConfigParser.instance.getInstance().reload();
     }
 }

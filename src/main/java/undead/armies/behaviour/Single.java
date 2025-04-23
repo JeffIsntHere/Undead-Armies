@@ -205,17 +205,21 @@ public class Single implements Resettable
         for(int i = 0; i < strategies.size(); i++, this.strategyIndex = ((this.strategyIndex + 1) % this.strategies.size()))
         {
             final Strategy strategy = this.strategies.get(this.strategyIndex);
-            final Situation situation = this.getSituation();
-            if(strategy.getCurrentScore(this, situation) == 0 || this.patience < 0)
+            if(this.patience <= 0)
             {
-                strategy.searchOtherStrategies(this, situation);
+                strategy.searchOtherStrategies(this, this.getSituation());
                 this.patience = this.pathfinderMob.getRandom().nextDouble() * 400;
             }
             if(strategy.doStrategy(this,this.argument))
             {
                 break;
             }
-            this.patience -= 10.0d;
+            final LivingEntity target = this.pathfinderMob.getTarget();
+            //this is to prevent the mob from searching other strategies while having no targets.
+            if(target != null && !target.isDeadOrDying())
+            {
+                this.patience -= 10.0d;
+            }
         }
         this.lastPosition = pathfinderMob.position();
     }

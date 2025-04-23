@@ -1,15 +1,18 @@
 package undead.armies.behaviour;
 
+import net.minecraft.util.RandomSource;
 import undead.armies.UndeadArmies;
 import undead.armies.behaviour.task.argument.Argument;
 import undead.armies.behaviour.task.BaseTask;
 import undead.armies.behaviour.task.argument.Situation;
+import undead.armies.parser.config.type.DecimalType;
 
 import java.util.ArrayList;
 
 //a strategy is simply a collection of tasks.
 public class Strategy
 {
+    public static final DecimalType biasOnKeepingFirstTask = new DecimalType("biasOnKeepingFirstTask", "basically when 2 tasks have the same score (both have equal performance for the specific situation) how likely should an undead mob swap it's first choice with the next.", 0.5);
     public final String name;
     BaseTask currentTask;
     int currentTaskLength;
@@ -63,10 +66,11 @@ public class Strategy
         BaseTask bestTask = this.currentTask.nextTask;
         int bestTaskScore = bestTask.situationScore(single, situation);
         BaseTask nextTask = bestTask.nextTask;
+        final RandomSource randomSource = single.pathfinderMob.getRandom();
         for(int i = 2; i < this.currentTaskLength; i++)
         {
             int score = nextTask.situationScore(single, situation);
-            if(score > bestTaskScore)
+            if(score > bestTaskScore || (Strategy.biasOnKeepingFirstTask.value != 0 && score == bestTaskScore && randomSource.nextDouble() <= Strategy.biasOnKeepingFirstTask.value))
             {
                 bestTaskScore = score;
                 bestTask = nextTask;
