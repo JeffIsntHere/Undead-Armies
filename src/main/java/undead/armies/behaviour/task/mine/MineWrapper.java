@@ -63,10 +63,6 @@ public class MineWrapper extends BaseTask
         {
             score++;
         }
-        if(situation.nearbyEntitiesWithGetSingle > 0)
-        {
-            score++;
-        }
         return score;
     }
 }

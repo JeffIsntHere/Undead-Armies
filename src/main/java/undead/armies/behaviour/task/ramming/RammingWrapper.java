@@ -9,7 +9,6 @@ import undead.armies.behaviour.task.argument.Situation;
 public class RammingWrapper extends BaseTask
 {
     protected RammingTask rammingTask = new RammingTask();
-    protected RammingSubGroup rammingSubGroup = null;
     @Override
     public boolean handleTask(@NotNull Single single, Argument argument)
     {
@@ -34,10 +33,6 @@ public class RammingWrapper extends BaseTask
             score++;
         }
         if(Math.abs(situation.targetYDifference) < 0.6d)
-        {
-            score++;
-        }
-        if(situation.nearbyEntitiesWithGetSingle + 1 >= RammingTask.minimumRammerPerBlock.value)
         {
             score++;
         }
