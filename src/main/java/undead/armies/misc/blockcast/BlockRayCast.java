@@ -16,12 +16,12 @@ public class BlockRayCast
     protected int x = 0;
     protected int y = 0;
     protected int z = 0;
-    protected final Base xDir;
-    protected final Base yDir;
-    protected final Base zDir;
-    protected final int xAdder;
-    protected final int yAdder;
-    protected final int zAdder;
+    public final Base xDir;
+    public final Base yDir;
+    public final Base zDir;
+    public final int xAdder;
+    public final int yAdder;
+    public final int zAdder;
     public BlockRayCast(@NotNull final Level level, @NotNull final BlockPos start, @NotNull final BlockPos end)
     {
         this.level = level;
