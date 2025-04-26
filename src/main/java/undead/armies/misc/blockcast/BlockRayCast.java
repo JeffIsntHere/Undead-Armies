@@ -10,18 +10,18 @@ import undead.armies.misc.blockcast.offset.*;
 public class BlockRayCast
 {
     public BlockPos current;
-    public final int length;
-    public final Level level;
+    public int length;
+    public Level level;
     public int stepCount = 0;
-    protected int x = 0;
-    protected int y = 0;
-    protected int z = 0;
-    public final Base xDir;
-    public final Base yDir;
-    public final Base zDir;
-    public final int xAdder;
-    public final int yAdder;
-    public final int zAdder;
+    public int x = 0;
+    public int y = 0;
+    public int z = 0;
+    public Base xDir;
+    public Base yDir;
+    public Base zDir;
+    public int xAdder;
+    public int yAdder;
+    public int zAdder;
     public BlockRayCast(@NotNull final Level level, @NotNull final BlockPos start, @NotNull final BlockPos end)
     {
         this.level = level;
@@ -35,48 +35,51 @@ public class BlockRayCast
         this.zAdder = Math.abs(direction.getZ());
         this.length = EMath.max(this.xAdder, this.yAdder, this.zAdder);
     }
-    public BlockState stopWhenHit()
+    public BlockState step()
     {
-        BlockState block = null;
-        for(; this.stepCount < this.length; this.stepCount++)
+        this.stepCount++;
+        this.x += this.xAdder;
+        this.y += this.yAdder;
+        this.z += this.zAdder;
+        if(this.x >= this.length)
         {
-            this.x += this.xAdder;
-            this.y += this.yAdder;
-            this.z += this.zAdder;
-            if(this.x >= this.length)
+            this.x -= this.length;
+            this.current = xDir.offset(this.current);
+            final BlockState temp = this.level.getBlockState(this.current);
+            if(!temp.isEmpty())
             {
-                this.x -= this.length;
-                this.current = xDir.offset(this.current);
-                final BlockState temp = this.level.getBlockState(this.current);
-                if(!temp.isEmpty())
-                {
-                    block = temp;
-                    break;
-                }
-            }
-            if(this.y >= this.length)
-            {
-                this.y -= this.length;
-                this.current = yDir.offset(this.current);
-                final BlockState temp = this.level.getBlockState(this.current);
-                if(!temp.isEmpty())
-                {
-                    block = temp;
-                    break;
-                }
-            }
-            if(this.z >= this.length)
-            {
-                this.z -= this.length;
-                this.current = zDir.offset(this.current);
-                final BlockState temp = this.level.getBlockState(this.current);
-                if(!temp.isEmpty())
-                {
-                    block = temp;
-                    break;
-                }
+                return temp;
             }
         }
-        return block;
+        if(this.y >= this.length)
+        {
+            this.y -= this.length;
+            this.current = yDir.offset(this.current);
+            final BlockState temp = this.level.getBlockState(this.current);
+            if(!temp.isEmpty())
+            {
+                return temp;
+            }
+        }
+        if(this.z >= this.length)
+        {
+            this.z -= this.length;
+            this.current = zDir.offset(this.current);
+            final BlockState temp = this.level.getBlockState(this.current);
+            if(!temp.isEmpty())
+            {
+                return temp;
+            }
+        }
+        return null;
+    }
+    public BlockState stopWhenHit()
+    {
+        BlockState blockState = null;
+        while(blockState == null && this.stepCount < this.length)
+        {
+            blockState = this.step();
+        }
+        return blockState;
     }
 }

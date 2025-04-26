@@ -1,5 +1,6 @@
 package undead.armies.behaviour.task.ramming;
 
+import net.minecraft.core.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import undead.armies.behaviour.Single;
 import undead.armies.behaviour.task.BaseTask;
@@ -9,6 +10,7 @@ import undead.armies.behaviour.task.argument.Situation;
 public class RammingWrapper extends BaseTask
 {
     protected RammingTask rammingTask = new RammingTask();
+    protected BlockPos blockPos = null;
     @Override
     public boolean handleTask(@NotNull Single single, Argument argument)
     {

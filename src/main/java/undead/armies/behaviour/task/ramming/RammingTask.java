@@ -11,6 +11,7 @@ import undead.armies.parser.config.type.DecimalType;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class RammingTask
 {
@@ -21,7 +22,7 @@ public class RammingTask
     protected LivingEntity target = null;
     protected Level level = null;
     public boolean success = true;
-    public final HashMap<Integer, BlockPos> middle = new HashMap<>();
+    public final HashSet<BlockPos> cache = new HashSet<>();
     /*
     1 = ram
     2 = get back
@@ -35,10 +36,6 @@ public class RammingTask
             end = new BlockPos(targetBlockPos.getX(), start.getY(), targetBlockPos.getZ());
         }
         final BlockRayCast blockRayCast = new BlockRayCast(this.level, start, end);
-        if(Math.abs(blockRayCast.xAdder) < Math.abs(blockRayCast.zAdder))
-        {
-
-        }
     }
     public void clean(final Collection<Single> collection)
     {
