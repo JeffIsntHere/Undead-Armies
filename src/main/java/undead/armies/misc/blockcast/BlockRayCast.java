@@ -22,6 +22,13 @@ public class BlockRayCast
     public int xAdder;
     public int yAdder;
     public int zAdder;
+    public void reset()
+    {
+        this.stepCount = 0;
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+    }
     public BlockRayCast(@NotNull final Level level, @NotNull final BlockPos start, @NotNull final BlockPos end)
     {
         this.level = level;

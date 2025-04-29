@@ -1,20 +1,26 @@
 package undead.armies.behaviour.task.ramming;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import undead.armies.behaviour.Single;
 import undead.armies.behaviour.Strategy;
+import undead.armies.behaviour.task.mine.MineTask;
+import undead.armies.misc.Util;
 import undead.armies.misc.blockcast.BlockRayCast;
 import undead.armies.parser.config.type.DecimalType;
 
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 
 public class RammingTask
 {
+    public static final DecimalType successGoal = new DecimalType("successGoal", "the number of blocks broken over the total number of target blocks to consider ramming as successful.", 0.5);
     public static final DecimalType baseDamage = new DecimalType("baseDamage", "base block damage for an undead mob.", 2);
     public static final DecimalType armorDamage = new DecimalType("armorDamage", "how much 1 armor point contributes to the block damage, ex: if it was 1 then 1 armor hp = +1 block damage", 0.2);
     protected Single leader = null;
@@ -22,35 +28,45 @@ public class RammingTask
     protected LivingEntity target = null;
     protected Level level = null;
     public boolean success = true;
-    public final HashSet<BlockPos> cache = new HashSet<>();
-    /*
-    1 = ram
-    2 = get back
-     */
-    public void setTargets(int Amount)
+    public BlockRayCast direction = null;
+    public final HashMap<Long, RammingProgress> cache = new HashMap<>();
+    protected void ram(final Single single)
     {
-        BlockPos start = this.leader.pathfinderMob.blockPosition().above();
-        BlockPos end;
+        BlockPos blockPos = single.pathfinderMob.blockPosition().above();
+        Long key = (((long)blockPos.getX()) << 32) | (blockPos.getY() & 0xffffffffL);
+        RammingProgress rammingProgress = this.cache.get(key);
+        if(rammingProgress == null)
         {
-            BlockPos targetBlockPos = this.leader.pathfinderMob.getTarget().blockPosition().above();
-            end = new BlockPos(targetBlockPos.getX(), start.getY(), targetBlockPos.getZ());
+            rammingProgress = new RammingProgress();
+            this.direction.reset();
+            this.direction.current = blockPos;
+            this.direction.stopWhenHit();
+            rammingProgress.blockPos = this.direction.current;
+            this.cache.put(key, rammingProgress);
         }
-        final BlockRayCast blockRayCast = new BlockRayCast(this.level, start, end);
+        rammingProgress.cumulativeDamage += single.pathfinderMob.getAttribute(Attributes.ARMOR).getValue() * RammingTask.armorDamage.value + RammingTask.baseDamage.value;
+        Util.makeEntityLookAtBlockPos(single.pathfinderMob, rammingProgress.blockPos);
+        single.pathfinderMob.setDeltaMovement(Util.getThrowVelocity(single.position(), new Vec3(this.target.getX() + 0.5d, this.target.getY() + 0.5d, this.target.getZ() + 0.5d), 5.0f, 0.5f));
     }
-    public void clean(final Collection<Single> collection)
+    public boolean breakBlockPos(final Single single, final RammingProgress rammingProgress, final BlockPos blockPos)
     {
-        collection.removeIf(member -> {
-            if(member.pathfinderMob.isDeadOrDying() || !member.pathfinderMob.level().equals(this.level) || member.pathfinderMob.getTarget() != this.target)
-            {
-                return true;
-            }
-            final Strategy strategy = member.getStrategyByName("pursue");
-            if(strategy.getCurrentTask() instanceof RammingWrapper rammingWrapper && rammingWrapper.rammingTask == this)
-            {
-                return false;
-            }
+        final BlockState blockState = this.level.getBlockState(rammingProgress.blockPos);
+        if(blockState.isAir())
+        {
             return true;
-        });
+        }
+        if(rammingProgress.cumulativeDamage > MineTask.getBlockHp(blockState))
+        {
+            Block.dropResources(blockState, level, rammingProgress.blockPos);
+            level.playSound(null, rammingProgress.blockPos, blockState.getSoundType(level, rammingProgress.blockPos, single.pathfinderMob).getBreakSound(), SoundSource.BLOCKS, 3.0f, 1.0f);
+            level.setBlock(rammingProgress.blockPos, Blocks.AIR.defaultBlockState(), 3);
+            return true;
+        }
+        else
+        {
+            level.playSound(null, rammingProgress.blockPos, blockState.getSoundType(level, rammingProgress.blockPos, single.pathfinderMob).getBreakSound(), SoundSource.BLOCKS, 2.0f, 1.0f);
+            return false;
+        }
     }
     public boolean handle(final Single single, final RammingWrapper rammingWrapper)
     {
@@ -66,9 +82,47 @@ public class RammingTask
             this.level = this.leader.pathfinderMob.level();
             this.target = single.pathfinderMob.getTarget();
         }
+        if(this.direction != null)
+        {
+            this.ram(single);
+        }
+        else
+        {
+            //go back.
+        }
         if(!this.leader.equals(single))
         {
             return this.success;
+        }
+        if(this.direction != null)
+        {
+            double successCounter = 0;
+            double attemptCounter = 0;
+            this.direction = null;
+            for(Long key : this.cache.keySet())
+            {
+                final RammingProgress rammingProgress = this.cache.get(key);
+                if(this.breakBlockPos(single, rammingProgress, rammingProgress.blockPos))
+                {
+                    successCounter++;
+                }
+                if(this.breakBlockPos(single, rammingProgress, rammingProgress.blockPos.above()))
+                {
+                    successCounter++;
+                }
+                attemptCounter+=2;
+            }
+            this.cache.clear();
+            if(successCounter / attemptCounter < successGoal.value)
+            {
+                this.success = false;
+            }
+        }
+        else
+        {
+            this.direction = new BlockRayCast(this.level, this.leader.pathfinderMob.blockPosition().above(), this.leader.pathfinderMob.getTarget().blockPosition().above());
+            this.cache.clear();
+            this.success = true;
         }
         return this.success;
     }
