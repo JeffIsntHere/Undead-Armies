@@ -44,6 +44,10 @@ public class RammingTask
             rammingProgress.blockPos = this.direction.current;
             this.cache.put(key, rammingProgress);
         }
+        else if(Math.abs(rammingProgress.blockPos.getY() - blockPos.getY()) > 1)
+        {
+            return;
+        }
         rammingProgress.cumulativeDamage += single.pathfinderMob.getAttribute(Attributes.ARMOR).getValue() * RammingTask.armorDamage.value + RammingTask.baseDamage.value;
         Util.makeEntityLookAtBlockPos(single.pathfinderMob, rammingProgress.blockPos);
         single.pathfinderMob.setDeltaMovement(Util.getThrowVelocity(single.position(), new Vec3(this.target.getX() + 0.5d, this.target.getY() + 0.5d, this.target.getZ() + 0.5d), 5.0f, 0.5f));
