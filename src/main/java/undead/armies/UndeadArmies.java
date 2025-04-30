@@ -16,6 +16,8 @@ import undead.armies.behaviour.group.Group;
 import undead.armies.behaviour.task.*;
 import undead.armies.behaviour.task.mine.MineTask;
 import undead.armies.behaviour.task.mine.MineWrapper;
+import undead.armies.behaviour.task.ramming.RammingTask;
+import undead.armies.behaviour.task.ramming.RammingWrapper;
 import undead.armies.parser.config.ConfigParser;
 import undead.armies.parser.config.type.TypeArgument;
 
@@ -52,7 +54,8 @@ public class UndeadArmies
                 new TypeArgument(MineWrapper.maxMiningDistance),
                 new TypeArgument(MineTask.blockHealthMultiplier),
                 new TypeArgument(MineTask.specific),
-                new TypeArgument(MineTask.unbreakable));
+                new TypeArgument(MineTask.unbreakable),
+                new TypeArgument(MineWrapper.cooldown));
         ConfigParser.instance.getInstance().registerConfig("dismount",
                 new TypeArgument(DismountTask.cooldown));
         ConfigParser.instance.getInstance().registerConfig("grab",
@@ -74,6 +77,12 @@ public class UndeadArmies
         ConfigParser.instance.getInstance().registerConfig("stacking",
                 new TypeArgument(TaskUtil.instance.stackTaskChance),
                 new TypeArgument(StackTask.cooldown));
+        ConfigParser.instance.getInstance().registerConfig("ramming",
+                new TypeArgument(TaskUtil.instance.ramTaskChance),
+                new TypeArgument(RammingWrapper.cooldown),
+                new TypeArgument(RammingTask.armorDamage),
+                new TypeArgument(RammingTask.baseDamage),
+                new TypeArgument(RammingTask.successGoal));
         ConfigParser.instance.getInstance().registerConfig("misc",
                 new TypeArgument(Group.recruitChance),
                 new TypeArgument(Single.boxLength),

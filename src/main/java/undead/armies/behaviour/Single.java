@@ -1,5 +1,6 @@
 package undead.armies.behaviour;
 
+import com.mojang.realmsclient.client.Request;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -50,6 +51,18 @@ public class Single implements Resettable
             }
         }
         return false;
+    }
+    public ArrayList<Single> getNearbySingles(@NotNull final LivingEntity target)
+    {
+        final ArrayList<Single> output = new ArrayList<>();
+        for(Entity entity : this.getNearbyEntities())
+        {
+            if(entity instanceof GetSingle getSingle && Single.targetCompatible(getSingle.getSingle(), target))
+            {
+                output.add(getSingle.getSingle());
+            }
+        }
+        return output;
     }
     @NotNull
     public final ArrayList<Strategy> strategies = new ArrayList<>();

@@ -72,6 +72,7 @@ public class RammingTask
             return false;
         }
     }
+    protected int triggerAfter = 0;
     public boolean handle(final Single single, final RammingWrapper rammingWrapper)
     {
         if(this.target.isDeadOrDying())
@@ -124,6 +125,12 @@ public class RammingTask
         }
         else
         {
+            triggerAfter--;
+            if(triggerAfter > -1)
+            {
+                return true;
+            }
+            this.triggerAfter = (RammingWrapper.rammingCooldown.value + RammingWrapper.cooldown.value - 1)/RammingWrapper.cooldown.value;
             this.direction = new BlockRayCast(this.level, this.leader.pathfinderMob.blockPosition().above(), this.leader.pathfinderMob.getTarget().blockPosition().above());
             this.cache.clear();
             this.success = true;

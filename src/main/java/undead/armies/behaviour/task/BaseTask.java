@@ -17,4 +17,5 @@ public abstract class BaseTask
         nextTask.nextTask = this.nextTask;
         this.nextTask = nextTask;
     }
+    public abstract int getCooldown(@NotNull final Single single);
 }

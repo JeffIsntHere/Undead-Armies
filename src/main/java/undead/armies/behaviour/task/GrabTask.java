@@ -46,4 +46,9 @@ public class GrabTask extends BaseTask
         }
         return score;
     }
+    @Override
+    public int getCooldown(@NotNull final Single single)
+    {
+        return 0;
+    }
 }

@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import undead.armies.behaviour.Single;
 import undead.armies.behaviour.Strategy;
 import undead.armies.behaviour.task.mine.MineWrapper;
+import undead.armies.behaviour.task.ramming.RammingWrapper;
 import undead.armies.parser.config.type.DecimalType;
 
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ public final class TaskUtil
     public DecimalType jumpTaskChance = new DecimalType("enableChance", 1.0d);
     public DecimalType stackTaskChance = new DecimalType("enableChance", "enabling this enables dismountTask, if this is disabled dismountTask will also be disabled.",1.0d);
     public DecimalType mineTaskChance = new DecimalType("enableChance", 1.0d);
+    public DecimalType ramTaskChance = new DecimalType("enableChance", 1.0d);
     private final ArrayList<BaseTask> taskPool = new ArrayList<>();
     public void setPursueTaskPool(@NotNull final RandomSource randomSource)
     {
@@ -37,6 +39,10 @@ public final class TaskUtil
         if(TaskUtil.instance.sprintTaskChance.value != 0 && TaskUtil.instance.sprintTaskChance.value >= randomSource.nextDouble())
         {
             this.taskPool.add(new SprintTask());
+        }
+        if(TaskUtil.instance.ramTaskChance.value != 0 && TaskUtil.instance.ramTaskChance.value >= randomSource.nextDouble())
+        {
+            this.taskPool.add(new RammingWrapper());
         }
     }
     public void setKillTaskPool(@NotNull final RandomSource randomSource)

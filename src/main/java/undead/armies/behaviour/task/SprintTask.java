@@ -16,12 +16,10 @@ public class SprintTask extends BaseTask
     public static final NumberType cooldown = new NumberType("cooldown", "cooldown between sprinting." , 460);
     public static final NumberType duration = new NumberType("duration", "duration for sprinting", 80);
     public static final NumberType amplifier = new NumberType("amplifier", 1);
-    protected int triggerAfter = 0;
     @Override
     public boolean handleTask(@NotNull Single single, final Argument argument)
     {
-        final int tickCount = single.pathfinderMob.tickCount;
-        if(this.triggerAfter > tickCount || (argument.value & 8) == 8 || (argument.value & 1) == 0)
+        if((argument.value & 8) == 8 || (argument.value & 1) == 0)
         {
             return false;
         }
@@ -30,7 +28,6 @@ public class SprintTask extends BaseTask
         {
             return false;
         }
-        this.triggerAfter = tickCount + SprintTask.cooldown.value;
         single.pathfinderMob.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, SprintTask.duration.value, SprintTask.amplifier.value,true,false));
         return true;
     }
@@ -55,5 +52,10 @@ public class SprintTask extends BaseTask
             score++;
         }
         return score;
+    }
+    @Override
+    public int getCooldown(@NotNull final Single single)
+    {
+        return SprintTask.cooldown.value;
     }
 }

@@ -150,4 +150,9 @@ public class DismountTask extends BaseTask
         }
         return score;
     }
+    @Override
+    public int getCooldown(@NotNull final Single single)
+    {
+        return DismountTask.cooldown.value;
+    }
 }

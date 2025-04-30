@@ -57,7 +57,6 @@ public class JumpTask extends BaseTask
             new Vec3i(-1,0,-3),
             new Vec3i(-2,0,2)
     };
-    protected int triggerAfter = 0;
     protected final ArrayDeque<BlockPos> blockPosMemory = new ArrayDeque<>();
     protected void addToClosestBlockPosIfNotLastBlockPos(final ClosestUnobstructedBlock ClosestUnobstructedBlock, final BlockPos blockPos)
     {
@@ -75,12 +74,7 @@ public class JumpTask extends BaseTask
     public boolean handleTask(@NotNull Single single, final Argument argument)
     {
         this.pathfindingTracker.tick();
-        if(this.triggerAfter > single.pathfinderMob.tickCount)
-        {
-            return false;
-        }
         final LivingEntity target = single.pathfinderMob.getTarget();
-        this.triggerAfter = single.pathfinderMob.tickCount + JumpTask.cooldown.value;
         if((argument.value & 8) == 8 || (argument.value & 4) == 0)
         {
             return false;
@@ -173,5 +167,10 @@ public class JumpTask extends BaseTask
             score++;
         }
         return score;
+    }
+    @Override
+    public int getCooldown(@NotNull final Single single)
+    {
+        return JumpTask.cooldown.value;
     }
 }

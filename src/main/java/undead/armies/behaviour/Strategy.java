@@ -16,6 +16,8 @@ public class Strategy
     public final String name;
     BaseTask currentTask;
     int currentTaskLength;
+    protected int cooldown = 0;
+    public int triggerAfter = 0;
     public BaseTask getCurrentTask()
     {
         return this.currentTask;
@@ -33,12 +35,38 @@ public class Strategy
         }
         return null;
     }
+    protected void setTask(final BaseTask baseTask, final Single single)
+    {
+        this.currentTask = baseTask;
+        this.cooldown = baseTask.getCooldown(single);
+    }
+    //returns true if strategy's task was successfully set to selected data type.
+    public <T extends BaseTask> boolean setTask(Class<T> instance, final Single single)
+    {
+        BaseTask buffer = this.currentTask;
+        for(int i = 0; i < this.currentTaskLength; i++)
+        {
+            if(buffer.getClass().isAssignableFrom(instance))
+            {
+                this.setTask(buffer, single);
+                return true;
+            }
+            buffer = buffer.nextTask;
+        }
+        return false;
+    }
     public boolean doStrategy(final Single single, final Argument argument)
     {
         if(this.currentTask == null)
         {
             return false;
         }
+        this.triggerAfter--;
+        if(this.triggerAfter > 0)
+        {
+            return true;
+        }
+        this.triggerAfter = cooldown;
         return this.currentTask.handleTask(single, argument);
     }
     //in the future all tasks should return a score based off how good they are for the situation
@@ -77,7 +105,7 @@ public class Strategy
             }
             nextTask = nextTask.nextTask;
         }
-        this.currentTask = bestTask;
+        this.setTask(bestTask, single);
         UndeadArmies.logger.debug("found another strat! " + this.currentTask.getClass().getCanonicalName());
     }
     public void setStrategy(final ArrayList<BaseTask> tasks)

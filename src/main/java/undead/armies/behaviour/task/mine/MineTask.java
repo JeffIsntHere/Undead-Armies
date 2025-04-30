@@ -72,26 +72,16 @@ public class MineTask
     public void init(final Single single)
     {
         final LivingEntity target = single.pathfinderMob.getTarget();
-        final List<Entity> entityList = single.getNearbyEntities();
-        for(Entity entity : entityList)
+        for(Single buffer : single.getNearbySingles(target))
         {
-            if(entity instanceof GetSingle getSingle)
+            Strategy bufferStrategy = buffer.getStrategyByName("pursue");
+            if(bufferStrategy == null)
             {
-                final Single buffer = getSingle.getSingle();
-                if(Single.targetCompatible(buffer, target))
-                {
-                    Strategy bufferStrategy = buffer.getStrategyByName("pursue");
-                    if(bufferStrategy == null)
-                    {
-                        continue;
-                    }
-                    MineWrapper currentTask = bufferStrategy.findTask(MineWrapper.class);
-                    if(currentTask == null)
-                    {
-                        continue;
-                    }
-                    currentTask.mineTask = this;
-                }
+                continue;
+            }
+            if(bufferStrategy.setTask(MineWrapper.class, buffer))
+            {
+                ((MineWrapper) bufferStrategy.getCurrentTask()).mineTask = this;
             }
         }
         this.startingPoint = single.pathfinderMob.blockPosition().above();
