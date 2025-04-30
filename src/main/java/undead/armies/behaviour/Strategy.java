@@ -106,7 +106,6 @@ public class Strategy
             nextTask = nextTask.nextTask;
         }
         this.setTask(bestTask, single);
-        UndeadArmies.logger.debug("found another strat! " + this.currentTask.getClass().getCanonicalName());
     }
     public void setStrategy(final ArrayList<BaseTask> tasks)
     {

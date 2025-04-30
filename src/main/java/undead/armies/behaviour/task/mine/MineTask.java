@@ -22,7 +22,7 @@ import java.util.List;
 
 public class MineTask
 {
-    public static final DecimalType unbreakable = new DecimalType("unbreakable", "any blocks with block hp over this value will be regarded as unbreakable.", 72.0d);
+    public static final DecimalType unbreakable = new DecimalType("unbreakable", "any blocks with block hp over this value will be regarded as unbreakable by mining.", 72.0d);
     public static final StringType specific = new StringType("specific", "this is used to manually specify block hp for any block.","");
     public static final DecimalType blockHealthMultiplier = new DecimalType("blockHealthMultiplier", "a block's hp is calculated using this: Blast resistance * blockHealthMultiplier. The result is how many hits is required to break the block.", 8.0d);
     public static final Base[][] offsets =
@@ -181,6 +181,7 @@ public class MineTask
         {
             this.remainingHp = MineTask.getBlockHp(blockState);
         }
+        boolean success = true;
         if(this.remainingHp > MineTask.unbreakable.value)
         {
             this.offsetIndex = this.offsetIndex % 4;
@@ -233,6 +234,7 @@ public class MineTask
             this.currentBlockState = this.level.getBlockState(this.currentBlockPos);
             this.remainingHp = MineTask.getBlockHp(this.currentBlockState);
             this.offsetIndexIndex = 1;
+            success = false;
         }
         this.remainingHp--;
         single.pathfinderMob.swing(InteractionHand.MAIN_HAND);
@@ -244,6 +246,7 @@ public class MineTask
                 Block.dropResources(blockState, this.level, this.currentBlockPos);
                 this.level.playSound(null, this.currentBlockPos, blockState.getSoundType(this.level, this.currentBlockPos, single.pathfinderMob).getBreakSound(), SoundSource.BLOCKS, 3.0f, 1.0f);
                 this.level.setBlock(this.currentBlockPos, Blocks.AIR.defaultBlockState(), 3);
+                success = true;
             }
             if(this.offsetIndexIndex == 3)
             {
@@ -258,6 +261,6 @@ public class MineTask
         {
             this.level.playSound(null, this.currentBlockPos, blockState.getSoundType(this.level, this.currentBlockPos, single.pathfinderMob).getHitSound(), SoundSource.BLOCKS, 2.0f / (float)this.remainingHp, 1.0f);
         }
-        return true;
+        return success;
     }
 }

@@ -130,11 +130,13 @@ public class JumpTask extends BaseTask
             }
         }
         final int blockPosMemorySize = blockPosMemory.size();
+        boolean success = false;
         if(ClosestUnobstructedBlock.closest != null)
         {
             blockPosMemory.add(startingPoint.below());
             single.pathfinderMob.lookAt(target, 180.0f, 180.0f);
             single.pathfinderMob.setDeltaMovement(Util.getThrowVelocity(single.position(), new Vec3(ClosestUnobstructedBlock.closest.getX() + 0.5d, ClosestUnobstructedBlock.closest.getY() + 1.0d, ClosestUnobstructedBlock.closest.getZ() + 0.5d), 5.0f, 0.5f));
+            success = true;
         }
         else if(blockPosMemorySize > 0)
         {
@@ -144,7 +146,7 @@ public class JumpTask extends BaseTask
         {
             blockPosMemory.removeFirst();
         }
-        return true;
+        return success;
     }
     @Override
     public int situationScore(@NotNull Single single, final Situation situation)

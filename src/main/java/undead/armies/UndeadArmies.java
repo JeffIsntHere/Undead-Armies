@@ -79,7 +79,9 @@ public class UndeadArmies
                 new TypeArgument(StackTask.cooldown));
         ConfigParser.instance.getInstance().registerConfig("ramming",
                 new TypeArgument(TaskUtil.instance.ramTaskChance),
+                new TypeArgument(RammingWrapper.recruitDelay),
                 new TypeArgument(RammingWrapper.cooldown),
+                new TypeArgument(RammingWrapper.rammingCooldown),
                 new TypeArgument(RammingTask.armorDamage),
                 new TypeArgument(RammingTask.baseDamage),
                 new TypeArgument(RammingTask.successGoal));

@@ -2,6 +2,7 @@ package undead.armies.behaviour.task.ramming;
 
 import net.minecraft.core.BlockPos;
 import org.jetbrains.annotations.NotNull;
+import undead.armies.UndeadArmies;
 import undead.armies.behaviour.Single;
 import undead.armies.behaviour.Strategy;
 import undead.armies.behaviour.task.BaseTask;
@@ -11,10 +12,12 @@ import undead.armies.parser.config.type.NumberType;
 
 public class RammingWrapper extends BaseTask
 {
+    public static final NumberType recruitDelay = new NumberType("recruitDelay", "how many ticks to delay recruiting task. The value will be rounded to the highest nearest multiple of cooldown", 20);
     public static final NumberType cooldown = new NumberType("cooldown", "cooldown between attempting ramming", 5);
-    public static final NumberType rammingCooldown = new NumberType("rammingCooldown", "cooldown between ramming attempts, the value will be rounded to the highest nearest multiple of cooldown.", 20);
+    public static final NumberType rammingCooldown = new NumberType("rammingCooldown", "cooldown between ramming attempts. The value will be rounded to the highest nearest multiple of cooldown.", 160);
     protected RammingTask rammingTask = null;
     protected BlockPos blockPos = null;
+    protected int recruitAfter = (RammingWrapper.recruitDelay.value + RammingWrapper.cooldown.value - 1)/RammingWrapper.cooldown.value;
     @Override
     public boolean handleTask(@NotNull Single single, Argument argument)
     {
@@ -24,7 +27,13 @@ public class RammingWrapper extends BaseTask
         }
         if(this.rammingTask == null)
         {
+            if(this.recruitAfter > 0)
+            {
+                this.recruitAfter--;
+                return true;
+            }
             this.rammingTask = new RammingTask();
+            int counter = 0;
             for(Single buffer : single.getNearbySingles(single.pathfinderMob.getTarget()))
             {
                 Strategy bufferStrategy = buffer.getStrategyByName("pursue");
@@ -36,6 +45,7 @@ public class RammingWrapper extends BaseTask
                 {
                     ((RammingWrapper) bufferStrategy.getCurrentTask()).rammingTask = this.rammingTask;
                 }
+                counter++;
             }
         }
         return this.rammingTask.handle(single, this);
