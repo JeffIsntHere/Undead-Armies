@@ -32,32 +32,33 @@ public class RammingTask
     public boolean success = true;
     public BlockRayCast direction = null;
     public final HashMap<BlockPos, RammingProgress> targetsCache = new HashMap<>();
-    public final HashMap<Long, RammingProgress> cache = new HashMap<>();
+    public final HashMap<Long, BlockPos> cache = new HashMap<>();
     protected void ram(final Single single)
     {
         BlockPos blockPos = single.pathfinderMob.blockPosition();
         Long key = (((long)blockPos.getX()) << 32) | (blockPos.getY() & 0xffffffffL);
-        RammingProgress rammingProgress = this.cache.get(key);
-        if(rammingProgress == null)
+        BlockPos targetBlock = this.cache.get(key);
+        if(targetBlock == null)
         {
-            rammingProgress = new RammingProgress();
             this.direction.reset();
             this.direction.current = blockPos;
             this.direction.stopWhenHit();
-            rammingProgress.blockPos = this.direction.current;
-            this.cache.put(key, rammingProgress);
+            targetBlock = this.direction.current;
+            this.cache.put(key, targetBlock);
+            if(this.targetsCache.get(targetBlock) == null)
+            {
+                this.targetsCache.put(targetBlock, new RammingProgress());
+            }
         }
-        else if(Math.abs(rammingProgress.blockPos.getY() - blockPos.getY()) > 1)
-        {
-            return;
-        }
+        RammingProgress rammingProgress = this.targetsCache.get(this.cache.get(key));
+        UndeadArmies.logger.debug("Target! " + this.cache.get(key));
         rammingProgress.cumulativeDamage += single.pathfinderMob.getAttribute(Attributes.ARMOR).getValue() * RammingTask.armorDamage.value + RammingTask.baseDamage.value;
-        Util.makeEntityLookAtBlockPos(single.pathfinderMob, rammingProgress.blockPos);
+        Util.makeEntityLookAtBlockPos(single.pathfinderMob, targetBlock);
         single.pathfinderMob.setDeltaMovement(Util.getThrowVelocity(single.position(), new Vec3(this.target.getX() + 0.5d, this.target.getY() + 0.5d, this.target.getZ() + 0.5d), 60.0f, 0.0f));
     }
     public boolean breakBlockPos(final Single single, final RammingProgress rammingProgress, final BlockPos blockPos)
     {
-        final BlockState blockState = this.level.getBlockState(rammingProgress.blockPos);
+        final BlockState blockState = this.level.getBlockState(blockPos);
         if(blockState.isAir())
         {
             return false;
@@ -110,22 +111,24 @@ public class RammingTask
         }
         if(this.direction != null)
         {
+            UndeadArmies.logger.debug("finalizing! ");
             double successCounter = 0;
             double attemptCounter = 0;
             this.direction = null;
-            for(Long key : this.cache.keySet())
+            for(BlockPos blockPos : this.targetsCache.keySet())
             {
-                final RammingProgress rammingProgress = this.cache.get(key);
-                if(this.breakBlockPos(single, rammingProgress, rammingProgress.blockPos))
+                final RammingProgress rammingProgress = this.targetsCache.get(blockPos);
+                if(this.breakBlockPos(single, rammingProgress, blockPos))
                 {
                     successCounter++;
                 }
-                if(this.breakBlockPos(single, rammingProgress, rammingProgress.blockPos.above()))
+                if(this.breakBlockPos(single, rammingProgress, blockPos.above()))
                 {
                     successCounter++;
                 }
                 attemptCounter+=2;
             }
+            this.targetsCache.clear();
             this.cache.clear();
             if(successCounter / attemptCounter < successGoal.value)
             {
@@ -142,6 +145,7 @@ public class RammingTask
             this.triggerAfter = (RammingWrapper.rammingCooldown.value + RammingWrapper.cooldown.value - 1)/RammingWrapper.cooldown.value;
             UndeadArmies.logger.debug("Starting ramming from ! " + this.leader.pathfinderMob.blockPosition());
             this.direction = new BlockRayCast(this.level, this.leader.pathfinderMob.blockPosition(), this.leader.pathfinderMob.getTarget().blockPosition());
+            this.targetsCache.clear();
             this.cache.clear();
             this.success = true;
         }

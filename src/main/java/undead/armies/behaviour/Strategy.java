@@ -1,7 +1,6 @@
 package undead.armies.behaviour;
 
 import net.minecraft.util.RandomSource;
-import undead.armies.UndeadArmies;
 import undead.armies.behaviour.task.argument.Argument;
 import undead.armies.behaviour.task.BaseTask;
 import undead.armies.behaviour.task.argument.Situation;

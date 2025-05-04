@@ -2,7 +2,6 @@ package undead.armies.behaviour.task.ramming;
 
 import net.minecraft.core.BlockPos;
 import org.jetbrains.annotations.NotNull;
-import undead.armies.UndeadArmies;
 import undead.armies.behaviour.Single;
 import undead.armies.behaviour.Strategy;
 import undead.armies.behaviour.task.BaseTask;
@@ -21,7 +20,7 @@ public class RammingWrapper extends BaseTask
     @Override
     public boolean handleTask(@NotNull Single single, Argument argument)
     {
-        if((argument.value & 1) == 0 || (argument.value & 2) == 2)
+        if((argument.value & 1) == 0)
         {
             return false;
         }
