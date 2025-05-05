@@ -84,7 +84,8 @@ public class UndeadArmies
                 new TypeArgument(RammingWrapper.rammingCooldown),
                 new TypeArgument(RammingTask.armorDamage),
                 new TypeArgument(RammingTask.baseDamage),
-                new TypeArgument(RammingTask.successGoal));
+                new TypeArgument(RammingTask.successGoal),
+                new TypeArgument(RammingTask.attemptCount));
         ConfigParser.instance.getInstance().registerConfig("misc",
                 new TypeArgument(Group.recruitChance),
                 new TypeArgument(Single.boxLength),

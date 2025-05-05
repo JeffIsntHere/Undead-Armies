@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import undead.armies.UndeadArmies;
 import undead.armies.parser.Parser;
+import undead.armies.parser.config.type.BooleanType;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -51,7 +52,9 @@ public class MineParser extends Parser
             value = -1.0d;
         }
         UndeadArmies.logger.debug("Block: " + blockState + " hp: " + value);
-        if(data.size() == 2)
+        BooleanType booleanType = new BooleanType("buffer", true);
+        booleanType.save(data.size() == 2 ? "" : data.get(2));
+        if(booleanType.value)
         {
             this.cache.put(new BlockStateBlockPair(null, blockState.getBlock()), value);
         }

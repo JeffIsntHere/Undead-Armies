@@ -16,6 +16,7 @@ import undead.armies.behaviour.task.mine.MineTask;
 import undead.armies.misc.Util;
 import undead.armies.misc.blockcast.BlockRayCast;
 import undead.armies.parser.config.type.DecimalType;
+import undead.armies.parser.config.type.NumberType;
 
 import java.util.HashMap;
 
@@ -25,6 +26,7 @@ public class RammingTask
     public static final DecimalType successGoal = new DecimalType("successGoal", "the number of blocks broken over the total number of target blocks to consider ramming as successful.", 0.5);
     public static final DecimalType baseDamage = new DecimalType("baseDamage", "base block damage for an undead mob.", 2.5);
     public static final DecimalType armorDamage = new DecimalType("armorDamage", "how much 1 armor point contributes to the block damage, ex: if it was 1 then 1 armor hp = +1 block damage", 0.2);
+    public static final NumberType attemptCount = new NumberType("attemptCount", "how many times a single undead mob can ram the same block before it is finalized, ex: 2 = Undead mob can ram the same block twice, and it will be counted as if 2 undead mobs rammed that block.", 1);
     protected Single leader = null;
     protected Strategy leaderStrategy = null;
     protected LivingEntity target = null;
@@ -32,29 +34,32 @@ public class RammingTask
     public boolean success = true;
     public BlockRayCast direction = null;
     public final HashMap<BlockPos, RammingProgress> targetsCache = new HashMap<>();
-    public final HashMap<Long, BlockPos> cache = new HashMap<>();
-    protected void ram(final Single single)
+    public final HashMap<BlockPos, BlockPos> cache = new HashMap<>();
+    protected void ram(final Single single, final BlockPos blockPos)
     {
-        BlockPos blockPos = single.pathfinderMob.blockPosition();
-        Long key = (((long)blockPos.getX()) << 32) | (blockPos.getY() & 0xffffffffL);
-        BlockPos targetBlock = this.cache.get(key);
+        BlockPos targetBlock = this.cache.get(blockPos);
         if(targetBlock == null)
         {
             this.direction.reset();
             this.direction.current = blockPos;
             this.direction.stopWhenHit();
             targetBlock = this.direction.current;
-            this.cache.put(key, targetBlock);
+            this.cache.put(blockPos, targetBlock);
             if(this.targetsCache.get(targetBlock) == null)
             {
                 this.targetsCache.put(targetBlock, new RammingProgress());
             }
         }
-        RammingProgress rammingProgress = this.targetsCache.get(this.cache.get(key));
-        UndeadArmies.logger.debug("Target! " + this.cache.get(key));
+        RammingProgress rammingProgress = this.targetsCache.get(this.cache.get(blockPos));
         rammingProgress.cumulativeDamage += single.pathfinderMob.getAttribute(Attributes.ARMOR).getValue() * RammingTask.armorDamage.value + RammingTask.baseDamage.value;
         Util.makeEntityLookAtBlockPos(single.pathfinderMob, targetBlock);
         single.pathfinderMob.setDeltaMovement(Util.getThrowVelocity(single.position(), new Vec3(this.target.getX() + 0.5d, this.target.getY() + 0.5d, this.target.getZ() + 0.5d), 60.0f, 0.0f));
+    }
+    protected void ram(final Single single)
+    {
+        BlockPos blockPos = single.pathfinderMob.blockPosition();
+        this.ram(single, blockPos);
+        this.ram(single, blockPos.above());
     }
     public boolean breakBlockPos(final Single single, final RammingProgress rammingProgress, final BlockPos blockPos)
     {
@@ -83,6 +88,7 @@ public class RammingTask
         }
     }
     protected int triggerAfter = 0;
+    protected int finalizeAfter = 0;
     public boolean handle(final Single single, final RammingWrapper rammingWrapper)
     {
         if(this.target != null && this.target.isDeadOrDying())
@@ -99,10 +105,15 @@ public class RammingTask
         }
         if(this.direction != null)
         {
-            this.ram(single);
+            if(rammingWrapper.ramCount < RammingTask.attemptCount.value)
+            {
+                this.ram(single);
+                rammingWrapper.ramCount++;
+            }
         }
         else
         {
+            rammingWrapper.ramCount = 0;
             //go back.
         }
         if(!this.leader.equals(single))
@@ -111,6 +122,11 @@ public class RammingTask
         }
         if(this.direction != null)
         {
+            if(this.finalizeAfter > 0)
+            {
+                this.finalizeAfter--;
+                return this.success;
+            }
             UndeadArmies.logger.debug("finalizing! ");
             double successCounter = 0;
             double attemptCounter = 0;
@@ -122,11 +138,7 @@ public class RammingTask
                 {
                     successCounter++;
                 }
-                if(this.breakBlockPos(single, rammingProgress, blockPos.above()))
-                {
-                    successCounter++;
-                }
-                attemptCounter+=2;
+                attemptCounter++;
             }
             this.targetsCache.clear();
             this.cache.clear();
@@ -142,8 +154,8 @@ public class RammingTask
             {
                 return true;
             }
+            this.finalizeAfter = RammingTask.attemptCount.value + 1;
             this.triggerAfter = (RammingWrapper.rammingCooldown.value + RammingWrapper.cooldown.value - 1)/RammingWrapper.cooldown.value;
-            UndeadArmies.logger.debug("Starting ramming from ! " + this.leader.pathfinderMob.blockPosition());
             this.direction = new BlockRayCast(this.level, this.leader.pathfinderMob.blockPosition(), this.leader.pathfinderMob.getTarget().blockPosition());
             this.targetsCache.clear();
             this.cache.clear();

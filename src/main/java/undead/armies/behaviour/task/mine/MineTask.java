@@ -10,7 +10,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import undead.armies.base.GetSingle;
 import undead.armies.behaviour.Single;
 import undead.armies.behaviour.Strategy;
 import undead.armies.misc.blockcast.offset.*;
@@ -18,7 +17,6 @@ import undead.armies.parser.config.type.DecimalType;
 import undead.armies.parser.config.type.StringType;
 
 import java.util.HashMap;
-import java.util.List;
 
 public class MineTask
 {

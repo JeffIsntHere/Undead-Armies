@@ -17,6 +17,7 @@ public class RammingWrapper extends BaseTask
     protected RammingTask rammingTask = null;
     protected BlockPos blockPos = null;
     protected int recruitAfter = (RammingWrapper.recruitDelay.value + RammingWrapper.cooldown.value - 1)/RammingWrapper.cooldown.value;
+    public int ramCount = 0;
     @Override
     public boolean handleTask(@NotNull Single single, Argument argument)
     {
@@ -32,7 +33,6 @@ public class RammingWrapper extends BaseTask
                 return true;
             }
             this.rammingTask = new RammingTask();
-            int counter = 0;
             for(Single buffer : single.getNearbySingles(single.pathfinderMob.getTarget()))
             {
                 Strategy bufferStrategy = buffer.getStrategyByName("pursue");
@@ -44,7 +44,6 @@ public class RammingWrapper extends BaseTask
                 {
                     ((RammingWrapper) bufferStrategy.getCurrentTask()).rammingTask = this.rammingTask;
                 }
-                counter++;
             }
         }
         return this.rammingTask.handle(single, this);
